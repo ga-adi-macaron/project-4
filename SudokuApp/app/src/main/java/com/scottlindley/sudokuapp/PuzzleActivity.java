@@ -3,20 +3,31 @@ package com.scottlindley.sudokuapp;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.OnSolveFinishedListener{
+    private static final String TAG = "PuzzleActivity";
     private SudokuGridLayout mBoardView;
     private TextView mScoreView;
     private int[] mKey, mSolution, mUserAnswers;
@@ -53,43 +64,40 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             }
         }.start();
 
+        ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.getState() == NetworkInfo.State.CONNECTED) {
 
-        mKey = new int[81];
-        mKey[0] = 1;
-        mKey[5] = 9;
-        mKey[9] = 5;
-        mKey[10] = 3;
-        mKey[15] = 4;
-        mKey[17] = 1;
-        mKey[19] = 9;
-        mKey[20] = 7;
-        mKey[23] = 8;
-        mKey[27] = 2;
-        mKey[29] = 4;
-        mKey[30] = 7;
-        mKey[34] = 5;
-        mKey[40] = 4;
-        mKey[46] = 5;
-        mKey[50] = 1;
-        mKey[51] = 3;
-        mKey[53] = 4;
-        mKey[57] = 5;
-        mKey[60] = 6;
-        mKey[61] = 8;
-        mKey[63] = 9;
-        mKey[65] = 3;
-        mKey[70] = 2;
-        mKey[71] = 7;
-        mKey[75] = 2;
-        mKey[80] = 3;
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Puzzles");
+            Log.d(TAG, "onCreate: " + ref);
+            ref.child("puzzle 1").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "onDataChange: " + dataSnapshot.getValue(Puzzle.class));
+                    List<Integer> listKey = dataSnapshot.getValue(Puzzle.class).getListKey();
+                    mKey = new int[81];
+                    for (int i = 0; i < listKey.size(); i++) {
+                        mKey[i] = listKey.get(i);
+                    }
 
-        mPuzzleSolver = new PuzzleSolver(mKey, this);
+                    mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
 
-        mUserAnswers = mKey;
+                    mUserAnswers = mKey;
 
-        createCells();
+                    createCells();
 
-        setUpChoiceTiles();
+                    setUpChoiceTiles();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            Toast.makeText(this, "No Network Connection", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
 
