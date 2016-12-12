@@ -23,6 +23,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
     private int mSelectedNum, mScore;
     private ArrayList<TextView> mChoiceTiles;
     private PuzzleSolver mPuzzleSolver;
+    private CountDownTimer mTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +31,10 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         setContentView(R.layout.activity_puzzle);
 
         mScoreView = (TextView)findViewById(R.id.score_text);
-        mScore = 15000;
+        mScore = 15001;
         mScoreView.setText(String.valueOf(mScore));
 
-        new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
+        mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
             @Override
             public void onTick(long l) {
                 mScore--;
@@ -142,6 +143,16 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                 cell.setText(String.valueOf(mSelectedNum));
                 cell.setTextColor(getResources().getColor(R.color.colorAccent));
                 mUserAnswers[cell.getId()] = Integer.parseInt(cell.getText().toString());
+
+                int numberCounter = 0;
+                for (int i=0; i<mUserAnswers.length; i++){
+                    if (mSelectedNum == mUserAnswers[i]){
+                        numberCounter++;
+                    }
+                }
+                if (numberCounter == 9){
+                    mChoiceTiles.get(mSelectedNum-1).setVisibility(View.INVISIBLE);
+                }
                 checkForWin();
             } else {
                 //Choice was wrong
@@ -202,6 +213,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         if (isCorrect){
             //TODO: END GAME
             Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
+            mTimer.cancel();
         }
     }
 

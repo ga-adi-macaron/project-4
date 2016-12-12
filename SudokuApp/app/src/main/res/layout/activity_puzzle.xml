@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/score_card"
         android:orientation="horizontal"
+        android:padding="2dp"
         android:layout_centerHorizontal="true"
         android:rowCount="9"
         android:columnCount="9"
