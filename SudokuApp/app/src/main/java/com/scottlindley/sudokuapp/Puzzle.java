@@ -7,17 +7,31 @@ import java.util.List;
  */
 
 public class Puzzle {
-    private List<Integer> mListKey;
+    private List<Integer> mKey;
+    private String mDifficulty;
     
     public Puzzle(){
 
     }
 
-    public List<Integer> getListKey() {
-        return mListKey;
+    public Puzzle(List<Integer> key, String difficulty){
+        mKey = key;
+        mDifficulty = difficulty;
     }
 
-    public void setListKey(List<Integer> listKey) {
-        mListKey = listKey;
+    public List<Integer> getKey() {
+        return mKey;
+    }
+
+    public void setKey(List<Integer> key) {
+        mKey = key;
+    }
+
+    public String getDifficulty() {
+        return mDifficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        mDifficulty = difficulty;
     }
 }

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
@@ -31,7 +30,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
     private SudokuGridLayout mBoardView;
     private TextView mScoreView;
     private int[] mKey, mSolution, mUserAnswers;
-    private int mSelectedNum, mScore;
+    private int mSelectedNum, mScore, mStrikes;
     private ArrayList<TextView> mChoiceTiles;
     private PuzzleSolver mPuzzleSolver;
     private CountDownTimer mTimer;
@@ -41,10 +40,27 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
 
+        mStrikes = 0;
+
         mScoreView = (TextView)findViewById(R.id.score_text);
         mScore = 15001;
         mScoreView.setText(String.valueOf(mScore));
 
+        setUpScoreTimer();
+
+        ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.getState() == NetworkInfo.State.CONNECTED) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Puzzles");
+            setUpRefListener(ref);
+        } else {
+            //TODO: PULL FROM LOCAL DATABASE
+            Toast.makeText(this, "No Network Connection", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    public void setUpScoreTimer(){
         mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
             @Override
             public void onTick(long l) {
@@ -59,47 +75,37 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             public void onFinish() {
                 mScore = 0;
                 mScoreView.setText("Score: 0");
-                Toast.makeText(PuzzleActivity.this, "Game Over", Toast.LENGTH_SHORT).show();
+                gameOver();
                 cancel();
             }
         }.start();
-
-        ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.getState() == NetworkInfo.State.CONNECTED) {
-
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Puzzles");
-            Log.d(TAG, "onCreate: " + ref);
-            ref.child("puzzle 1").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d(TAG, "onDataChange: " + dataSnapshot.getValue(Puzzle.class));
-                    List<Integer> listKey = dataSnapshot.getValue(Puzzle.class).getListKey();
-                    mKey = new int[81];
-                    for (int i = 0; i < listKey.size(); i++) {
-                        mKey[i] = listKey.get(i);
-                    }
-
-                    mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
-
-                    mUserAnswers = mKey;
-
-                    createCells();
-
-                    setUpChoiceTiles();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        } else {
-            Toast.makeText(this, "No Network Connection", Toast.LENGTH_SHORT).show();
-            finish();
-        }
     }
 
+    public void setUpRefListener(DatabaseReference ref){
+        ref.child("puzzle 1").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Integer> key = dataSnapshot.getValue(Puzzle.class).getKey();
+                mKey = new int[81];
+                for (int i = 0; i < key.size(); i++) {
+                    mKey[i] = key.get(i);
+                }
+
+                mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
+
+                mUserAnswers = mKey;
+
+                createCells();
+
+                setUpChoiceTiles();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public void createCells(){
         mBoardView = (SudokuGridLayout) findViewById(R.id.board_view);
@@ -138,7 +144,9 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                     checkCellInput(cell);
                 } else {
                     int number = Integer.parseInt(cell.getText().toString());
-                    mChoiceTiles.get(number - 1).performClick();
+                    if(mChoiceTiles.get(number-1).getVisibility() == View.VISIBLE) {
+                        mChoiceTiles.get(number - 1).performClick();
+                    }
                 }
             }
         });
@@ -170,6 +178,21 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                     mScoreView.setText("Score: " + String.valueOf(mScore));
                 }
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
+
+                mStrikes++;
+                switch (mStrikes){
+                    case 1:
+                        findViewById(R.id.strike_layer).setAlpha(0.25f);
+                        break;
+                    case 2:
+                        findViewById(R.id.strike_layer).setAlpha(0.50f);
+                        break;
+                    case 3:
+                        findViewById(R.id.strike_layer).setAlpha(0.75f);
+                        gameOver();
+                        break;
+                    default:
+                }
             }
         }
     }
@@ -223,6 +246,13 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
             mTimer.cancel();
         }
+    }
+
+    public void gameOver(){
+        for (TextView tile : mChoiceTiles){
+            tile.setVisibility(View.INVISIBLE);
+        }
+        Toast.makeText(this, "GameOver", Toast.LENGTH_SHORT).show();
     }
 
     @Override
