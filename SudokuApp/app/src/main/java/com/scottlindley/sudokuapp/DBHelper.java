@@ -83,12 +83,9 @@ public class DBHelper extends SQLiteOpenHelper{
      * The puzzles are then sent off to the {@link #replacePuzzles(List)} method.
      */
     public void setUpBroadcastReceiver(){
-        List<Puzzle> currentPuzzles = getAllPuzzles();
-
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "onReceive: ");
                 String difficulty = intent.getStringExtra(PuzzleRefreshService.DIFFICULTIES_INTENT_KEY);
                 try {
                     JSONArray jarray =
@@ -279,7 +276,6 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     public void addPuzzle(Puzzle puzzle){
-        Log.d(TAG, "addPuzzle: ");
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DIFFICULTY, puzzle.getDifficulty());
@@ -290,7 +286,6 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     public void removePuzzle(String difficulty){
-        Log.d(TAG, "removePuzzle: ");
         SQLiteDatabase db = getWritableDatabase();
         Puzzle puzzle;
         switch (difficulty){

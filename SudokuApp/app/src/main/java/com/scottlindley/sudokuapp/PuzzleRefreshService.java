@@ -87,7 +87,6 @@ public class PuzzleRefreshService extends JobService {
     }
 
     private void broadcastIntent(JSONArray jsonKey, String difficulty) {
-        Log.d(TAG, "broadcastIntent: ");
         Intent intent = new Intent(PUZZLE_REFRESH_SERVICE);
 
         intent.putExtra(KEYS_INTENT_KEY, jsonKey.toString());

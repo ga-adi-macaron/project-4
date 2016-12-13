@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
@@ -107,7 +108,6 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                 mScore = 0;
                 mScoreView.setText("Score: 0");
                 endGame(false);
-                cancel();
             }
         }.start();
     }
@@ -196,7 +196,8 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                     }
                 }
                 if (numberCounter == 9){
-                    mChoiceTiles.get(mSelectedNum-1).setVisibility(View.INVISIBLE);
+                    ((CardView)mChoiceTiles.get(mSelectedNum-1).getParent())
+                            .setVisibility(View.INVISIBLE);
                 }
                 checkForWin();
             } else {
@@ -284,7 +285,8 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
 
     private void endGame(boolean win){
         for (TextView tile : mChoiceTiles){
-            tile.setVisibility(View.INVISIBLE);
+            ((CardView)tile.getParent()).setVisibility(View.INVISIBLE);
+            mTimer.cancel();
         }
         if(win){
             Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
