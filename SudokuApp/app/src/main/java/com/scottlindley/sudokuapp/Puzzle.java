@@ -1,30 +1,35 @@
 package com.scottlindley.sudokuapp;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.List;
 
 /**
  * Created by Scott Lindley on 12/11/2016.
  */
 
 public class Puzzle {
-    private JSONArray mKey;
+    private static final String TAG = "Puzzle";
+    private List<Integer> mKey;
     private String mDifficulty;
     
     public Puzzle(){
 
     }
 
-    public Puzzle(JSONArray key, String difficulty){
+    public Puzzle(List<Integer> key, String difficulty){
         mKey = key;
         mDifficulty = difficulty;
     }
 
-    public JSONArray getKey() {
+    public List<Integer> getKey() {
         return mKey;
     }
 
-    public void setKey(JSONArray key) {
+    public void setKey(List<Integer> key) {
         mKey = key;
     }
 
@@ -44,13 +49,18 @@ public class Puzzle {
      */
     public int[] getKeyIntArray(){
         int[] arr = new int[81];
-        for (int i=0; i<mKey.length(); i++){
-            try {
-                arr[0] = Integer.parseInt(mKey.get(i).toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        for (int i=0; i<mKey.size(); i++){
+            arr[i] = mKey.get(i);
         }
         return arr;
+    }
+
+    public JSONArray getKeyJSONArray(){
+        try {
+            return new JSONArray(getKeyIntArray());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

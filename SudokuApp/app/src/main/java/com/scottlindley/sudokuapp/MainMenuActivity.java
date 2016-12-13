@@ -24,11 +24,12 @@ public class MainMenuActivity extends AppCompatActivity {
         checkForNewPuzzles();
 
         Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
-        intent.putExtra(DIFFICULTY_INTENT_KEY, "easy");
+        intent.putExtra(DIFFICULTY_INTENT_KEY, "medium");
         startActivity(intent);
     }
 
     private void checkForNewPuzzles(){
+        DBHelper.getInstance(this).setUpBroadcastReceiver();
         JobInfo puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
                 new ComponentName(this, PuzzleRefreshService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)

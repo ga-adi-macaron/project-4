@@ -9,7 +9,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
  */
 
 public class DBAssetHelper extends SQLiteAssetHelper{
-    public static final String DATA_BASE_NAME = "SudokuDB";
+    public static final String DATA_BASE_NAME = "SudokuDB.db";
     public static final int VERSION_NUMBER = 1;
 
     public DBAssetHelper(Context context) {
