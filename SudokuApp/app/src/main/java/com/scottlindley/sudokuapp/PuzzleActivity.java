@@ -1,10 +1,9 @@
 package com.scottlindley.sudokuapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
@@ -15,18 +14,12 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.OnSolveFinishedListener{
     private static final String TAG = "PuzzleActivity";
+    private DBHelper mDBHelper;
     private SudokuGridLayout mBoardView;
     private TextView mScoreView;
     private int[] mKey, mSolution, mUserAnswers;
@@ -40,27 +33,65 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
 
-        mStrikes = 0;
+        mDBHelper = DBHelper.getInstance(this);
 
-        mScoreView = (TextView)findViewById(R.id.score_text);
-        mScore = 15001;
-        mScoreView.setText(String.valueOf(mScore));
+        setUpScoreCard();
 
-        setUpScoreTimer();
+        getPuzzleKey();
 
-        ConnectivityManager manager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = manager.getActiveNetworkInfo();
-        if (info != null && info.getState() == NetworkInfo.State.CONNECTED) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Puzzles");
-            setUpRefListener(ref);
+        mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
+
+        mUserAnswers = mKey;
+
+        createCells();
+
+        setUpChoiceTiles();
+
+    }
+
+    /**
+     * Grabs one random puzzle's key of the selected difficulty.
+     * The difficulty is found in the received intent from the MainMenuActivity.
+     * Next the DBHelper is asked to grab on puzzle of said difficulty using one of its
+     * 'get{difficulty}Puzzle()' methods.
+     */
+    private void getPuzzleKey(){
+        Intent receivedIntent = getIntent();
+        String difficulty = receivedIntent.getStringExtra(MainMenuActivity.DIFFICULTY_INTENT_KEY);
+        Puzzle puzzle;
+        switch (difficulty){
+            case "easy":
+                puzzle = mDBHelper.getEasyPuzzle();
+                break;
+            case "medium":
+                puzzle = mDBHelper.getMediumPuzzle();
+                break;
+            case "hard":
+                puzzle = mDBHelper.getHardPuzzle();
+                break;
+            case "expert":
+                puzzle = mDBHelper.getExpertPuzzle();
+                break;
+            default: puzzle = null;
+        }
+
+        if (puzzle != null){
+            mKey = puzzle.getKeyIntArray();
         } else {
-            //TODO: PULL FROM LOCAL DATABASE
-            Toast.makeText(this, "No Network Connection", Toast.LENGTH_SHORT).show();
             finish();
+            Toast.makeText(this, "ERROR, PUZZLE NOT FOUND", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void setUpScoreTimer(){
+    /**
+     * Sets the starting score and begins a count down that subtracts 1 point from the score
+     * with each 1 second tick.
+     */
+    private void setUpScoreCard(){
+        mStrikes = 0;
+        mScoreView = (TextView)findViewById(R.id.score_text);
+        mScore = 15001;
+        mScoreView.setText(String.valueOf(mScore));
         mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
             @Override
             public void onTick(long l) {
@@ -75,39 +106,19 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             public void onFinish() {
                 mScore = 0;
                 mScoreView.setText("Score: 0");
-                gameOver();
+                endGame(false);
                 cancel();
             }
         }.start();
     }
 
-    public void setUpRefListener(DatabaseReference ref){
-        ref.child("puzzle 1").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Integer> key = dataSnapshot.getValue(Puzzle.class).getKey();
-                mKey = new int[81];
-                for (int i = 0; i < key.size(); i++) {
-                    mKey[i] = key.get(i);
-                }
-
-                mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
-
-                mUserAnswers = mKey;
-
-                createCells();
-
-                setUpChoiceTiles();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    public void createCells(){
+    /**
+     * The 81 TextView cells of the puzzle are created and inserted programatically. This
+     * allows this activity's xml file to be much smaller.
+     * Each cell is given an ID corresponding to it's position in the puzzle.
+     * (first cell ID: 0 - last cell ID: 80)
+     */
+    private void createCells(){
         mBoardView = (SudokuGridLayout) findViewById(R.id.board_view);
 
         for (int i=0; i<81; i++){
@@ -136,7 +147,16 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         }
     }
 
-    public void setCellClickListener(final TextView cell){
+    /**
+     * Defines the actions taken upon clicking any one cell in the puzzle.
+     * If the cell is empty, the click is taken as user attempting to assign a value to this cell.
+     * If the cell isn't empty AND the number in that cell is still an input option (input options
+     * that are no longer available are not visible to the user),
+     * then set the selected number{@link #mSelectedNum} to the value found in that cell.
+     * This is done by performing the Choice Tile's onClick.
+     * @param cell
+     */
+    private void setCellClickListener(final TextView cell){
         cell.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -152,7 +172,12 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         });
     }
 
-    public void checkCellInput(TextView cell){
+    /**
+     * This method is called once a user inputs a value into the cell. The input is checked against
+     * the puzzle's solution and actions are carried out accordingly.
+     * @param cell
+     */
+    private void checkCellInput(TextView cell){
         if (mSelectedNum != 0) {
             if (mSolution[cell.getId()] == mSelectedNum) {
                 //Choice was right
@@ -160,6 +185,10 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                 cell.setTextColor(getResources().getColor(R.color.colorAccent));
                 mUserAnswers[cell.getId()] = Integer.parseInt(cell.getText().toString());
 
+                /*
+                If the user has found all instances of this number in the puzzle,
+                remove that number down in the choice tiles.
+                 */
                 int numberCounter = 0;
                 for (int i=0; i<mUserAnswers.length; i++){
                     if (mSelectedNum == mUserAnswers[i]){
@@ -177,9 +206,11 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                 if (mScore > 0) {
                     mScoreView.setText("Score: " + String.valueOf(mScore));
                 }
+                //Vibrate the phone to give a negative feedback
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
 
                 mStrikes++;
+                //Tint the puzzle's color to indicate visually how many strikes the user has.
                 switch (mStrikes){
                     case 1:
                         findViewById(R.id.strike_layer).setAlpha(0.25f);
@@ -189,7 +220,8 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                         break;
                     case 3:
                         findViewById(R.id.strike_layer).setAlpha(0.75f);
-                        gameOver();
+                        //When the user has three strikes, the game is over
+                        endGame(false);
                         break;
                     default:
                 }
@@ -197,7 +229,10 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         }
     }
 
-    public void setUpChoiceTiles() {
+    /**
+     * Sets up the input selection tiles at the bottom of the screen
+     */
+    private void setUpChoiceTiles() {
         mChoiceTiles = new ArrayList<>();
         mChoiceTiles.add((TextView) findViewById(R.id.tile1));
         mChoiceTiles.add((TextView) findViewById(R.id.tile2));
@@ -234,7 +269,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
         }
     }
 
-    public void checkForWin(){
+    private void checkForWin(){
         boolean isCorrect = true;
         for (int i=0; i<81; i++){
             if (mUserAnswers[i] != mSolution[i]){
@@ -242,23 +277,28 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             }
         }
         if (isCorrect){
-            //TODO: END GAME
-            Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
             mTimer.cancel();
+            endGame(true);
         }
     }
 
-    public void gameOver(){
+    private void endGame(boolean win){
         for (TextView tile : mChoiceTiles){
             tile.setVisibility(View.INVISIBLE);
         }
-        Toast.makeText(this, "GameOver", Toast.LENGTH_SHORT).show();
+        if(win){
+            Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this, "GameOver", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    /**
+     * Interface method called once the PuzzleSolver has finished solving the puzzle
+     */
     @Override
     public void grabSolution() {
         mSolution = mPuzzleSolver.getSolution();
         (findViewById(R.id.loading_wheel)).setVisibility(View.INVISIBLE);
-
     }
 }
