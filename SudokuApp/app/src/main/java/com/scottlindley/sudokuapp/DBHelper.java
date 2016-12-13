@@ -1,10 +1,14 @@
 package com.scottlindley.sudokuapp;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,9 +46,11 @@ public class DBHelper extends SQLiteOpenHelper{
                     COL_RACES_LOST+" INTEGER)";
 
     private static DBHelper sInstance;
+    private Context mContext;
 
     private DBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION_NUMBER);
+        mContext = context;
     }
 
     public static DBHelper getInstance(Context context){
@@ -58,6 +64,7 @@ public class DBHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_PUZZLE_TABLE);
         sqLiteDatabase.execSQL(CREATE_STATS_TABLE);
+        setUpBroadcastReceiver();
     }
 
     @Override
@@ -65,6 +72,41 @@ public class DBHelper extends SQLiteOpenHelper{
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+PUZZLE_TABLE);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+STATS_TABLE);
         this.onCreate(sqLiteDatabase);
+    }
+
+    /**
+     * Listens for a broadcasted intent from the Puzzle Refresh Service
+     * Once received, it first look to see how many puzzles have been sent.
+     * The method then loops through the puzzles and creates a new puzzle object
+     * for each iteration of the loop.
+     * The puzzles are then sent off to the {@link #replacePuzzles(List)} method.
+     */
+    private void setUpBroadcastReceiver(){
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                List<Puzzle> puzzles = new ArrayList<>();
+                int numberOfPuzzles =
+                        intent.getIntExtra(PuzzleRefreshService.NUMBER_OF_PUZZLES_INTENT_KEY, -1);
+                if (numberOfPuzzles != -1){
+                    for (int i=0; i<numberOfPuzzles; i++){
+                        try {
+                            JSONArray jArr = new JSONArray(
+                                    intent.getStringArrayExtra(PuzzleRefreshService.KEYS_INTENT_KEY+i));
+                            String difficulty =
+                                    intent.getStringExtra(PuzzleRefreshService.DIFFICULTIES_INTENT_KEY+i);
+                            puzzles.add(new Puzzle(jArr, difficulty));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                replacePuzzles(puzzles);
+            }
+        };
+
+        LocalBroadcastManager.getInstance(mContext)
+                .registerReceiver(receiver, new IntentFilter(PuzzleRefreshService.PUZZLE_REFRESH_SERVICE));
     }
 
     /**
@@ -215,7 +257,7 @@ public class DBHelper extends SQLiteOpenHelper{
         for (Puzzle puzzle: puzzles) {
             ContentValues values = new ContentValues();
             values.put(COL_DIFFICULTY, puzzle.getDifficulty());
-            JSONArray keyArr = new JSONArray(puzzle.getKey());
+            JSONArray keyArr = puzzle.getKey();
             values.put(COL_KEY, keyArr.toString());
             db.insert(PUZZLE_TABLE, null, values);
         }
@@ -270,14 +312,10 @@ public class DBHelper extends SQLiteOpenHelper{
         if(cursor.moveToFirst()){
             while(!cursor.isAfterLast()){
                 try {
-                    List<Integer> puzzleKey = new ArrayList<>();
                     JSONArray keyArr =
                             new JSONArray(cursor.getString(cursor.getColumnIndex(COL_KEY)));
-                    for (int i = 0; i < keyArr.length(); i++) {
-                        puzzleKey.add(Integer.parseInt(keyArr.get(i).toString()));
-                    }
                     puzzles.add(new Puzzle(
-                            puzzleKey,
+                            keyArr,
                             cursor.getString(cursor.getColumnIndex(COL_DIFFICULTY))
                     ));
                 } catch (JSONException e) {
