@@ -23,7 +23,6 @@ public class DBHelper extends SQLiteOpenHelper{
     public static final String PUZZLE_TABLE = "Puzzle";
     public static final String STATS_TABLE = "Stats";
 
-    public static final String COL_ID = "id";
     public static final String COL_KEY = "key";
     public static final String COL_DIFFICULTY = "difficulty";
     public static final String COL_HIGHSCORE = "highscore";
@@ -33,12 +32,11 @@ public class DBHelper extends SQLiteOpenHelper{
 
     public static final String CREATE_PUZZLE_TABLE =
             "CREATE TABLE "+PUZZLE_TABLE+" ("+
-                    COL_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                     COL_KEY+" TEXT, "+
                     COL_DIFFICULTY+" TEXT)";
     public static final String CREATE_STATS_TABLE =
             "CREATE TABLE "+STATS_TABLE+" ("+
-                    COL_HIGHSCORE+" INTEGER PRIMARY KEY, "+
+                    COL_HIGHSCORE+" INTEGER, "+
                     COL_BEST_TIME+" TEXT, "+
                     COL_RACES_WON+" INTEGER, "+
                     COL_RACES_LOST+" INTEGER)";
@@ -82,6 +80,19 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     /**
+     * @return returns all easy puzzles
+     */
+    public List<Puzzle> getAllEasyPuzzles(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(
+                PUZZLE_TABLE, null,
+                "WHERE "+COL_DIFFICULTY+" = ?", new String[]{"easy"}, null, null, null);
+        List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
+        cursor.close();
+        return easyPuzzles;
+    }
+
+    /**
      * @return randomly returns one easy puzzle
      */
     public Puzzle getEasyPuzzle(){
@@ -93,6 +104,19 @@ public class DBHelper extends SQLiteOpenHelper{
         cursor.close();
         int randomIndex = (int) (Math.random()*(easyPuzzles.size()));
         return easyPuzzles.get(randomIndex);
+    }
+
+    /**
+     * @return returns all medium puzzles
+     */
+    public List<Puzzle> getAllMediumPuzzle(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(
+                PUZZLE_TABLE, null,
+                "WHERE "+COL_DIFFICULTY+" = ?", new String[]{"medium"}, null, null, null);
+        List<Puzzle> mediumPuzzles = getPuzzlesOutOfCursor(cursor);
+        cursor.close();
+        return mediumPuzzles;
     }
 
     /**
@@ -110,6 +134,19 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     /**
+     * @return returns all hard puzzles
+     */
+    public List<Puzzle> getAllHardPuzzle(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(
+                PUZZLE_TABLE, null,
+                "WHERE "+COL_DIFFICULTY+" = ?", new String[]{"hard"}, null, null, null);
+        List<Puzzle> hardPuzzles = getPuzzlesOutOfCursor(cursor);
+        cursor.close();
+        return hardPuzzles;
+    }
+
+    /**
      * @return randomly returns one hard puzzle
      */
     public Puzzle getHardPuzzle(){
@@ -121,6 +158,19 @@ public class DBHelper extends SQLiteOpenHelper{
         cursor.close();
         int randomIndex = (int) (Math.random()*(hardPuzzles.size()));
         return hardPuzzles.get(randomIndex);
+    }
+
+    /**
+     * @return returns all expert puzzles
+     */
+    public List<Puzzle> getALLExpertPuzzle(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(
+                PUZZLE_TABLE, null,
+                "WHERE "+COL_DIFFICULTY+" = ?", new String[]{"expert"}, null, null, null);
+        List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
+        cursor.close();
+        return expertPuzzles;
     }
 
     /**
@@ -155,6 +205,21 @@ public class DBHelper extends SQLiteOpenHelper{
         }
         cursor.close();
         return null;
+    }
+
+
+
+    public void replacePuzzles(List<Puzzle> puzzles) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(PUZZLE_TABLE, null, null);
+        for (Puzzle puzzle: puzzles) {
+            ContentValues values = new ContentValues();
+            values.put(COL_DIFFICULTY, puzzle.getDifficulty());
+            JSONArray keyArr = new JSONArray(puzzle.getKey());
+            values.put(COL_KEY, keyArr.toString());
+            db.insert(PUZZLE_TABLE, null, values);
+        }
+        db.close();
     }
 
     public void updateHighScore(int highscore){
