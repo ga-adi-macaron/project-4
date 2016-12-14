@@ -1,15 +1,13 @@
 package com.joelimyx.politicallocal;
 
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.joelimyx.politicallocal.news.NewsFragment;
-import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.OnTabSelectListener;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
     private BottomNavigationView mBottomBar;
@@ -32,14 +30,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .beginTransaction()
                     .replace(R.id.main_container, NewsFragment.newInstance())
                     .commit();
+            item.setChecked(true);
             break;
 
         case R.id.reps:
+            Toast.makeText(this, "reps", Toast.LENGTH_SHORT).show();
             break;
 
         case R.id.bills:
+            Toast.makeText(this, "bills", Toast.LENGTH_SHORT).show();
             break;
-
         }
         return true;
     }
