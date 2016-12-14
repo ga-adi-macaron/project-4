@@ -10,6 +10,5 @@
         title="Representative"/>
     <tab
         id="@+id/bills"
-        icon="@drawable/ic_reps"
         title="Bills"/>
 </tabs>

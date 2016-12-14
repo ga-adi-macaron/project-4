@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/news"
+        android:title="News"
+        android:icon="@drawable/ic_news"/>
+    <item android:id="@+id/reps"
+        android:title="Representatives"
+        android:icon="@drawable/ic_news"/>
+    <item android:id="@+id/bills"
+        android:title="Bills"
+        android:icon="@drawable/ic_news"/>
+</menu>
