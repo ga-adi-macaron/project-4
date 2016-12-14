@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -35,27 +34,12 @@ public class MainMenuActivity extends AppCompatActivity {
 
 
 //        checkForNewPuzzles();
+        //TODO: THIS DELETES DATA BEFORE RECEIVING NEW DATA.... FIX!
 
-
-        DBHelper helper = DBHelper.getInstance(this);
-        List<Puzzle> easyPuzzles = helper.getAllEasyPuzzles();
-        List<Puzzle> mediumPuzzles = helper.getAllMediumPuzzle();
-        List<Puzzle> hardPuzzles = helper.getAllHardPuzzle();
-        List<Puzzle> expertPuzzles = helper.getALLExpertPuzzle();
-
-        Log.d(TAG, "onCreate: "+easyPuzzles.size());
-        Log.d(TAG, "onCreate: "+mediumPuzzles.size());
-        Log.d(TAG, "onCreate: "+hardPuzzles.size());
-        Log.d(TAG, "onCreate: "+expertPuzzles.size());
-        Log.d(TAG, "onCreate: "+easyPuzzles.get(0).getKeyJSONArray().toString());
-        Log.d(TAG, "onCreate: "+mediumPuzzles.get(0).getKeyJSONArray().toString());
-        Log.d(TAG, "onCreate: "+hardPuzzles.get(0).getKeyJSONArray().toString());
-        Log.d(TAG, "onCreate: "+expertPuzzles.get(0).getKeyJSONArray().toString());
-
-
+        
         Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
         intent.putExtra(DIFFICULTY_INTENT_KEY, "medium");
-//        startActivity(intent);
+        startActivity(intent);
     }
 
     private void checkForNewPuzzles(){
@@ -86,13 +70,13 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    private void transformAndPost(ArrayList<Integer> key){
+    private void transformAndPost(List<Integer> key, String difficulty) {
         ArrayList<Integer> key2 = new ArrayList<>();
         ArrayList<Integer> key3 = new ArrayList<>();
         ArrayList<Integer> key4 = new ArrayList<>();
 
-        for(int i=0; i<key.size(); i++){
-            if(key.get(i)!=0) {
+        for (int i = 0; i < key.size(); i++) {
+            if (key.get(i) != 0) {
                 int shiftA = key.get(i) + 2;
                 int shiftB = key.get(i) + 5;
                 int shiftC = key.get(i) + 7;
@@ -116,7 +100,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
 
         ArrayList<ArrayList<Integer>> transformedKeys = new ArrayList<>();
-        transformedKeys.add(key);
+        transformedKeys.add((ArrayList<Integer>) key);
         transformedKeys.add(mirrorX(key));
         transformedKeys.add(mirrorY(key));
         transformedKeys.add(mirrorY(mirrorX(key)));
@@ -133,6 +117,12 @@ public class MainMenuActivity extends AppCompatActivity {
         transformedKeys.add(mirrorY(key4));
         transformedKeys.add(mirrorY(mirrorX(key4)));
 
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("Puzzles");
+
+        for (int i = 0; i < transformedKeys.size(); i++) {
+            ref.child(difficulty).push().setValue(transformedKeys.get(i));
+        }
     }
 
     private ArrayList<Integer> mirrorX(List<Integer> key){

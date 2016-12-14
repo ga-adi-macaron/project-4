@@ -83,6 +83,9 @@ public class DBHelper extends SQLiteOpenHelper{
      * The puzzles are then sent off to the {@link #replacePuzzles(List)} method.
      */
     public void setUpBroadcastReceiver(){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(PUZZLE_TABLE, null, null);
+        db.close();
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -94,7 +97,7 @@ public class DBHelper extends SQLiteOpenHelper{
                     for (int i=0; i<jarray.length(); i++){
                         intKey.add(jarray.getInt(i));
                     }
-                    removePuzzle(difficulty);
+//                    removePuzzle(difficulty);
                     addPuzzle(new Puzzle(
                             intKey,
                             difficulty));
@@ -131,7 +134,6 @@ public class DBHelper extends SQLiteOpenHelper{
         List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         return easyPuzzles;
-        return easyPuzzles;
     }
 
     /**
@@ -145,7 +147,7 @@ public class DBHelper extends SQLiteOpenHelper{
         List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(easyPuzzles.size()));
-        if(!easyPuzzles.isEmpty()) {
+        if(easyPuzzles!=null && !easyPuzzles.isEmpty()) {
             return easyPuzzles.get(randomIndex);
         }
         return null;
@@ -175,7 +177,7 @@ public class DBHelper extends SQLiteOpenHelper{
         List<Puzzle> mediumPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(mediumPuzzles.size()-1));
-        if(!mediumPuzzles.isEmpty()) {
+        if(mediumPuzzles!=null && !mediumPuzzles.isEmpty()) {
             return mediumPuzzles.get(randomIndex);
         }
         return null;
@@ -205,7 +207,7 @@ public class DBHelper extends SQLiteOpenHelper{
         List<Puzzle> hardPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(hardPuzzles.size()));
-        if (!hardPuzzles.isEmpty()) {
+        if (hardPuzzles!=null && !hardPuzzles.isEmpty()) {
             return hardPuzzles.get(randomIndex);
         }
         return null;
@@ -220,7 +222,6 @@ public class DBHelper extends SQLiteOpenHelper{
                 PUZZLE_TABLE, null,
                 COL_DIFFICULTY+" LIKE ?", new String[]{"%expert%"}, null, null, null);
         List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
-        Log.d(TAG, "getALLExpertPuzzle: "+expertPuzzles.size());
         cursor.close();
         return expertPuzzles;
     }
@@ -236,7 +237,7 @@ public class DBHelper extends SQLiteOpenHelper{
         List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(expertPuzzles.size()));
-        if (!expertPuzzles.isEmpty()) {
+        if (expertPuzzles!=null && !expertPuzzles.isEmpty()) {
             return expertPuzzles.get(randomIndex);
         }
         return null;
@@ -365,7 +366,6 @@ public class DBHelper extends SQLiteOpenHelper{
                 try {
                     JSONArray jsonArray =
                             new JSONArray(cursor.getString(cursor.getColumnIndex(COL_KEY)));
-                    Log.d(TAG, "getPuzzlesOutOfCursor: ITERATION");
                     List<Integer> intKey = new ArrayList<>();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         intKey.add(jsonArray.getInt(i));
@@ -374,13 +374,11 @@ public class DBHelper extends SQLiteOpenHelper{
                             intKey,
                             cursor.getString(cursor.getColumnIndex(COL_DIFFICULTY))
                     ));
-                    Log.d(TAG, "getPuzzlesOutOfCursor: PUZZLES SIZE IN WHILE LOOP " + puzzles.size());
                     cursor.moveToNext();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            Log.d(TAG, "getPuzzlesOutOfCursor: "+puzzles.size());
             return puzzles;
         }
         return null;
