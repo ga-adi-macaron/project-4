@@ -127,9 +127,10 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"easy"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"easy"}, null, null, null);
         List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
+        return easyPuzzles;
         return easyPuzzles;
     }
 
@@ -140,7 +141,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"easy"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"easy"}, null, null, null);
         List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(easyPuzzles.size()));
@@ -157,7 +158,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"medium"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"medium"}, null, null, null);
         List<Puzzle> mediumPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         return mediumPuzzles;
@@ -170,7 +171,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"medium"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"medium"}, null, null, null);
         List<Puzzle> mediumPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(mediumPuzzles.size()-1));
@@ -187,7 +188,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"hard"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"hard"}, null, null, null);
         List<Puzzle> hardPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         return hardPuzzles;
@@ -200,7 +201,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"hard"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"hard"}, null, null, null);
         List<Puzzle> hardPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(hardPuzzles.size()));
@@ -217,8 +218,9 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"expert"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"%expert%"}, null, null, null);
         List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
+        Log.d(TAG, "getALLExpertPuzzle: "+expertPuzzles.size());
         cursor.close();
         return expertPuzzles;
     }
@@ -230,7 +232,7 @@ public class DBHelper extends SQLiteOpenHelper{
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
-                COL_DIFFICULTY+" = ?", new String[]{"expert"}, null, null, null);
+                COL_DIFFICULTY+" LIKE ?", new String[]{"expert"}, null, null, null);
         List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
         int randomIndex = (int) (Math.random()*(expertPuzzles.size()));
@@ -276,6 +278,7 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     public void addPuzzle(Puzzle puzzle){
+        Log.d(TAG, "addPuzzle: ");
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DIFFICULTY, puzzle.getDifficulty());
@@ -355,27 +358,31 @@ public class DBHelper extends SQLiteOpenHelper{
      * @return a list of puzzles with the data stored in the given cursor
      */
 
-    public List<Puzzle> getPuzzlesOutOfCursor(Cursor cursor){
-        List<Puzzle> puzzles = new ArrayList<>();
-        if(cursor.moveToFirst()){
-            while(!cursor.isAfterLast()){
+    public List<Puzzle> getPuzzlesOutOfCursor(Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            List<Puzzle> puzzles = new ArrayList<>();
+            while (!cursor.isAfterLast()) {
                 try {
                     JSONArray jsonArray =
                             new JSONArray(cursor.getString(cursor.getColumnIndex(COL_KEY)));
+                    Log.d(TAG, "getPuzzlesOutOfCursor: ITERATION");
                     List<Integer> intKey = new ArrayList<>();
-                    for (int i=0; i<jsonArray.length(); i++){
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         intKey.add(jsonArray.getInt(i));
                     }
                     puzzles.add(new Puzzle(
                             intKey,
                             cursor.getString(cursor.getColumnIndex(COL_DIFFICULTY))
                     ));
+                    Log.d(TAG, "getPuzzlesOutOfCursor: PUZZLES SIZE IN WHILE LOOP " + puzzles.size());
+                    cursor.moveToNext();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                cursor.moveToNext();
             }
+            Log.d(TAG, "getPuzzlesOutOfCursor: "+puzzles.size());
+            return puzzles;
         }
-        return puzzles;
+        return null;
     }
 }

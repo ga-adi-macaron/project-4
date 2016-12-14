@@ -1,7 +1,5 @@
 package com.scottlindley.sudokuapp;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
