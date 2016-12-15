@@ -20,9 +20,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.joelimyx.politicallocal.R;
-import com.joelimyx.politicallocal.news.Gson.News;
-import com.joelimyx.politicallocal.news.Gson.Value;
+import com.joelimyx.politicallocal.news.gson.News;
+import com.joelimyx.politicallocal.news.gson.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -36,9 +37,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Use the {@link NewsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewsFragment extends Fragment implements NewsAdapter.OnNewsItemSelectedListener{
+public class NewsFragment extends Fragment
+        implements NewsAdapter.OnNewsItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener{
+
     private static String baseUrl = "https://api.cognitive.microsoft.com/";
     private SwipeRefreshLayout mRefreshLayout;
+    private Call<News> mCall;
+    private NewsAdapter mNewsAdapter;
 
     public NewsFragment() {
     }
@@ -55,21 +61,27 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnNewsItemSele
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
         final RecyclerView newsRecyclerView = (RecyclerView) view.findViewById(R.id.news_recyclerview);
+        newsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mNewsAdapter = new NewsAdapter(new ArrayList<Value>(),getContext(),NewsFragment.this);
+        newsRecyclerView.setAdapter(mNewsAdapter);
+
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.news_swipe_refresh);
         mRefreshLayout.setRefreshing(true);
-        newsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mRefreshLayout.setOnRefreshListener(this);
+
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<News> call = retrofit.create(NewsService.class).getNews("bernie", 12);
-        call.enqueue(new Callback<News>() {
+        mCall = retrofit.create(BingSearchService.class).getNews("bernie", 12);
+        mCall.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
                 List<Value> newsList = response.body().getValue();
-                newsRecyclerView.setAdapter(new NewsAdapter(newsList,getContext(),NewsFragment.this));
+                mNewsAdapter.swapData(newsList);
                 mRefreshLayout.setRefreshing(false);
             }
 
@@ -89,12 +101,13 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnNewsItemSele
         CustomTabsClient.bindCustomTabsService(getContext(), packageName, new CustomTabsServiceConnection() {
             @Override
             public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
-                client.warmup(0L);
+                client.warmup(10L);
 
                 Uri uri = Uri.parse(url);
                 CustomTabsSession session = client.newSession(null);
                 session.mayLaunchUrl(uri,null,null);
 
+                //Create intent with the loaded session and change the toolbar color of custom chrome tab
                 CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session)
                         .setToolbarColor(ContextCompat.getColor(getContext(),R.color.colorPrimary))
                         .build();
@@ -104,6 +117,26 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnNewsItemSele
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 Toast.makeText(getContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh() {
+        // TODO: 12/15/16 Refresh content and move to first element
+        mCall.enqueue(new Callback<News>() {
+            @Override
+            public void onResponse(Call<News> call, Response<News> response) {
+                List<Value> newsList = response.body().getValue();
+                mNewsAdapter.swapData(newsList);
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<News> call, Throwable t) {
+                Toast.makeText(getContext(), "Failed to get News", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }

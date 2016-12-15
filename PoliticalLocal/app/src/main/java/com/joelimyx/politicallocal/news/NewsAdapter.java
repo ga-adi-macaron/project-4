@@ -10,8 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
-import com.joelimyx.politicallocal.news.Gson.News;
-import com.joelimyx.politicallocal.news.Gson.Value;
+import com.joelimyx.politicallocal.news.gson.Value;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -64,6 +63,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
                 mListener.onNewsItemSelected(current.getUrl());
             }
         });
+    }
+
+    public void swapData(List<Value> updateList){
+        mNewsList = updateList;
+        notifyDataSetChanged();
     }
 
     @Override

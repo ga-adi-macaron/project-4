@@ -1,5 +1,5 @@
 
-package com.joelimyx.politicallocal.news.Gson;
+package com.joelimyx.politicallocal.news.gson;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

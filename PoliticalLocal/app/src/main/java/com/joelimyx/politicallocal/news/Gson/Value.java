@@ -1,5 +1,5 @@
 
-package com.joelimyx.politicallocal.news.Gson;
+package com.joelimyx.politicallocal.news.gson;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
