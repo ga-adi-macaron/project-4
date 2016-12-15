@@ -8,38 +8,85 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.transition.Explode;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class MainMenuActivity extends AppCompatActivity {
+public class MainMenuActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String TAG = "MainMenuActivity";
     public static final String DIFFICULTY_INTENT_KEY = "difficulty";
+    public static final String PUZZLE_KEY_INTENT_KEY = "puzzle key";
     private static final int PUZZLE_REFRESH_JOB_ID = 88;
+    private CardView mSoloCard, mRaceCard, mStatsCard, mSettingsCard;
 
+    //TODO: THIS ACTIVITY IS A MESS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        getWindow().setEnterTransition(new Explode());
+        getWindow().setExitTransition(new Explode());
+        getWindow().getAllowEnterTransitionOverlap();
+
         setContentView(R.layout.activity_main);
 
         DBAssetHelper dbAssetSetUp = new DBAssetHelper(MainMenuActivity.this);
         dbAssetSetUp.getReadableDatabase();
 
+        setUpCardViews();
+
 //        addPuzzle();
 
-
-
 //        checkForNewPuzzles();
-        //TODO: THIS DELETES DATA BEFORE RECEIVING NEW DATA.... FIX!
 
-        
-        Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
-        intent.putExtra(DIFFICULTY_INTENT_KEY, "medium");
-        startActivity(intent);
+    }
+
+    private void setUpCardViews(){
+        mSoloCard = (CardView)findViewById(R.id.solo_card);
+        mRaceCard = (CardView)findViewById(R.id.race_card);
+        mStatsCard = (CardView)findViewById(R.id.stats_card);
+        mSettingsCard = (CardView)findViewById(R.id.settings_card);
+
+        mSoloCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TextView soloText = ((TextView)mSoloCard.getChildAt(0));
+                TextView raceText = ((TextView)mRaceCard.getChildAt(0));
+                TextView statsText = ((TextView)mStatsCard.getChildAt(0));
+                ImageView settingsImage = ((ImageView)mSettingsCard.getChildAt(0));
+
+                TextView easyText = (TextView)findViewById(R.id.easyText);
+                TextView mediumText = (TextView)findViewById(R.id.mediumText);
+                TextView hardText = (TextView)findViewById(R.id.hardText);
+                TextView expertText = (TextView)findViewById(R.id.expertText);
+
+                easyText.setVisibility(View.VISIBLE);
+                mediumText.setVisibility(View.VISIBLE);
+                hardText.setVisibility(View.VISIBLE);
+                expertText.setVisibility(View.VISIBLE);
+
+                soloText.setVisibility(View.INVISIBLE);
+                raceText.setVisibility(View.INVISIBLE);
+                statsText.setVisibility(View.INVISIBLE);
+                settingsImage.setVisibility(View.INVISIBLE);
+
+                easyText.setOnClickListener(MainMenuActivity.this);
+                mediumText.setOnClickListener(MainMenuActivity.this);
+                hardText.setOnClickListener(MainMenuActivity.this);
+                expertText.setOnClickListener(MainMenuActivity.this);
+            }
+        });
     }
 
     private void checkForNewPuzzles(){
@@ -70,92 +117,37 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    private void transformAndPost(List<Integer> key, String difficulty) {
-        ArrayList<Integer> key2 = new ArrayList<>();
-        ArrayList<Integer> key3 = new ArrayList<>();
-        ArrayList<Integer> key4 = new ArrayList<>();
-
-        for (int i = 0; i < key.size(); i++) {
-            if (key.get(i) != 0) {
-                int shiftA = key.get(i) + 2;
-                int shiftB = key.get(i) + 5;
-                int shiftC = key.get(i) + 7;
-                if (shiftA > 9) {
-                    shiftA = shiftA - 9;
-                }
-                if (shiftB > 9) {
-                    shiftB = shiftB - 9;
-                }
-                if (shiftC > 9) {
-                    shiftC = shiftC - 9;
-                }
-                key2.add(shiftA);
-                key3.add(shiftB);
-                key4.add(shiftC);
-            } else {
-                key2.add(0);
-                key3.add(0);
-                key4.add(0);
-            }
+    @Override
+    public void onClick(View view) {
+        Log.d(TAG, "onClick: ");
+        DBHelper helper = DBHelper.getInstance(this);
+        String difficulty;
+        String stringKey;
+        String cardText = ((TextView)view).getText().toString();
+        switch(cardText){
+            case "Easy":
+                difficulty = "easy";
+                stringKey = helper.getEasyPuzzle().getKeyJSONArray().toString();
+                break;
+            case "Medium":
+                difficulty = "medium";
+                stringKey = helper.getMediumPuzzle().getKeyJSONArray().toString();
+                break;
+            case "Hard":
+                difficulty = "hard";
+                stringKey = helper.getHardPuzzle().getKeyJSONArray().toString();
+                break;
+            case "Expert":
+                difficulty = "expert";
+                stringKey = helper.getExpertPuzzle().getKeyJSONArray().toString();
+                break;
+            default:
+                difficulty = "error";
+                stringKey = "error";
         }
-
-        ArrayList<ArrayList<Integer>> transformedKeys = new ArrayList<>();
-        transformedKeys.add((ArrayList<Integer>) key);
-        transformedKeys.add(mirrorX(key));
-        transformedKeys.add(mirrorY(key));
-        transformedKeys.add(mirrorY(mirrorX(key)));
-        transformedKeys.add(key2);
-        transformedKeys.add(mirrorX(key2));
-        transformedKeys.add(mirrorY(key2));
-        transformedKeys.add(mirrorY(mirrorX(key2)));
-        transformedKeys.add(key3);
-        transformedKeys.add(mirrorX(key3));
-        transformedKeys.add(mirrorY(key3));
-        transformedKeys.add(mirrorY(mirrorX(key3)));
-        transformedKeys.add(key4);
-        transformedKeys.add(mirrorX(key4));
-        transformedKeys.add(mirrorY(key4));
-        transformedKeys.add(mirrorY(mirrorX(key4)));
-
-        FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference("Puzzles");
-
-        for (int i = 0; i < transformedKeys.size(); i++) {
-            ref.child(difficulty).push().setValue(transformedKeys.get(i));
-        }
-    }
-
-    private ArrayList<Integer> mirrorX(List<Integer> key){
-        ArrayList<Integer> mirrored = new ArrayList<>();
-        ArrayList<Integer> row = new ArrayList<>();
-        for(int i=0; i<key.size(); i++){
-            row.add(key.get(i));
-            if (i%9==8){
-                Collections.reverse(row);
-                mirrored.addAll(row);
-                row.clear();
-            }
-        }
-        return mirrored;
-    }
-
-    private ArrayList<Integer> mirrorY(List<Integer> key){
-        ArrayList<Integer> mirrored = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> rows = new ArrayList<>();
-        ArrayList<Integer> row = new ArrayList<>();
-        for(int i=0; i<key.size(); i++){
-            row.add(key.get(i));
-            if(i%9==8){
-                ArrayList<Integer> addedRow = new ArrayList<>();
-                addedRow.addAll(row);
-                rows.add(addedRow);
-                row.clear();
-            }
-        }
-        Collections.reverse(rows);
-        for(ArrayList<Integer> r : rows){
-            mirrored.addAll(r);
-        }
-        return mirrored;
+        Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
+        intent.putExtra(DIFFICULTY_INTENT_KEY, difficulty);
+        intent.putExtra(PUZZLE_KEY_INTENT_KEY, stringKey);
+        startActivity(intent);
     }
 }

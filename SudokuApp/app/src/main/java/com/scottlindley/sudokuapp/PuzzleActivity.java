@@ -164,8 +164,11 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                     checkCellInput(cell);
                 } else {
                     int number = Integer.parseInt(cell.getText().toString());
-                    if(mChoiceTiles.get(number-1).getVisibility() == View.VISIBLE) {
+                    if(((CardView)mChoiceTiles.get(number-1).getParent()).getVisibility()
+                            == View.VISIBLE) {
                         mChoiceTiles.get(number - 1).performClick();
+                    } else {
+                        mSelectedNum = 0;
                     }
                 }
             }
@@ -198,6 +201,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                 if (numberCounter == 9){
                     ((CardView)mChoiceTiles.get(mSelectedNum-1).getParent())
                             .setVisibility(View.INVISIBLE);
+                    mSelectedNum = 0;
                 }
                 checkForWin();
             } else {

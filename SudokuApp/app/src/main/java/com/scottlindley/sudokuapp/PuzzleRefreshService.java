@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 
@@ -45,6 +46,19 @@ public class PuzzleRefreshService extends JobService {
     }
 
     private void grabPuzzles(DatabaseReference ref, final String difficulty) {
+        //TODO: grab number or puzzles in each difficulty. Use that to send all puzzles in one broadcast
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                dataSnapshot.getChildrenCount();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         ref.addChildEventListener(new ChildEventListener() {
 
             @Override
