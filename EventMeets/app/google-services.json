@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "686915213597",
+    "firebase_url": "https://eventmeets-7e862.firebaseio.com",
+    "project_id": "eventmeets-7e862",
+    "storage_bucket": "eventmeets-7e862.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686915213597:android:27cf911986d1fb12",
+        "android_client_info": {
+          "package_name": "com.jonathanlieblich.eventmeets"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "686915213597-b1s94isd0as2te5t40j41om3ab05jdm8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jonathanlieblich.eventmeets",
+            "certificate_hash": "4A01877FDC7B1A6DAD3A8F7B66E4C92FAD46547B"
+          }
+        },
+        {
+          "client_id": "686915213597-g5nddrmfi4juqmu10gi9upb8k1o6vhr4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1a096pYBmn24TryH-R8nr8Q32q3OP_IQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686915213597-g5nddrmfi4juqmu10gi9upb8k1o6vhr4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
