@@ -5,7 +5,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.joelimyx.politicallocal.news.NewsFragment;
 
@@ -20,26 +19,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         mBottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
 
         mBottomBar.setOnNavigationItemSelectedListener(this);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_container, NewsFragment.newInstance())
+                .commit();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-        case R.id.news:
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.main_container, NewsFragment.newInstance())
-                    .commit();
-            item.setChecked(true);
-            break;
+            case R.id.reps:
+                break;
 
-        case R.id.reps:
-            Toast.makeText(this, "reps", Toast.LENGTH_SHORT).show();
-            break;
+            case R.id.news:
 
-        case R.id.bills:
-            Toast.makeText(this, "bills", Toast.LENGTH_SHORT).show();
-            break;
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_container, NewsFragment.newInstance())
+                        .commit();
+                break;
+
+            case R.id.bills:
+                break;
         }
         return true;
     }

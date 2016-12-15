@@ -2,13 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/news"
-          android:title="News"
-          android:icon="@drawable/ic_news"/>
 
     <item android:id="@+id/reps"
           android:title="Representatives"
-          android:icon="@drawable/ic_news"/>
+          android:icon="@drawable/ic_reps"/>
+
+    <item android:id="@+id/news"
+          android:title="News"
+          android:icon="@drawable/ic_news"
+          android:checked="true"/>
 
     <item android:id="@+id/bills"
           android:title="Bills"

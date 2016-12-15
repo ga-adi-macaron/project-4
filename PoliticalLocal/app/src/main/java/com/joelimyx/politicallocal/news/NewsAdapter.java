@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
@@ -22,10 +23,19 @@ import java.util.List;
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
     List<Value> mNewsList;
     private Context mContext;
+    private OnNewsItemSelectedListener mListener;
 
-    public NewsAdapter(List<Value> newsList, Context context) {
+    /**
+     * Callback to the NewsFragment to instantiate a Custom Chrome Tab
+     */
+    interface OnNewsItemSelectedListener{
+        void onNewsItemSelected(String url);
+    }
+
+    public NewsAdapter(List<Value> newsList, Context context, OnNewsItemSelectedListener listener) {
         mNewsList = newsList;
         mContext = context;
+        mListener = listener;
     }
 
     @Override
@@ -37,15 +47,23 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
     @Override
     public void onBindViewHolder(NewsViewHolder holder, int position) {
-        Value current = mNewsList.get(position);
+        final Value current = mNewsList.get(position);
         if(current.getImage()!=null) {
             Picasso.with(mContext)
                     .load(current.getImage().getThumbnail().getContentUrl())
                     .fit()
                     .into(holder.mNewsImage);
+        }else{
+            holder.mNewsImage.setVisibility(View.GONE);
         }
         holder.mNewsTitle.setText(current.getName());
         holder.mNewsSource.setText(current.getProvider().get(0).getName());
+        holder.mNewsItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onNewsItemSelected(current.getUrl());
+            }
+        });
     }
 
     @Override
@@ -56,11 +74,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     class NewsViewHolder extends RecyclerView.ViewHolder{
         private ImageView mNewsImage;
         private TextView mNewsTitle, mNewsSource;
+        private RelativeLayout mNewsItem;
+
         public NewsViewHolder(View itemView) {
             super(itemView);
             mNewsImage = (ImageView) itemView.findViewById(R.id.news_image);
             mNewsTitle= (TextView) itemView.findViewById(R.id.news_title);
             mNewsSource = (TextView) itemView.findViewById(R.id.news_source);
+            mNewsItem = (RelativeLayout) itemView.findViewById(R.id.news_item);
         }
     }
 }
