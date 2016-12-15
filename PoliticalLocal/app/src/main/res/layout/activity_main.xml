@@ -11,14 +11,16 @@
     <FrameLayout
         android:id="@+id/main_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_bar"/>
 
-    <com.roughike.bottombar.BottomBar
-        android:id="@+id/bottom_bar"
+    <android.support.design.widget.BottomNavigationView
+        android:id="@id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        app:bb_showShadow="true"
-        app:bb_inActiveTabAlpha="0.6"
-        app:bb_tabXmlResource="@xml/bottom_bar"/>
+        app:menu="@menu/menu_bottom"
+        app:itemIconTint="@color/bottom_bar_state"
+        app:itemTextColor="@color/bottom_bar_state"
+        android:background="@color/colorPrimary"/>
 </RelativeLayout>

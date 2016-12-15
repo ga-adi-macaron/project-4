@@ -1,29 +1,44 @@
 package com.joelimyx.politicallocal;
 
-import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 
-import com.joelimyx.politicallocal.news.News;
 import com.joelimyx.politicallocal.news.NewsFragment;
-import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.OnTabSelectListener;
+import com.joelimyx.politicallocal.reps.RepsFragment;
 
-public class MainActivity extends AppCompatActivity implements OnTabSelectListener{
-    private BottomBar mBottomBar;
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+    private BottomNavigationView mBottomBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBottomBar = (BottomBar) findViewById(R.id.bottom_bar);
-        mBottomBar.setOnTabSelectListener(this);
+        mBottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
+
+        mBottomBar.setOnNavigationItemSelectedListener(this);
+
+        //todo: Default show as news fragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.main_container, RepsFragment.newInstance())
+                .commit();
+        mBottomBar.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
-    public void onTabSelected(@IdRes int tabId) {
-        switch (tabId){
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.reps:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_container, RepsFragment.newInstance())
+                        .commit();
+                break;
+
             case R.id.news:
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -31,12 +46,9 @@ public class MainActivity extends AppCompatActivity implements OnTabSelectListen
                         .commit();
                 break;
 
-            case R.id.reps:
-                break;
-
             case R.id.bills:
                 break;
-
         }
+        return true;
     }
 }
