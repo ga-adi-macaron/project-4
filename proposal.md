@@ -58,4 +58,6 @@
  * Categories for different types of alcohol
  * Search near current location
 
+### Nature
+
 ### I'm Bored, Choose for Me
