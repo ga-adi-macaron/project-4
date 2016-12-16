@@ -34,7 +34,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = "MapsActivity: ";
@@ -47,6 +50,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FloatingActionButton fab;
     private String mPlaylistTitle, mPlaylistDescription;
     private Playlist mPlaylist;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabasePlaylistReference;
+    private LatLngBounds currentScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Create Google Api Client
         buildGoogleApiClient();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabasePlaylistReference = mFirebaseDatabase.getReference("Playlists");
 
         //Create Map Fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -82,6 +90,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+
+        currentScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
+        
+
     }
 
     public Dialog onCreateDialog() {
@@ -98,7 +110,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mPlaylistTitle = title.getText().toString();
                         mPlaylistDescription = description.getText().toString();
                         mPlaylist = new Playlist(lastLocation.getLatitude(),lastLocation.getLongitude(),mPlaylistTitle,mPlaylistDescription);
+                        mDatabasePlaylistReference.push().setValue(mPlaylist);
                         Toast.makeText(MapsActivity.this, "Even cooler", Toast.LENGTH_SHORT).show();
+
                         mMap.addMarker(new MarkerOptions().position(new LatLng(mPlaylist.getLat(), mPlaylist.getLon()))
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.covermatters2)).title(mPlaylist.getTitle()));
                     }
@@ -150,7 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (lastLocation != null) {
             LatLng current = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(12f));
+            mMap.moveCamera(CameraUpdateFactory.zoomTo(18f));
         }
     }
 
