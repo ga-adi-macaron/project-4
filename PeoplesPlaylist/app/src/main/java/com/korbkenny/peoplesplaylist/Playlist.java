@@ -16,14 +16,15 @@ public class Playlist {
     private URL mCover;
     private List<Song> mSongList;
 
+    public Playlist(){}
 
-    public Playlist(double latitude, double longitude, String title, String description) {
-        mLatitude = latitude;
-        mLongitude = longitude;
-        mTitle = title;
-        mDescription = description;
-        mSongList = new ArrayList<>();
-    }
+//    public Playlist(double latitude, double longitude, String title, String description) {
+//        mLatitude = latitude;
+//        mLongitude = longitude;
+//        mTitle = title;
+//        mDescription = description;
+//        mSongList = new ArrayList<>();
+//    }
 
     public double getLat() {
         return mLatitude;
