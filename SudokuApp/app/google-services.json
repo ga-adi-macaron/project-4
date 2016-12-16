@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:667951060873:android:336820e2efca9216",
         "android_client_info": {
-          "package_name": "com.scottlindley.sudokuapp"
+          "package_name": "com.scottlindley.suyouthinkyoucandoku"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "667951060873-itqcd79fk716eoa799mim2crpo8q3m33.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.scottlindley.sudokuapp",
+            "package_name": "com.scottlindley.suyouthinkyoucandoku",
             "certificate_hash": "99921907E3B2C61924E0A1EF6D4555B586404FDE"
           }
         },

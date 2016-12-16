@@ -1,4 +1,4 @@
-package com.scottlindley.sudokuapp;
+package com.scottlindley.suyouthinkyoucandoku;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

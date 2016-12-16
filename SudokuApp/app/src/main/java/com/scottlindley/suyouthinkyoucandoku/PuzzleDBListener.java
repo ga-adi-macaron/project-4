@@ -1,4 +1,4 @@
-package com.scottlindley.sudokuapp;
+package com.scottlindley.suyouthinkyoucandoku;
 
 /**
  * Created by Scott Lindley on 12/13/2016.

@@ -1,4 +1,4 @@
-package com.scottlindley.sudokuapp;
+package com.scottlindley.suyouthinkyoucandoku;
 
 import android.content.Context;
 import android.content.Intent;
@@ -58,7 +58,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
      */
     private void getPuzzleKey(){
         Intent receivedIntent = getIntent();
-        String difficulty = receivedIntent.getStringExtra(MainMenuActivity.DIFFICULTY_INTENT_KEY);
+        String difficulty = receivedIntent.getStringExtra(SoloActivity.DIFFICULTY_INTENT_KEY);
         Puzzle puzzle;
         switch (difficulty){
             case "easy":

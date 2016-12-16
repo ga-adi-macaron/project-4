@@ -1,4 +1,4 @@
-package com.scottlindley.sudokuapp;
+package com.scottlindley.suyouthinkyoucandoku;
 
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;

@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#4b4b4b"
+    android:id="@+id/activity_solo"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.scottlindley.suyouthinkyoucandoku.MainMenuActivity">
+    tools:context="com.scottlindley.suyouthinkyoucandoku.SoloActivity">
 
     <GridLayout
         android:layout_width="wrap_content"
@@ -25,20 +26,11 @@
             android:layout_column="0"
             android:layout_row="0">
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Solo"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#eee"/>
-            <TextView
                 android:id="@+id/easyText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="Easy"
-                android:visibility="invisible"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#eee"/>
@@ -54,20 +46,11 @@
             android:layout_column="1"
             android:layout_row="0">
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Race"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#eee"/>
-            <TextView
                 android:id="@+id/mediumText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="Medium"
-                android:visibility="invisible"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#eee"/>
@@ -83,20 +66,11 @@
             android:layout_column="0"
             android:layout_row="1">
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Stats"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#eee"/>
-            <TextView
                 android:id="@+id/hardText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="Hard"
-                android:visibility="invisible"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#eee"/>
@@ -111,23 +85,17 @@
             android:backgroundTint="@color/colorPrimary"
             android:layout_column="1"
             android:layout_row="1">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="24dp"
-                android:gravity="center"
-                android:src="@drawable/ic_settings_white_24dp"/>
             <TextView
                 android:id="@+id/expertText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="Expert"
-                android:visibility="invisible"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#eee"/>
         </android.support.v7.widget.CardView>
     </GridLayout>
 </RelativeLayout>
+
 
