@@ -1,4 +1,4 @@
-package com.jonathanlieblich.eventmeets;
+package com.example.jon.eventmeets;
 
 import org.junit.Test;
 
