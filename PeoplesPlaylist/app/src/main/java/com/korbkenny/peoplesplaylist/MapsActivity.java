@@ -92,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         currentScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
-        
+
 
     }
 
@@ -112,7 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mPlaylist = new Playlist(lastLocation.getLatitude(),lastLocation.getLongitude(),mPlaylistTitle,mPlaylistDescription);
                         mDatabasePlaylistReference.push().setValue(mPlaylist);
                         Toast.makeText(MapsActivity.this, "Even cooler", Toast.LENGTH_SHORT).show();
-
+                        Intent intent = new Intent(MapsActivity.this,PlaylistActivity.class);
+                        startActivity(intent);
                         mMap.addMarker(new MarkerOptions().position(new LatLng(mPlaylist.getLat(), mPlaylist.getLon()))
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.covermatters2)).title(mPlaylist.getTitle()));
                     }
