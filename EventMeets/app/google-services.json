@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "391746933212",
+    "firebase_url": "https://eventmeets-61d2d.firebaseio.com",
+    "project_id": "eventmeets-61d2d",
+    "storage_bucket": "eventmeets-61d2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391746933212:android:c3a0069e000f8ee2",
+        "android_client_info": {
+          "package_name": "com.example.jon.eventmeets"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "391746933212-npiv1st7qrk3575rg55vvlqec1n0educ.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGlEdMaBmRdIv6KhjYV0s53djG1HMOEck"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391746933212-npiv1st7qrk3575rg55vvlqec1n0educ.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

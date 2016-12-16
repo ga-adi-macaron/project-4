@@ -31,7 +31,7 @@ public class BaseLoginActivity extends AppCompatActivity {
         dialog.getButton(R.id.login_prompt_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                
+                onNewActicityButtonPressed()
             }
         });
         dialog.show();
