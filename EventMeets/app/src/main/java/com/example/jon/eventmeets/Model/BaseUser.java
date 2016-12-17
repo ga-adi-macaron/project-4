@@ -14,6 +14,7 @@ public class BaseUser {
     private String mUsername;
     private String mCurrentLocation;
 
+    // TODO: Convert to a singleton which stores user data & instantiate with data during login
     public BaseUser(String firstName, String lastName, String username) {
         mFirstName = firstName;
         mLastName = lastName;

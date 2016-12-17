@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class BaseLoginActivity extends AppCompatActivity {
+public class BaseLoginActivity extends AppCompatActivity implements BaseLoginContract.View{
     private Button mLoginButton;
+    private BaseLoginContract.Presenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,24 +17,21 @@ public class BaseLoginActivity extends AppCompatActivity {
 
         mLoginButton = (Button)findViewById(R.id.login_main_btn);
 
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showLoginPrompt();
-            }
-        });
+        mPresenter = new BaseLoginPresenter(this);
     }
 
-    public void showLoginPrompt() {
-        AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                .setView(R.layout.not_logged_in_dialog)
-                .create();
-        dialog.getButton(R.id.login_prompt_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onNewActicityButtonPressed()
-            }
-        });
-        dialog.show();
+    @Override
+    public void displayLoginDialog() {
+
+    }
+
+    @Override
+    public void startMainMenuActivity() {
+
+    }
+
+    @Override
+    public void skipLogin() {
+
     }
 }

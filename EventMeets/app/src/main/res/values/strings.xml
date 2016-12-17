@@ -3,4 +3,5 @@
     <string name="login">Log me in</string>
     <string name="login_prompt">Looks like you\'re new here!</string>
     <string name="Skip_login">Skip for now</string>
+    <string name="title_activity_event_browse_view">EventBrowseViewActivity</string>
 </resources>

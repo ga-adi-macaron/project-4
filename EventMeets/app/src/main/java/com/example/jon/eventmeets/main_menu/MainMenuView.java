@@ -1,10 +1,12 @@
 package com.example.jon.eventmeets.main_menu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,16 +16,13 @@ import com.example.jon.eventmeets.R;
 
 import java.util.List;
 
-/**
- * Created by Jon on 12/16/2016.
- */
-
 public class MainMenuView extends AppCompatActivity implements MainMenuContract.View{
     private MainMenuPresenter mPresenter;
     private Button mBrowseButton;
     private Button mLoginMainMenuButton;
     private RecyclerView mMainEventsRecycler;
     private TextView mEventHeader;
+    private MainMenuRecyclerAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -34,13 +33,16 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
     }
 
     @Override
-    public void setupRecyclerView(List<EventParent> list, LinearLayoutManager manager, RecyclerView.Adapter adapter) {
-
+    public void setupRecyclerView(List<EventParent> list) {
+        mAdapter = new MainMenuRecyclerAdapter(list);
+        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mMainEventsRecycler.setLayoutManager(manager);
+        mMainEventsRecycler.setAdapter(mAdapter);
     }
 
     @Override
     public void hideLoginButton() {
-
+        mLoginMainMenuButton.setVisibility(View.GONE);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
 
     @Override
     public void displayLoginButton() {
-
+        mLoginMainMenuButton.setVisibility(View.VISIBLE);
     }
 
     @Override

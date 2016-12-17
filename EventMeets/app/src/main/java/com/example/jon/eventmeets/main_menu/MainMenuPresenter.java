@@ -11,13 +11,13 @@ import java.util.List;
  * Created by Jon on 12/16/2016.
  */
 
-public class MainMenuPresenter implements MainMenuContract.Presenter {
+class MainMenuPresenter implements MainMenuContract.Presenter {
     private MainMenuView mView;
     private List<EventParent> mEventList;
     private FirebaseDatabase mFirebase;
     private DatabaseReference mReference;
 
-    public MainMenuPresenter(MainMenuView view) {
+    MainMenuPresenter(MainMenuView view) {
         mView = view;
         mFirebase = FirebaseDatabase.getInstance();
         mReference = mFirebase.getReference();

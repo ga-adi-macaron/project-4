@@ -8,7 +8,7 @@ import com.example.jon.eventmeets.Model.EventParent;
 
 import java.util.List;
 
-public interface MainMenuContract {
+interface MainMenuContract {
     interface Presenter {
         void onNewEventsNeeded();
         void onNewEventsReady(List<EventParent> newEvents);
