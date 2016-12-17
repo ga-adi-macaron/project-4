@@ -11,6 +11,6 @@ import retrofit2.http.Query;
  */
 
 public interface DistrictService {
-    @GET("/districts/locate?latitude=40.74&longitude=-73.98555")
-    Call<District> getDistrict(@Query("latitude") String latitude, @Query("longtitude") String longtitude);
+    @GET("/districts/locate")
+    Call<District> getDistrict(@Query("latitude") String latitude, @Query("longitude") String longtitude);
 }

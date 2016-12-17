@@ -1,6 +1,7 @@
 package com.joelimyx.politicallocal.main;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -31,6 +33,9 @@ public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    private static final String TAG = "MainActivity";
+    public static final int LOCATION_REQUEST_CODE = 1;
 
     private BottomNavigationView mBottomBar;
     private GoogleApiClient mGoogleApiClient;
@@ -55,10 +60,6 @@ public class MainActivity extends AppCompatActivity
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-        }
-
-        if (mCurrentLocation!=null) {
-
         }
 
         mBottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
@@ -102,31 +103,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode==1){
+        if (requestCode==LOCATION_REQUEST_CODE){
             if (grantResults.length>0) {
-                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                String latitude = String.valueOf(mCurrentLocation.getLatitude());
-                String longitude = String.valueOf(mCurrentLocation.getLongitude());
-
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(district_base_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-                Call<District> call = retrofit.create(DistrictService.class).getDistrict(latitude, longitude);
-                call.enqueue(new Callback<District>() {
-                    @Override
-                    public void onResponse(Call<District> call, Response<District> response) {
-                        if (response.isSuccessful()) {
-                            Result temp = response.body().getResults().get(0);
-                            Log.d("Main", "onResponse District:" + temp.getState() + temp.getDistrict());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<District> call, Throwable t) {
-
-                    }
-                });
+                getCurrentLocation();
             }
         }
     }
@@ -137,12 +116,47 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_REQUEST_CODE);
+        }else{
+            getCurrentLocation();
         }
     }
 
+    /**
+     * Helper method for getting current location
+     */
+    private void getCurrentLocation(){
+        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        String latitude = String.valueOf(mCurrentLocation.getLatitude());
+        String longitude = String.valueOf(mCurrentLocation.getLongitude());
+
+        Log.d(TAG, "getCurrentLocation location: "+latitude+","+longitude);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(district_base_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        Call<District> call = retrofit.create(DistrictService.class).getDistrict(latitude, longitude);
+        call.enqueue(new Callback<District>() {
+            @Override
+            public void onResponse(Call<District> call, Response<District> response) {
+                if (response.isSuccessful()) {
+                    Result temp = response.body().getResults().get(0);
+                    SharedPreferences preferences = getSharedPreferences(getString(R.string.district),MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("state",temp.getState());
+                    editor.commit();
+                    Log.d("Main", "onResponse District:" + temp.getState() + temp.getDistrict());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<District> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed to get response", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onFailure: ");
+            }
+        });
+
+    }
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -150,7 +164,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Log.d(TAG, "onConnectionFailed: "+connectionResult.getErrorMessage());
+        Toast.makeText(this, "No Network Available", Toast.LENGTH_SHORT).show();
     }
 
     @Override
