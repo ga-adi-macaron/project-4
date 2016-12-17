@@ -1,19 +1,25 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +28,8 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
     private static final String TAG = "PuzzleActivity";
     private DBHelper mDBHelper;
     private SudokuGridLayout mBoardView;
-    private TextView mScoreView;
+    private TextView mTimerView;
+    private long mTime;
     private int[] mKey, mSolution, mUserAnswers;
     private int mSelectedNum, mScore, mStrikes;
     private ArrayList<TextView> mChoiceTiles;
@@ -58,29 +65,14 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
      */
     private void getPuzzleKey(){
         Intent receivedIntent = getIntent();
-        String difficulty = receivedIntent.getStringExtra(SoloActivity.DIFFICULTY_INTENT_KEY);
-        Puzzle puzzle;
-        switch (difficulty){
-            case "easy":
-                puzzle = mDBHelper.getEasyPuzzle();
-                break;
-            case "medium":
-                puzzle = mDBHelper.getMediumPuzzle();
-                break;
-            case "hard":
-                puzzle = mDBHelper.getHardPuzzle();
-                break;
-            case "expert":
-                puzzle = mDBHelper.getExpertPuzzle();
-                break;
-            default: puzzle = null;
-        }
-
-        if (puzzle != null){
-            mKey = puzzle.getKeyIntArray();
-        } else {
-            finish();
-            Toast.makeText(this, "ERROR, PUZZLE NOT FOUND", Toast.LENGTH_SHORT).show();
+        try {
+            JSONArray jsonKey = new JSONArray(receivedIntent.getStringExtra(SoloActivity.PUZZLE_KEY_INTENT_KEY));
+            mKey = new int[81];
+            for (int i=0; i<jsonKey.length(); i++){
+                mKey[i] = Integer.parseInt(jsonKey.get(i).toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -90,23 +82,24 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
      */
     private void setUpScoreCard(){
         mStrikes = 0;
-        mScoreView = (TextView)findViewById(R.id.score_text);
-        mScore = 15001;
-        mScoreView.setText(String.valueOf(mScore));
+        mTimerView = (TextView)findViewById(R.id.score_text);
+        mScore = 1201;
+        mTime = 0;
+        mTimerView.setText(DateUtils.formatElapsedTime(mTime));
         mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
             @Override
             public void onTick(long l) {
                 mScore--;
+                mTime++;
                 if (mScore <= 0){
                     onFinish();
                 }
-                mScoreView.setText("Score: "+String.valueOf(mScore));
+                mTimerView.setText(DateUtils.formatElapsedTime(mTime));
             }
 
             @Override
             public void onFinish() {
                 mScore = 0;
-                mScoreView.setText("Score: 0");
                 endGame(false);
             }
         }.start();
@@ -207,10 +200,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             } else {
                 //Choice was wrong
                 cell.setText("");
-                mScore = mScore - 1000;
-                if (mScore > 0) {
-                    mScoreView.setText("Score: " + String.valueOf(mScore));
-                }
+                mScore = mScore - 100;
                 //Vibrate the phone to give a negative feedback
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
 
@@ -292,11 +282,53 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             ((CardView)tile.getParent()).setVisibility(View.INVISIBLE);
             mTimer.cancel();
         }
-        if(win){
-            Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show();
-        }else {
-            Toast.makeText(this, "GameOver", Toast.LENGTH_SHORT).show();
+
+        View dialogView = getLayoutInflater().inflate(R.layout.end_game_dialog, null);
+        TextView gameResultText = (TextView)dialogView.findViewById(R.id.game_result_text);
+        TextView currentScore = (TextView)dialogView.findViewById(R.id.current_score);
+        TextView highScore = (TextView)dialogView.findViewById(R.id.high_score);
+        TextView currentTime = (TextView)dialogView.findViewById(R.id.current_time);
+        TextView bestTime = (TextView)dialogView.findViewById(R.id.best_time);
+        TextView lostMessage = (TextView)dialogView.findViewById(R.id.lost_game_message);
+
+        if(win) {
+            gameResultText.setText("You Win!");
+            Stats stats = mDBHelper.getStats();
+            Log.d(TAG, "endGame: "+stats.getHighscore());
+            Log.d(TAG, "endGame: "+stats.getBestTime());
+            if (mScore > stats.getHighscore()) {
+                mDBHelper.updateHighScore(mScore);
+                stats = mDBHelper.getStats();
+            }
+            if (mTime < stats.getBestTime() || stats.getBestTime() == 0) {
+                mDBHelper.updateBestTime((int)(long) mTime);
+                stats = mDBHelper.getStats();
+            }
+            currentScore.setText("Score: " + mScore);
+            currentTime.setText("Time: " + mTimerView.getText());
+            highScore.setText("High Score: " + stats.getHighscore());
+            bestTime.setText("Best Time: " + DateUtils.formatElapsedTime((long)(int)stats.getBestTime()));
+        } else {
+            gameResultText.setText("You Lose");
+            if (mStrikes > 2){
+                lostMessage.setText("Three incorrect answers");
+            } else {
+                lostMessage.setText("Ran out of time! Maximum 20 minutes.");
+            }
+            lostMessage.setVisibility(View.VISIBLE);
         }
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setPositiveButton("okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setView(dialogView)
+                .create();
+        dialog.show();
+
     }
 
     /**

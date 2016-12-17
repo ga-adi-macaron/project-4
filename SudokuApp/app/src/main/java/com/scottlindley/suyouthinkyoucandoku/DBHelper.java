@@ -43,9 +43,9 @@ public class DBHelper extends SQLiteOpenHelper{
     public static final String CREATE_STATS_TABLE =
             "CREATE TABLE "+STATS_TABLE+" ("+
                     COL_HIGHSCORE+" INTEGER, "+
-                    COL_BEST_TIME+" TEXT, "+
                     COL_RACES_WON+" INTEGER, "+
-                    COL_RACES_LOST+" INTEGER)";
+                    COL_RACES_LOST+" INTEGER, "+
+                    COL_BEST_TIME+" INTEGER)";
 
     private static DBHelper sInstance;
     private Context mContext;
@@ -255,7 +255,7 @@ public class DBHelper extends SQLiteOpenHelper{
                 cursor.getInt(cursor.getColumnIndex(COL_HIGHSCORE)),
                 cursor.getInt(cursor.getColumnIndex(COL_RACES_WON)),
                 cursor.getInt(cursor.getColumnIndex(COL_RACES_LOST)),
-                cursor.getString(cursor.getColumnIndex(COL_BEST_TIME)));
+                cursor.getInt(cursor.getColumnIndex(COL_BEST_TIME)));
             cursor.close();
             return stats;
         }
@@ -343,7 +343,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.close();
     }
 
-    public void updateBestTime(String bestTime){
+    public void updateBestTime(int bestTime){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_BEST_TIME, bestTime);

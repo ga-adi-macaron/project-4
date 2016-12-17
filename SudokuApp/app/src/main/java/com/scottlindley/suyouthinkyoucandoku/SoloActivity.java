@@ -61,4 +61,10 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra(PUZZLE_KEY_INTENT_KEY, stringKey);
         startActivity(intent);
     }
+
+    @Override
+    public void onBackPressed() {
+        finishAfterTransition();
+        super.onBackPressed();
+    }
 }

@@ -1,5 +1,6 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
+import android.app.ActivityOptions;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -9,7 +10,11 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.transition.ChangeTransform;
+import android.transition.TransitionSet;
+import android.util.Pair;
 import android.view.View;
+import android.view.Window;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,10 +27,15 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final int PUZZLE_REFRESH_JOB_ID = 88;
     private CardView mSoloCard, mRaceCard, mStatsCard, mSettingsCard;
 
-    //TODO: THIS ACTIVITY IS A MESS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        TransitionSet transition = new TransitionSet();
+        transition.addTransition(new ChangeTransform());
+        getWindow().setSharedElementEnterTransition(transition);
+        getWindow().setSharedElementReturnTransition(transition);
 
         setContentView(R.layout.activity_main);
 
@@ -39,6 +49,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         checkForNewPuzzles();
 
+        DBHelper.getInstance(this).getStats();
     }
 
 
@@ -51,7 +62,17 @@ public class MainMenuActivity extends AppCompatActivity {
         mSoloCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainMenuActivity.this, SoloActivity.class));
+                Pair<View, String> pair1 =
+                        Pair.create(findViewById(R.id.solo_card), getString(R.string.solo_transition_1));
+                Pair<View, String> pair2 =
+                        Pair.create(findViewById(R.id.race_card), getString(R.string.solo_transition_2));
+                Pair<View, String> pair3 =
+                        Pair.create(findViewById(R.id.settings_card), getString(R.string.solo_transition_3));
+                Pair<View, String> pair4 =
+                        Pair.create(findViewById(R.id.stats_card), getString(R.string.solo_transition_4));
+                ActivityOptions options =
+                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair1, pair2, pair3, pair4);
+                startActivity(new Intent(MainMenuActivity.this, SoloActivity.class), options.toBundle());
             }
         });
 

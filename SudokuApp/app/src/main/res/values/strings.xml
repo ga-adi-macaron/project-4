@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Su you think you can Doku</string>
     <string name="app_id">801200029873</string>
+    <string name="solo_transition_1">Solo Transition 1</string>
+    <string name="solo_transition_2">Solo Transition 2</string>
+    <string name="solo_transition_3">Solo Transition 3</string>
+    <string name="solo_transition_4">Solo Transition 4</string>
 </resources>

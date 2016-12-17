@@ -5,10 +5,9 @@ package com.scottlindley.suyouthinkyoucandoku;
  */
 
 public class Stats {
-    private int mHighscore, mRacesWon, mRacesLost;
-    private String mBestTime;
+    private int mHighscore, mRacesWon, mRacesLost, mBestTime;
 
-    public Stats(int highscore, int racesWon, int racesLost, String bestTime) {
+    public Stats(int highscore, int racesWon, int racesLost, int bestTime) {
         mHighscore = highscore;
         mRacesWon = racesWon;
         mRacesLost = racesLost;
@@ -19,31 +18,16 @@ public class Stats {
         return mHighscore;
     }
 
-    public void setHighscore(int highscore) {
-        mHighscore = highscore;
-    }
-
     public int getRacesWon() {
         return mRacesWon;
-    }
-
-    public void setRacesWon(int racesWon) {
-        mRacesWon = racesWon;
     }
 
     public int getRacesLost() {
         return mRacesLost;
     }
 
-    public void setRacesLost(int racesLost) {
-        mRacesLost = racesLost;
-    }
-
-    public String getBestTime() {
+    public int getBestTime() {
         return mBestTime;
     }
 
-    public void setBestTime(String bestTime) {
-        mBestTime = bestTime;
-    }
 }

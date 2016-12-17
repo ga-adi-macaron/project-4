@@ -57,7 +57,8 @@ public class RaceActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-                Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfig);
+                Games.RealTimeMultiplayer.create(mGoogleApiClient, roomConfig);
+//                Games.RealTimeMultiplayer.join(mGoogleApiClient, roomConfig);
             }
         });
     }
@@ -177,7 +178,13 @@ public class RaceActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onJoinedRoom(int i, Room room) {
+        Log.d(TAG, "onRoomCreated: "+room.getRoomId());
+        if (i != GamesStatusCodes.STATUS_OK) {
+            // let screen go to sleep
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+            // show error message, return to main screen.
+        }
     }
 
     @Override
