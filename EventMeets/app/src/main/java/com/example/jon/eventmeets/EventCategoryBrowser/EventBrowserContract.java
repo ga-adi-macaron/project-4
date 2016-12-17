@@ -1,12 +1,8 @@
-package com.example.jon.eventmeets.EventBrowser;
+package com.example.jon.eventmeets.EventCategoryBrowser;
 
 import com.example.jon.eventmeets.Model.Category;
 
 import java.util.List;
-
-/**
- * Created by Jon on 12/16/2016.
- */
 
 interface EventBrowserContract {
     interface View {

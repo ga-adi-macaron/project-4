@@ -25,7 +25,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".EventBrowser.EventBrowseViewActivity"
+            android:name=".EventCategoryBrowser.EventBrowseViewActivity"
             android:label="@string/title_activity_event_browse_view"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

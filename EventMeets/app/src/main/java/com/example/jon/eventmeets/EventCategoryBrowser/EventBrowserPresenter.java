@@ -1,4 +1,4 @@
-package com.example.jon.eventmeets.EventBrowser;
+package com.example.jon.eventmeets.EventCategoryBrowser;
 
 /**
  * Created by Jon on 12/16/2016.

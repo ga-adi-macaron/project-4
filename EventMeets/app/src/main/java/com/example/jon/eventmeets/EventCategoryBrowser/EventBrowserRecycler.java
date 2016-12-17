@@ -1,9 +1,10 @@
-package com.example.jon.eventmeets.EventBrowser;
+package com.example.jon.eventmeets.EventCategoryBrowser;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.jon.eventmeets.Model.Category;
 import com.example.jon.eventmeets.R;
@@ -38,6 +39,9 @@ public class EventBrowserRecycler extends RecyclerView.Adapter<EventBrowserRecyc
     }
 
     class EventBrowserViewHolder extends RecyclerView.ViewHolder {
+        TextView mCategoryName;
+
+
         public EventBrowserViewHolder(View itemView) {
             super(itemView);
         }

@@ -15,49 +15,61 @@ public class BaseUser {
     private String mCurrentLocation;
 
     // TODO: Convert to a singleton which stores user data & instantiate with data during login
-    public BaseUser(String firstName, String lastName, String username) {
-        mFirstName = firstName;
-        mLastName = lastName;
-        mUsername = username;
+//    public BaseUser(String firstName, String lastName, String username) {
+//        mFirstName = firstName;
+//        mLastName = lastName;
+//        mUsername = username;
+//    }
+
+    private static BaseUser sInstance = null;
+
+    public static BaseUser getInstance() {
+        if(sInstance == null) {
+            sInstance = new BaseUser();
+        }
+        return sInstance;
     }
 
-    public String getFirstName() {
+    private BaseUser() {
+    }
+
+    private String getFirstName() {
         return mFirstName;
     }
 
-    public String getLastName() {
+    private String getLastName() {
         return mLastName;
     }
 
-    public ArrayList<EventParent> getSavedEvents() {
+    private ArrayList<EventParent> getSavedEvents() {
         return mSavedEvents;
     }
 
-    public void saveNewEvent(EventParent savedEvent) {
+    private void saveNewEvent(EventParent savedEvent) {
         mSavedEvents.add(savedEvent);
     }
 
-    public void saveNewEvent(int index, EventParent savedEvent) {
+    private void saveNewEvent(int index, EventParent savedEvent) {
         mSavedEvents.add(index, savedEvent);
     }
 
-    public ArrayList<EventParent> getScheduledEvents() {
+    private ArrayList<EventParent> getScheduledEvents() {
         return mScheduledEvents;
     }
 
-    public void scheduleNewEvent(EventParent scheduledEvent) {
+    private void scheduleNewEvent(EventParent scheduledEvent) {
         mScheduledEvents.add(scheduledEvent);
     }
 
-    public String getUsername() {
+    private String getUsername() {
         return mUsername;
     }
 
-    public String getCurrentLocation() {
+    private String getCurrentLocation() {
         return mCurrentLocation;
     }
 
-    public void setCurrentLocation(String currentLocation) {
+    private void setCurrentLocation(String currentLocation) {
         mCurrentLocation = currentLocation;
     }
 }
