@@ -26,6 +26,13 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private Button mLoginButton, mCreateAccount, mSkipLogin;
     private EditText mAccountName, mPassword, mHiddenConfirm;
     private TextView mHiddenConfirmPassword;
+    private BaseLoginContract.Presenter mPresenter;
+
+    public BaseLoginDialogFragment(BaseLoginContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
+    public BaseLoginDialogFragment(){}
 
     @Nullable
     @Override
@@ -34,6 +41,9 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         mLoginButton = (Button)view.findViewById(R.id.login_prompt_button);
         mCreateAccount = (Button)view.findViewById(R.id.create_account_btn);
         mSkipLogin = (Button)view.findViewById(R.id.skip_login);
+
+        mAccountName = (EditText)view.findViewById(R.id.username_edit);
+        mPassword = (EditText)view.findViewById(R.id.password_edit);
 
         mLoginButton.setOnClickListener(this);
         mCreateAccount.setOnClickListener(this);
@@ -46,16 +56,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
-
-//        mLoginButton = (Button)dialog.findViewById(R.id.login_prompt_button);
-//        mCreateAccount = (Button)dialog.findViewById(R.id.create_account_btn);
-//        mSkipLogin = (Button)dialog.findViewById(R.id.skip_login_btn);
-//
-//        mAccountName = (EditText)dialog.findViewById(R.id.username_edit);
-//        mPassword = (EditText)dialog.findViewById(R.id.password_edit);
-//
-//        mHiddenConfirm = (EditText)dialog.findViewById(R.id.hidden_confirm_edit);
-//        mHiddenConfirmPassword = (TextView)dialog.findViewById(R.id.hidden_confirm_new_password);
 
         dialog.show();
 
@@ -71,21 +71,13 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         return dialog;
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//
-//        mLoginButton.setOnClickListener(this);
-//        mCreateAccount.setOnClickListener(this);
-//        mSkipLogin.setOnClickListener(this);
-//    }
-
     @Override
     public void onClick(View view) {
         int id = view.getId();
         switch(id) {
             case R.id.login_prompt_button:
                 Toast.makeText(getActivity(), "login", Toast.LENGTH_SHORT).show();
+                mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString());
                 break;
             case R.id.create_account_btn:
                 Toast.makeText(getActivity(), "create", Toast.LENGTH_SHORT).show();

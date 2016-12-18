@@ -3,6 +3,7 @@ package com.example.jon.eventmeets;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Created by Jon on 12/16/2016.
@@ -39,9 +40,15 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
 
     @Override
     public void checkLoginDetails(String username, String password) {
-        if(username.equals("test")&&password.equals("test")) {
-            Toast.makeText((BaseLoginActivity) mView, "Login", Toast.LENGTH_SHORT).show();
+        if(username.equals("test")&&password.equals("test"))
             notifyLoginSuccess(true);
-        }
+    }
+
+    @Override
+    public void onUserReturn() {
+//        FirebaseUser user = mAuth.getCurrentUser();
+//        if(user != null) {
+//            mView.startMainMenuActivity();
+//        }
     }
 }

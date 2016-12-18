@@ -16,5 +16,10 @@ public interface BaseLoginContract {
         void notifyLoginSuccess(boolean wasSuccessful);
         void onLoginSkipped();
         void checkLoginDetails(String username, String password);
+        void onUserReturn();
+    }
+
+    interface SecondViewListener {
+        void getPresenter();
     }
 }
