@@ -1,13 +1,10 @@
 package com.example.jon.eventmeets;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +24,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private EditText mAccountName, mPassword, mHiddenConfirm;
     private TextView mHiddenConfirmPassword;
     private BaseLoginContract.Presenter mPresenter;
+    private Dialog mDialog;
 
     public BaseLoginDialogFragment(BaseLoginContract.Presenter presenter) {
         mPresenter = presenter;
@@ -45,6 +43,9 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         mAccountName = (EditText)view.findViewById(R.id.username_edit);
         mPassword = (EditText)view.findViewById(R.id.password_edit);
 
+        mHiddenConfirmPassword = (TextView)view.findViewById(R.id.hidden_confirm_new_password);
+        mHiddenConfirm = (EditText)view.findViewById(R.id.hidden_confirm_edit);
+
         mLoginButton.setOnClickListener(this);
         mCreateAccount.setOnClickListener(this);
         mSkipLogin.setOnClickListener(this);
@@ -55,20 +56,18 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        mDialog = super.onCreateDialog(savedInstanceState);
 
-        dialog.show();
+        mDialog.show();
 
-        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
 
         lp.gravity = Gravity.CENTER;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 
-        dialog.getWindow().setAttributes(lp);
-        dialog.setCancelable(false);
-
-        return dialog;
+        mDialog.getWindow().setAttributes(lp);
+        return mDialog;
     }
 
     @Override
@@ -76,11 +75,27 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         int id = view.getId();
         switch(id) {
             case R.id.login_prompt_button:
-                Toast.makeText(getActivity(), "login", Toast.LENGTH_SHORT).show();
                 mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString());
                 break;
             case R.id.create_account_btn:
                 Toast.makeText(getActivity(), "create", Toast.LENGTH_SHORT).show();
+                mHiddenConfirmPassword.setVisibility(View.VISIBLE);
+                mHiddenConfirm.setVisibility(View.VISIBLE);
+                mCreateAccount.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String username = mAccountName.getText().toString();
+                        String password = mPassword.getText().toString();
+                        String confirm = mHiddenConfirm.getText().toString();
+                        if(mPresenter.onNewAccountRequested(username, password, confirm)) {
+                            mHiddenConfirm.setVisibility(View.GONE);
+                            mHiddenConfirmPassword.setVisibility(View.GONE);
+                            revertOnClickListener(mCreateAccount);
+                        } else {
+                            Toast.makeText(getContext(), "failure", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
                 break;
             case R.id.skip_login:
                 Toast.makeText(getActivity(), "skip", Toast.LENGTH_SHORT).show();
@@ -88,5 +103,9 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
             default:
                 Toast.makeText(getActivity(), "Extra listener", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void revertOnClickListener(View view) {
+        view.setOnClickListener(this);
     }
 }

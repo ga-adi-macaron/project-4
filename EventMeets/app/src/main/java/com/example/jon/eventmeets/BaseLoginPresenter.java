@@ -51,4 +51,9 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
 //            mView.startMainMenuActivity();
 //        }
     }
+
+    @Override
+    public boolean onNewAccountRequested(String username, String password, String confirmPassword) {
+        return password.equals(confirmPassword);
+    }
 }

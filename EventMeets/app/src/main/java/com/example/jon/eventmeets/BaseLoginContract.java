@@ -17,9 +17,6 @@ public interface BaseLoginContract {
         void onLoginSkipped();
         void checkLoginDetails(String username, String password);
         void onUserReturn();
-    }
-
-    interface SecondViewListener {
-        void getPresenter();
+        boolean onNewAccountRequested(String username, String password, String confirmPassword);
     }
 }
