@@ -12,8 +12,9 @@ public interface BaseLoginContract {
     }
 
     interface Presenter {
-        void onLoginPressed(String username, String password);
+        void onLoginPressed();
         void notifyLoginSuccess(boolean wasSuccessful);
         void onLoginSkipped();
+        void checkLoginDetails(String username, String password);
     }
 }

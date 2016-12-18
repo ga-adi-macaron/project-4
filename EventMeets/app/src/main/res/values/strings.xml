@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">EventMeets</string>
     <string name="login">Log me in</string>
-    <string name="login_prompt">Looks like you\'re new here!</string>
+    <string name="login_prompt">Username/Email</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="password_confirm">Confirm Password</string>
     <string name="Skip_login">Skip for now</string>
     <string name="title_activity_event_browse_view">EventBrowseViewActivity</string>
+    <string name="create_account">Create New Account</string>
 </resources>
