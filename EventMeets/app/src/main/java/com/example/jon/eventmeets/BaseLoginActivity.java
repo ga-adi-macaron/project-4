@@ -1,6 +1,7 @@
 package com.example.jon.eventmeets;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,29 +43,33 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
 
     @Override
     public void displayLoginDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(R.layout.not_logged_in_dialog)
-                .setCancelable(false)
-                .create();
-
-        LayoutInflater.from(this).inflate(R.layout.not_logged_in_dialog, null, false);
-        //Login dialog buttons' click listeners
-        Button login = (Button)findViewById(R.id.login_prompt_button);
-                login.setOnClickListener(this);
-        Button skip = (Button)findViewById(R.id.skip_login_btn);
-                skip.setOnClickListener(this);
-        Button create = (Button)findViewById(R.id.create_account_btn);
-                create.setOnClickListener(this);
-
-        dialog.show();
-
-        //Getting references to EditTexts
-        mAccountName = (EditText)findViewById(R.id.username_edit);
-        mPassword = (EditText)findViewById(R.id.password_edit);
-
-        //Hidden password confirmation elements
-        mConfirmPassword = (EditText)findViewById(R.id.hidden_confirm_edit);
-        mConfirm = (TextView)findViewById(R.id.hidden_confirm_new_password);
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction()
+                .add(new BaseLoginDialogFragment(), "login")
+                .commit();
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setView(R.layout.not_logged_in_dialog)
+//                .setCancelable(false)
+//                .create();
+//
+//        LayoutInflater.from(this).inflate(R.layout.not_logged_in_dialog, null, false);
+//        //Login dialog buttons' click listeners
+//        Button login = (Button)findViewById(R.id.login_prompt_button);
+//                login.setOnClickListener(this);
+//        Button skip = (Button)findViewById(R.id.skip_login_btn);
+//                skip.setOnClickListener(this);
+//        Button create = (Button)findViewById(R.id.create_account_btn);
+//                create.setOnClickListener(this);
+//
+//        dialog.show();
+//
+//        //Getting references to EditTexts
+//        mAccountName = (EditText)findViewById(R.id.username_edit);
+//        mPassword = (EditText)findViewById(R.id.password_edit);
+//
+//        //Hidden password confirmation elements
+//        mConfirmPassword = (EditText)findViewById(R.id.hidden_confirm_edit);
+//        mConfirm = (TextView)findViewById(R.id.hidden_confirm_new_password);
     }
 
     @Override
