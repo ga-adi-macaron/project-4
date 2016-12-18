@@ -29,6 +29,14 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
         super.onCreate(savedInstanceState, persistentState);
         setContentView(R.layout.activity_main_menu);
 
+        mBrowseButton = (Button)findViewById(R.id.fab);
+        mLoginMainMenuButton = (Button)findViewById(R.id.main_menu_login_btn);
+        mEventHeader = (TextView)findViewById(R.id.main_event_header);
+
+        Intent intent = getIntent();
+        if(intent.getBooleanExtra("logged in", false))
+            mLoginMainMenuButton.setVisibility(View.GONE);
+
         mPresenter = new MainMenuPresenter(this);
     }
 

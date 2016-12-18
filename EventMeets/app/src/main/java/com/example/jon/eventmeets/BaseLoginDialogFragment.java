@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,16 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.not_logged_in_dialog, container, false);
+        View view =  inflater.inflate(R.layout.not_logged_in_dialog, container, true);
+        mLoginButton = (Button)view.findViewById(R.id.login_prompt_button);
+        mCreateAccount = (Button)view.findViewById(R.id.create_account_btn);
+        mSkipLogin = (Button)view.findViewById(R.id.skip_login);
+
+        mLoginButton.setOnClickListener(this);
+        mCreateAccount.setOnClickListener(this);
+        mSkipLogin.setOnClickListener(this);
+
+        return view;
     }
 
     @NonNull
@@ -37,31 +47,38 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
 
+//        mLoginButton = (Button)dialog.findViewById(R.id.login_prompt_button);
+//        mCreateAccount = (Button)dialog.findViewById(R.id.create_account_btn);
+//        mSkipLogin = (Button)dialog.findViewById(R.id.skip_login_btn);
+//
+//        mAccountName = (EditText)dialog.findViewById(R.id.username_edit);
+//        mPassword = (EditText)dialog.findViewById(R.id.password_edit);
+//
+//        mHiddenConfirm = (EditText)dialog.findViewById(R.id.hidden_confirm_edit);
+//        mHiddenConfirmPassword = (TextView)dialog.findViewById(R.id.hidden_confirm_new_password);
+
+        dialog.show();
+
         WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
 
-        lp.verticalMargin = 16;
-        lp.horizontalMargin = 16;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.gravity = Gravity.CENTER;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 
         dialog.getWindow().setAttributes(lp);
-
-        mLoginButton = (Button)dialog.findViewById(R.id.login_prompt_button);
-        mCreateAccount = (Button)dialog.findViewById(R.id.create_account_btn);
-        mSkipLogin = (Button)dialog.findViewById(R.id.skip_login_btn);
-
-        mAccountName = (EditText)dialog.findViewById(R.id.username_edit);
-        mPassword = (EditText)dialog.findViewById(R.id.password_edit);
-
-        mHiddenConfirm = (EditText)dialog.findViewById(R.id.hidden_confirm_edit);
-        mHiddenConfirmPassword = (TextView)dialog.findViewById(R.id.hidden_confirm_new_password);
-
-//        mLoginButton.setOnClickListener(this);
-//        mCreateAccount.setOnClickListener(this);
-//        mSkipLogin.setOnClickListener(this);
+        dialog.setCancelable(false);
 
         return dialog;
     }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        mLoginButton.setOnClickListener(this);
+//        mCreateAccount.setOnClickListener(this);
+//        mSkipLogin.setOnClickListener(this);
+//    }
 
     @Override
     public void onClick(View view) {
