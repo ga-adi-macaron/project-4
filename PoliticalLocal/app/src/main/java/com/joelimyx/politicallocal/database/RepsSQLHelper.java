@@ -1,36 +1,44 @@
 package com.joelimyx.politicallocal.database;
 
-import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.joelimyx.politicallocal.reps.MyReps;
+import com.joelimyx.politicallocal.reps.gson.congress.Result;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Joe on 12/16/16.
  */
 
 public class RepsSQLHelper extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "politician.db";
-    public static final String REPS_TABLE_NAME = "reps_table";
-    public static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "politician.db";
+    private static final String REPS_TABLE_NAME = "reps_table";
+    private static final int DATABASE_VERSION = 4;
 
-    public static final String COL_BIO_ID = "bio_id";
-    public static final String COL_C_ID = "c_id";
-    public static final String COL_NAME= "name";
-    public static final String COL_PARTY= "party";
-    public static final String COL_PHONE= "phone_#";
-    public static final String COL_POSITION = "position";
-    public static final String COL_DISTRICT_CLASS = "district_class";
+    private static final String COL_BIO_ID = "bio_id";
+    private static final String COL_C_ID = "c_id";
+    private static final String COL_NAME= "name";
+    private static final String COL_PARTY= "party";
+    private static final String COL_PHONE= "phone";
+    private static final String COL_CHAMBER = "chamber";
+    private static final String COL_DISTRICT_CLASS = "district_class";
 
-    public static final String[] BASIC_COLUMNS = {COL_NAME,COL_PARTY};
-    public static final String CREATE_TABLE =
+    private static final String[] BASIC_COLUMNS = {COL_NAME,COL_PARTY};
+    private static final String CREATE_TABLE =
             "CREATE TABLE "+ REPS_TABLE_NAME+"("+
-                    COL_BIO_ID+" INTEGER PRIMARY KEY, "+
-                    COL_C_ID+" INTEGER, "+
+                    COL_BIO_ID+" TEXT PRIMARY KEY, "+
+                    COL_C_ID+" TEXT, "+
                     COL_NAME+" TEXT, "+
                     COL_PARTY+" TEXT, "+
                     COL_PHONE+" TEXT, "+
-                    COL_POSITION+" TEXT, "+
+                    COL_CHAMBER +" TEXT, "+
                     COL_DISTRICT_CLASS+" INTEGER)";
 
     private static RepsSQLHelper sInstance;
@@ -55,5 +63,88 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + REPS_TABLE_NAME);
         this.onCreate(db);
+    }
+
+    public void addRep(Result legislator){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COL_BIO_ID,legislator.getBioguideId());
+        values.put(COL_C_ID,legislator.getCrpId());
+
+        String name = legislator.getFirstName();
+        //Add Middle name
+        if (legislator.getMiddleName()!=null){
+            name+=" "+legislator.getMiddleName();
+        }
+        values.put(COL_NAME,name+" "+legislator.getLastName());
+        values.put(COL_PARTY,legislator.getParty());
+        values.put(COL_PHONE,legislator.getPhone());
+
+        //Add district or class
+        if (legislator.getDistrict()==null) {
+            values.put(COL_DISTRICT_CLASS, legislator.getSenateClass());
+        }else{
+            values.put(COL_DISTRICT_CLASS, (Double) legislator.getDistrict());
+        }
+
+        values.put(COL_CHAMBER,legislator.getChamber());
+
+        db.insert(REPS_TABLE_NAME,null,values);
+        db.close();
+    }
+
+    public List<MyReps> getRepsList(){
+        SQLiteDatabase db = getReadableDatabase();
+        List<MyReps> myRepsList = new ArrayList<>();
+        Cursor cursor = db.query(REPS_TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        if (cursor.moveToFirst()){
+            while (!cursor.isAfterLast()){
+                myRepsList.add(new MyReps(
+                        cursor.getString(cursor.getColumnIndex(COL_BIO_ID)),
+                        cursor.getString(cursor.getColumnIndex(COL_C_ID)),
+                        cursor.getString(cursor.getColumnIndex(COL_NAME)),
+                        cursor.getString(cursor.getColumnIndex(COL_PARTY)),
+                        cursor.getString(cursor.getColumnIndex(COL_PHONE)),
+                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
+                        cursor.getString(cursor.getColumnIndex(COL_CHAMBER))
+                        ));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return myRepsList;
+    }
+    public MyReps getMyRepByID(String id){
+        SQLiteDatabase db = getReadableDatabase();
+        MyReps myReps = null;
+        Cursor cursor = db.query(REPS_TABLE_NAME,
+                null,
+                COL_BIO_ID+" LIKE ?",
+                new String[]{id},
+                null,
+                null,
+                null,
+                "1");
+        if (cursor.moveToFirst()){
+            Log.d("database", "getMyRepByID: movetofirst");
+            myReps = new MyReps(
+                    cursor.getString(cursor.getColumnIndex(COL_BIO_ID)),
+                    cursor.getString(cursor.getColumnIndex(COL_C_ID)),
+                    cursor.getString(cursor.getColumnIndex(COL_NAME)),
+                    cursor.getString(cursor.getColumnIndex(COL_PARTY)),
+                    cursor.getString(cursor.getColumnIndex(COL_PHONE)),
+                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
+                    cursor.getString(cursor.getColumnIndex(COL_CHAMBER))
+                    );
+        }
+        cursor.close();
+        return myReps;
     }
 }

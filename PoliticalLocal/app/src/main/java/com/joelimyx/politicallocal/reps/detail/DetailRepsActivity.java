@@ -20,9 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.database.RepsSQLHelper;
+import com.joelimyx.politicallocal.reps.MyReps;
 import com.joelimyx.politicallocal.reps.RepsFragment;
-import com.joelimyx.politicallocal.reps.detail.gson.Attributes;
-import com.joelimyx.politicallocal.reps.detail.gson.DetailInfo;
 import com.joelimyx.politicallocal.reps.gson.opensecret.ListOfLegislator;
 import com.joelimyx.politicallocal.reps.service.OpenSecretService;
 
@@ -44,33 +44,17 @@ public class DetailRepsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_reps);
 
+        RepsSQLHelper db = RepsSQLHelper.getInstance(this);
         /*---------------------------------------------------------------------------------
         // Basic info
         ---------------------------------------------------------------------------------*/
-        final TextView namePartyText = (TextView) findViewById(R.id.detail_reps_name_party);
-        final TextView phoneText = (TextView) findViewById(R.id.detail_reps_phone);
-        final TextView websiteText= (TextView) findViewById(R.id.detail_reps_website);
+        TextView namePartyText = (TextView) findViewById(R.id.detail_reps_name_party);
+        TextView phoneText = (TextView) findViewById(R.id.detail_reps_phone);
+        TextView websiteText= (TextView) findViewById(R.id.detail_reps_website);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(RepsFragment.open_Url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        Call<DetailInfo> call = retrofit.create(OpenSecretService.class).getDetail(getIntent().getStringExtra("id"));
-        call.enqueue(new Callback<DetailInfo>() {
-            @Override
-            public void onResponse(Call<DetailInfo> call, Response<DetailInfo> response) {
-                Attributes temp = response.body().getResponse().getLegislator().getAttributes();
-                namePartyText.setText(temp.getFirstlast()+"("+temp.getParty()+"-NY)");
-                phoneText.setText(temp.getPhone());
-                websiteText.setText(temp.getWebsite());
-            }
-
-            @Override
-            public void onFailure(Call<DetailInfo> call, Throwable t) {
-                Toast.makeText(DetailRepsActivity.this, "Failed to get data", Toast.LENGTH_SHORT).show();
-            }
-        });
+        MyReps myReps = db.getMyRepByID(getIntent().getStringExtra("id"));
+        namePartyText.setText(myReps.getName());
+        phoneText.setText(myReps.getPhone());
 
         /*---------------------------------------------------------------------------------
         // Toolbar Area

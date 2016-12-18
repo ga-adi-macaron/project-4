@@ -8,9 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
-import com.joelimyx.politicallocal.reps.gson.opensecret.Attributes;
-import com.joelimyx.politicallocal.reps.gson.opensecret.Legislator;
-import com.joelimyx.politicallocal.reps.gson.probulica.Result;
+import com.joelimyx.politicallocal.reps.gson.congress.Result;
 
 import java.util.List;
 
@@ -19,16 +17,18 @@ import java.util.List;
  */
 
 public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder> {
-    private List<Legislator> mRepList;
+    private List<MyReps> mRepList;
     private OnRepsItemSelectedListener mListener;
+    private String mState;
 
     interface OnRepsItemSelectedListener{
         void OnRepsItemSelected(String id);
     }
 
-    public RepsAdapter(List<Legislator> repList, OnRepsItemSelectedListener listener) {
+    public RepsAdapter(List<MyReps> repList, String state, OnRepsItemSelectedListener listener) {
         mRepList = repList;
         mListener = listener;
+        mState = state;
     }
 
     @Override
@@ -40,15 +40,13 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
 
     @Override
     public void onBindViewHolder(RepsViewHolder holder, int position) {
-        final Attributes current = mRepList.get(position).getAttributes();
-//        holder.mRepsName.setText(current.getName());
-//        holder.mStateParty.setText(current.getParty()+"-NY");
-        holder.mRepsName.setText(current.getFirstlast());
-        holder.mStateParty.setText(current.getParty()+"-NY");
+        final MyReps current = mRepList.get(position);
+        holder.mRepsName.setText(current.getName());
+        holder.mStateParty.setText(current.getParty()+"-"+mState);
         holder.mRepsItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.OnRepsItemSelected(current.getCid());
+                mListener.OnRepsItemSelected(current.getBioId());
             }
         });
     }
@@ -58,7 +56,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
         return mRepList.size();
     }
 
-    public void swapData(List<Legislator> updateList){
+    public void swapData(List<MyReps> updateList){
         mRepList = updateList;
         notifyDataSetChanged();
     }

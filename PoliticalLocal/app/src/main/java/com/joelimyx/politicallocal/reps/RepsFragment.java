@@ -1,18 +1,22 @@
 package com.joelimyx.politicallocal.reps;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.reps.detail.DetailRepsActivity;
 import com.joelimyx.politicallocal.reps.gson.opensecret.ListOfLegislator;
 import com.joelimyx.politicallocal.reps.gson.opensecret.Legislator;
@@ -34,9 +38,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RepsFragment extends Fragment
         implements RepsAdapter.OnRepsItemSelectedListener{
-    public static final String open_Url = "https://www.opensecrets.org/";
-    public static final String baseUrl = "https://api.propublica.org/";
     private RepsAdapter mAdapter;
+    private static final String TAG = "RepsFragment";
 
     public RepsFragment() {
     }
@@ -56,27 +59,13 @@ public class RepsFragment extends Fragment
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.reps_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        mAdapter = new RepsAdapter(new ArrayList<Legislator>(),this);
+
+        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.district_file),Context.MODE_PRIVATE);
+        RepsSQLHelper db = RepsSQLHelper.getInstance(getContext());
+
+        mAdapter = new RepsAdapter(db.getRepsList(),preferences.getString(getString(R.string.state),null),this);
         recyclerView.setAdapter(mAdapter);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(open_Url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        Call<ListOfLegislator> call = retrofit.create(OpenSecretService.class).getLegislators("NY01");
-        call.enqueue(new Callback<ListOfLegislator>() {
-            @Override
-            public void onResponse(Call<ListOfLegislator> call, Response<ListOfLegislator> response) {
-                List<Legislator> repsList = response.body().getResponse().getLegislator();
-                mAdapter.swapData(repsList);
-            }
-
-            @Override
-            public void onFailure(Call<ListOfLegislator> call, Throwable t) {
-                Toast.makeText(getContext(), "Fail to get list", Toast.LENGTH_SHORT).show();
-                t.printStackTrace();
-            }
-        });
     }
 
     @Override
