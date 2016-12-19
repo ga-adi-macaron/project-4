@@ -103,7 +103,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+
+        //  When a marker is clicked, get the playlist Id contained in its tag,
+        //  and start the playlist activity with the Id. But only if it's within
+        //  a certain distance from your location.
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                getLastLocation();
+                double distance = getDistanceBetweenPoints(marker,lastLocation);
+                Log.d(TAG, "onMarkerClick: " + distance);
+
+                if (distance<100) {
+                    Intent intent = new Intent(MapsActivity.this, PlaylistActivity.class);
+                    intent.putExtra("Playlist Id", marker.getTag().toString());
+                    startActivity(intent);
+                }
+                else {
+                    Toast.makeText(MapsActivity.this, "Get a bit closer, wouldja?", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+        });
     }
+
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,6 +245,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //  Get distance between you and the marker you click
+    private double getDistanceBetweenPoints(Marker marker, Location lastLocation) {
+        double lat1 = marker.getPosition().latitude;
+        double lon1 = marker.getPosition().longitude;
+        double lat2 = lastLocation.getLatitude();
+        double lon2 = lastLocation.getLongitude();
+
+        int R = 6371; // km
+        double x = (lon2 - lon1) * Math.cos((lat1 + lat2) / 2);
+        double y = (lat2 - lat1);
+
+        return Math.sqrt(x * x + y * y) * R;
+    }
 
     //  Build the API client.
 
@@ -295,6 +332,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void getLastLocation(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
+                lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }
+            else{
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_LOCATION);
+            }
+        }
+    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {

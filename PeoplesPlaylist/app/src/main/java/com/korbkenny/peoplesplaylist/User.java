@@ -5,4 +5,5 @@ package com.korbkenny.peoplesplaylist;
  */
 
 public class User {
+
 }

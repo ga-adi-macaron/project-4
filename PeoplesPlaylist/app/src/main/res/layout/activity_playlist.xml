@@ -52,10 +52,30 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="100dp">
+        android:layout_height="80dp"
+        android:gravity="center_horizontal">
 
+        <android.support.v7.widget.CardView
+            android:id="@+id/player_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:cardCornerRadius="25dp"
+            android:layout_gravity="center_vertical"/>
+        <android.support.v7.widget.CardView
+            android:id="@+id/player_play_pause"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"/>
+        <android.support.v7.widget.CardView
+            android:id="@+id/player_skip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:cardCornerRadius="25dp"
+            android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
+
+
     <android.support.v7.widget.CardView
         android:id="@+id/recycler_cardview"
         android:layout_below="@id/cover_cardview"
@@ -71,5 +91,17 @@
         android:layout_height="match_parent"
         />
     </android.support.v7.widget.CardView>
+
+    <android.support.design.widget.FloatingActionButton
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/fab_song"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:src="@android:drawable/ic_input_add"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
 
 </RelativeLayout>
