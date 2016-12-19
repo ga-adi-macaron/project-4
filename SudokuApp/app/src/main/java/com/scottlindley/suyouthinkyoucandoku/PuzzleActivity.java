@@ -1,5 +1,6 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -15,23 +18,46 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
+import com.google.android.gms.games.multiplayer.realtime.RealTimeMessageReceivedListener;
+import com.google.android.gms.games.multiplayer.realtime.Room;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
+import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
+import com.google.example.games.basegameutils.BaseGameUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.OnSolveFinishedListener{
+public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.OnSolveFinishedListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener {
     private static final String TAG = "PuzzleActivity";
     private DBHelper mDBHelper;
     private SudokuGridLayout mBoardView;
     private TextView mTimerView;
+    public static final int RC_SIGN_IN = 5667;
+    public static final int RC_AUTOMATCH = 6980;
+    private boolean mResolvingConnectionFailure = false;
+    private List<String> mParticipantIDS;
+    private GoogleApiClient mGoogleApiClient;
     private long mTime;
     private int[] mKey, mSolution, mUserAnswers;
     private int mSelectedNum, mScore, mStrikes;
+    private boolean isRace;
     private ArrayList<TextView> mChoiceTiles;
     private PuzzleSolver mPuzzleSolver;
     private CountDownTimer mTimer;
@@ -43,18 +69,28 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
 
         mDBHelper = DBHelper.getInstance(this);
 
-        setUpScoreCard();
+        isRace = getIntent().getBooleanExtra(MainMenuActivity.RACE_INTENT_EXTRA, false);
 
-        getPuzzleKey();
+        if (isRace) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                    .build();
+        }
+        
+        if (!isRace) {
+            getPuzzleKey();
+        }
 
         mPuzzleSolver = new PuzzleSolver(mKey, PuzzleActivity.this);
 
-        mUserAnswers = mKey;
+        setUpScoreCard();
 
         createCells();
 
         setUpChoiceTiles();
-
     }
 
     /**
@@ -71,6 +107,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
             for (int i=0; i<jsonKey.length(); i++){
                 mKey[i] = Integer.parseInt(jsonKey.get(i).toString());
             }
+            mUserAnswers = mKey;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -338,5 +375,167 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
     public void grabSolution() {
         mSolution = mPuzzleSolver.getSolution();
         (findViewById(R.id.loading_wheel)).setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mGoogleApiClient!=null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            mResolvingConnectionFailure = false;
+            mGoogleApiClient.connect();
+            if (resultCode == Activity.RESULT_OK) {
+                Log.d(TAG, "onActivityResult: CONNECTING");
+            } else {
+                Log.d(TAG, "onActivityResult: "+resultCode);
+            }
+        }
+        if (requestCode == RC_AUTOMATCH) {
+            Log.d(TAG, "onActivityResult: "+resultCode);
+            ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+            Bundle autoMatch = RoomConfig.createAutoMatchCriteria(1, 1, 0);
+            RoomConfig roomConfig = RoomConfig.builder(PuzzleActivity.this)
+                    .setRoomStatusUpdateListener(PuzzleActivity.this)
+                    .setMessageReceivedListener(PuzzleActivity.this)
+                    .setAutoMatchCriteria(autoMatch)
+                    .addPlayersToInvite(invitees)
+                    .build();
+            Games.RealTimeMultiplayer.create(mGoogleApiClient, roomConfig);
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d(TAG, "onConnected: "+mGoogleApiClient.isConnected());
+        Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+        startActivityForResult(intent, RC_AUTOMATCH);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended: ");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        if (mResolvingConnectionFailure){return;}
+
+        mResolvingConnectionFailure = true;
+
+        Log.d(TAG, "onConnectionFailed: "+connectionResult);
+        if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "ERROR BASE GAME UTILS")){
+            mResolvingConnectionFailure = false;
+        }
+
+    }
+
+    @Override
+    public void onRoomConnecting(Room room) {
+        Log.d(TAG, "onRoomConnecting: ");
+    }
+
+    @Override
+    public void onRoomAutoMatching(Room room) {
+        Log.d(TAG, "onRoomAutoMatching: ");
+    }
+
+    @Override
+    public void onPeerInvitedToRoom(Room room, List<String> list) {
+        Log.d(TAG, "onPeerInvitedToRoom: ");
+    }
+
+    @Override
+    public void onPeerDeclined(Room room, List<String> list) {
+        Log.d(TAG, "onPeerDeclined: ");
+    }
+
+    @Override
+    public void onPeerJoined(Room room, List<String> list) {
+        Log.d(TAG, "onPeerJoined: ");
+    }
+
+    @Override
+    public void onPeerLeft(Room room, List<String> list) {
+        Log.d(TAG, "onPeerLeft: ");
+    }
+
+    @Override
+    public void onConnectedToRoom(Room room) {
+        Log.d(TAG, "onConnectedToRoom: ");
+    }
+
+    @Override
+    public void onDisconnectedFromRoom(Room room) {
+        Log.d(TAG, "onDisconnectedFromRoom: ");
+    }
+
+    @Override
+    public void onPeersConnected(Room room, List<String> list) {
+        Log.d(TAG, "onPeersConnected: ");
+        mParticipantIDS = list;
+    }
+
+    @Override
+    public void onPeersDisconnected(Room room, List<String> list) {
+        Log.d(TAG, "onPeersDisconnected: ");
+    }
+
+    @Override
+    public void onP2PConnected(String s) {
+        Log.d(TAG, "onP2PConnected: ");
+    }
+
+    @Override
+    public void onP2PDisconnected(String s) {
+        Log.d(TAG, "onP2PDisconnected: ");
+    }
+
+    @Override
+    public void onRoomCreated(int i, Room room) {
+        Log.d(TAG, "onRoomCreated: "+room.getRoomId());
+        Toast.makeText(this, "Room ID: "+room.getRoomId(), Toast.LENGTH_SHORT).show();
+        if (i != GamesStatusCodes.STATUS_OK) {
+            // let screen go to sleep
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            // show error message, return to main screen.
+        }
+    }
+
+    @Override
+    public void onJoinedRoom(int i, Room room) {
+        Log.d(TAG, "onRoomCreated: "+room.getRoomId());
+        if (i != GamesStatusCodes.STATUS_OK) {
+            // let screen go to sleep
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+            // show error message, return to main screen.
+        }
+    }
+
+    @Override
+    public void onLeftRoom(int i, String s) {
+        Log.d(TAG, "onLeftRoom: ");
+    }
+
+    @Override
+    public void onRoomConnected(int i, Room room) {
+        Log.d(TAG, "onRoomConnected: ");
+        byte[] data = "MESSAGE".getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, room.getRoomId());
+    }
+
+    @Override
+    public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
+        String data = new String(realTimeMessage.getMessageData(), StandardCharsets.UTF_8);
+        Log.d(TAG, "onRealTimeMessageReceived: "+data);
+        Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
     }
 }

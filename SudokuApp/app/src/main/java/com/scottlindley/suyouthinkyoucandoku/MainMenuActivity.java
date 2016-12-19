@@ -26,6 +26,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private static final String TAG = "MainMenuActivity";
     private static final int PUZZLE_REFRESH_JOB_ID = 88;
     private CardView mSoloCard, mRaceCard, mStatsCard, mSettingsCard;
+    public static final String RACE_INTENT_EXTRA = "race extra";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,9 @@ public class MainMenuActivity extends AppCompatActivity {
         mRaceCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainMenuActivity.this, RaceActivity.class));
+                Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
+                intent.putExtra(RACE_INTENT_EXTRA, true);
+                startActivity(intent);
             }
         });
 
@@ -99,6 +102,7 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    //TODO: DELETES EVERYTHING
     private void checkForNewPuzzles(){
         DBHelper.getInstance(this).setUpBroadcastReceiver();
         JobInfo puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
