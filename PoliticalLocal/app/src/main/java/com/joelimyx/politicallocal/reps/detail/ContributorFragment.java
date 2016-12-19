@@ -2,47 +2,44 @@ package com.joelimyx.politicallocal.reps.detail;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.reps.gson.opensecret.Contributor;
+import com.joelimyx.politicallocal.reps.gson.opensecret.Contributors;
+import com.joelimyx.politicallocal.reps.gson.opensecret.ContributorsList;
+import com.joelimyx.politicallocal.reps.service.OpenSecretService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ContributorFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ContributorFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_ID = "id";
+    public static final String opensecret_URL = "https://www.opensecrets.org/";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mCId;
 
 
     public ContributorFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ContributorFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ContributorFragment newInstance(String param1, String param2) {
+    public static ContributorFragment newInstance(String param1) {
         ContributorFragment fragment = new ContributorFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_ID, param1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,8 +48,7 @@ public class ContributorFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mCId = getArguments().getString(ARG_ID);
         }
     }
 
@@ -63,4 +59,26 @@ public class ContributorFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_contributor, container, false);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        final RecyclerView contributor_recyclerView = (RecyclerView) view.findViewById(R.id.contributor_recyclerview);
+        contributor_recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(opensecret_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        Call<ContributorsList> call = retrofit.create(OpenSecretService.class).getContributors(mCId);
+        call.enqueue(new Callback<ContributorsList>() {
+            @Override
+            public void onResponse(Call<ContributorsList> call, Response<ContributorsList> response) {
+                List<Contributor> contributors = response.body().getResponse().getContributors().getContributor();
+                contributor_recyclerView.setAdapter(new ContributorAdapter(contributors));
+            }
+
+            @Override
+            public void onFailure(Call<ContributorsList> call, Throwable t) {
+
+            }
+        });
+    }
 }
