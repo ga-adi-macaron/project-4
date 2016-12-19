@@ -11,20 +11,15 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.reps.MyReps;
-import com.joelimyx.politicallocal.reps.RepsFragment;
-import com.joelimyx.politicallocal.reps.gson.opensecret.ListOfLegislator;
-import com.joelimyx.politicallocal.reps.service.OpenSecretService;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,12 +27,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailRepsActivity extends AppCompatActivity {
+public class DetailRepsActivity extends AppCompatActivity implements View.OnClickListener{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
     private ViewPager mViewPager;
+
+    private MyReps mMyReps;
     private static final String TAG = "DetailRepsActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +46,16 @@ public class DetailRepsActivity extends AppCompatActivity {
         // Basic info
         ---------------------------------------------------------------------------------*/
         TextView namePartyText = (TextView) findViewById(R.id.detail_reps_name_party);
-        TextView phoneText = (TextView) findViewById(R.id.detail_reps_phone);
-        TextView websiteText= (TextView) findViewById(R.id.detail_reps_website);
+        ImageView phoneImage = (ImageView) findViewById(R.id.detail_reps_phone);
+        ImageView emailImage = (ImageView) findViewById(R.id.detail_reps_email);
+        ImageView websiteImage= (ImageView) findViewById(R.id.detail_reps_website);
 
-        MyReps myReps = db.getMyRepByID(getIntent().getStringExtra("id"));
-        namePartyText.setText(myReps.getName());
-        phoneText.setText(myReps.getPhone());
+        mMyReps = db.getMyRepByID(getIntent().getStringExtra("id"));
+        namePartyText.setText(mMyReps.getName());
+
+        phoneImage.setOnClickListener(this);
+        emailImage.setOnClickListener(this);
+        websiteImage.setOnClickListener(this);
 
         /*---------------------------------------------------------------------------------
         // Toolbar Area
@@ -73,6 +74,19 @@ public class DetailRepsActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        // TODO: 12/18/16 App Linking
+        switch (view.getId()){
+            case R.id.detail_reps_phone:
+                break;
+            case R.id.detail_reps_email:
+                break;
+            case R.id.detail_reps_website:
+                break;
+        }
     }
 
 
@@ -111,10 +125,6 @@ public class DetailRepsActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -137,11 +147,12 @@ public class DetailRepsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Contributors";
-                case 1:
                     return "Issues";
+                case 1:
+                    return "Contributors";
+                default:
+                    return null;
             }
-            return null;
         }
     }
 }

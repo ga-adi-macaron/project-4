@@ -20,13 +20,16 @@ import java.util.List;
 public class RepsSQLHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "politician.db";
     private static final String REPS_TABLE_NAME = "reps_table";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String COL_BIO_ID = "bio_id";
     private static final String COL_C_ID = "c_id";
     private static final String COL_NAME= "name";
     private static final String COL_PARTY= "party";
     private static final String COL_PHONE= "phone";
+    private static final String COL_EMAIL = "email";
+    private static final String COL_WEBSITE = "website";
+    private static final String COL_TWITTER = "twitter";
     private static final String COL_CHAMBER = "chamber";
     private static final String COL_DISTRICT_CLASS = "district_class";
 
@@ -38,6 +41,9 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     COL_NAME+" TEXT, "+
                     COL_PARTY+" TEXT, "+
                     COL_PHONE+" TEXT, "+
+                    COL_EMAIL+" TEXT, "+
+                    COL_WEBSITE+" TEXT, "+
+                    COL_TWITTER+" TEXT, "+
                     COL_CHAMBER +" TEXT, "+
                     COL_DISTRICT_CLASS+" INTEGER)";
 
@@ -80,6 +86,9 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
         values.put(COL_NAME,name+" "+legislator.getLastName());
         values.put(COL_PARTY,legislator.getParty());
         values.put(COL_PHONE,legislator.getPhone());
+        values.put(COL_EMAIL,legislator.getOcEmail());
+        values.put(COL_WEBSITE,legislator.getWebsite());
+        values.put(COL_TWITTER,legislator.getTwitterId());
 
         //Add district or class
         if (legislator.getDistrict()==null) {
@@ -112,8 +121,11 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(COL_NAME)),
                         cursor.getString(cursor.getColumnIndex(COL_PARTY)),
                         cursor.getString(cursor.getColumnIndex(COL_PHONE)),
-                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
-                        cursor.getString(cursor.getColumnIndex(COL_CHAMBER))
+                        cursor.getString(cursor.getColumnIndex(COL_EMAIL)),
+                        cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
+                        cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
+                        cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
+                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS))
                         ));
                 cursor.moveToNext();
             }
@@ -133,16 +145,17 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                 null,
                 "1");
         if (cursor.moveToFirst()){
-            Log.d("database", "getMyRepByID: movetofirst");
             myReps = new MyReps(
                     cursor.getString(cursor.getColumnIndex(COL_BIO_ID)),
                     cursor.getString(cursor.getColumnIndex(COL_C_ID)),
                     cursor.getString(cursor.getColumnIndex(COL_NAME)),
                     cursor.getString(cursor.getColumnIndex(COL_PARTY)),
                     cursor.getString(cursor.getColumnIndex(COL_PHONE)),
-                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
-                    cursor.getString(cursor.getColumnIndex(COL_CHAMBER))
-                    );
+                    cursor.getString(cursor.getColumnIndex(COL_EMAIL)),
+                    cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
+                    cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
+                    cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
+                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)));
         }
         cursor.close();
         return myReps;

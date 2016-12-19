@@ -54,15 +54,9 @@ public class Result {
     @SerializedName("website")
     @Expose
     private String website;
-    @SerializedName("gender")
-    @Expose
-    private String gender;
     @SerializedName("senate_class")
     @Expose
     private Integer senateClass;
-    @SerializedName("state_rank")
-    @Expose
-    private String stateRank;
     @SerializedName("term_end")
     @Expose
     private String termEnd;
@@ -198,28 +192,12 @@ public class Result {
         this.website = website;
     }
 
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public Integer getSenateClass() {
         return senateClass;
     }
 
     public void setSenateClass(Integer senateClass) {
         this.senateClass = senateClass;
-    }
-
-    public String getStateRank() {
-        return stateRank;
-    }
-
-    public void setStateRank(String stateRank) {
-        this.stateRank = stateRank;
     }
 
     public String getTermEnd() {

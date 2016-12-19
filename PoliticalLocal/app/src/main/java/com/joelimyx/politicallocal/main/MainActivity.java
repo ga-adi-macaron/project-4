@@ -1,6 +1,7 @@
 package com.joelimyx.politicallocal.main;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     private BottomNavigationView mBottomBar;
     private GoogleApiClient mGoogleApiClient;
     private Location mCurrentLocation;
+    String mState;
 
     public static final String district_base_URL = "https://congress.api.sunlightfoundation.com/";
     public static final String open_Url = "https://www.opensecrets.org/";
@@ -72,6 +74,9 @@ public class MainActivity extends AppCompatActivity
             }
         }.execute();
 
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE);
+        mState = preferences.getString(getString(R.string.state),null);
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         //todo: Default show as news fragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_container, RepsFragment.newInstance())
+                .replace(R.id.main_container, RepsFragment.newInstance(mState))
                 .commit();
         mBottomBar.getMenu().getItem(0).setChecked(true);
     }
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.reps:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.main_container, RepsFragment.newInstance())
+                        .replace(R.id.main_container, RepsFragment.newInstance(mState))
                         .commit();
                 break;
 
@@ -117,6 +122,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /*---------------------------------------------------------------------------------
+    // PERMISION REQUEST AREA
+    ---------------------------------------------------------------------------------*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -155,6 +163,7 @@ public class MainActivity extends AppCompatActivity
         super.onStop();
         mGoogleApiClient.disconnect();
     }
+
     /*---------------------------------------------------------------------------------
     // Helper Method AREA
     ---------------------------------------------------------------------------------*/
@@ -183,6 +192,7 @@ public class MainActivity extends AppCompatActivity
                 editor.commit();
                 for (Result current: result) {
                     db.addRep(current);
+                    // TODO: 12/18/16 Get image and store
                 }
             }
 

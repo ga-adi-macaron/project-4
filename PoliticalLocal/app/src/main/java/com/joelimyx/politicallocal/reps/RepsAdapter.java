@@ -4,11 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
-import com.joelimyx.politicallocal.reps.gson.congress.Result;
 
 import java.util.List;
 
@@ -41,8 +40,21 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
     @Override
     public void onBindViewHolder(RepsViewHolder holder, int position) {
         final MyReps current = mRepList.get(position);
-        holder.mRepsName.setText(current.getName());
-        holder.mStateParty.setText(current.getParty()+"-"+mState);
+        String repsNameParty = current.getName()+" ("+current.getParty()+"-"+mState+")";
+        holder.mRepsName.setText(repsNameParty);
+
+        //Setting district/rank to either senate or house position
+        String districtRank;
+        if (current.getChamber().equalsIgnoreCase("Senate")){
+            districtRank="Senator Class "+current.getDistrictClass();
+        }else{
+            if (current.getDistrictClass()==0){
+                districtRank=mState+" At-Large District";
+            }else{
+                districtRank=mState+" District "+current.getDistrictClass();
+            }
+        }
+        holder.mRepsDistrictRank.setText(districtRank);
         holder.mRepsItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -56,21 +68,16 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
         return mRepList.size();
     }
 
-    public void swapData(List<MyReps> updateList){
-        mRepList = updateList;
-        notifyDataSetChanged();
-    }
-
     class RepsViewHolder extends RecyclerView.ViewHolder{
-        private TextView mRepsName, mStateParty;
-        private LinearLayout mRepsItem;
+        private TextView mRepsName, mRepsDistrictRank;
+        private RelativeLayout mRepsItem;
 
         public RepsViewHolder(View itemView) {
             super(itemView);
 
             mRepsName = (TextView) itemView.findViewById(R.id.reps_name);
-            mStateParty= (TextView) itemView.findViewById(R.id.reps_state_party);
-            mRepsItem = (LinearLayout) itemView.findViewById(R.id.reps_item);
+            mRepsDistrictRank = (TextView) itemView.findViewById(R.id.reps_district_rank);
+            mRepsItem = (RelativeLayout) itemView.findViewById(R.id.reps_item);
         }
     }
 }
