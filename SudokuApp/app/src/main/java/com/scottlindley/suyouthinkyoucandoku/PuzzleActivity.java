@@ -34,6 +34,8 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.example.games.basegameutils.BaseGameUtils;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,7 +81,7 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
                     .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                     .build();
         }
-        
+
         if (!isRace) {
             getPuzzleKey();
         }
@@ -528,8 +530,9 @@ public class PuzzleActivity extends AppCompatActivity implements PuzzleSolver.On
     @Override
     public void onRoomConnected(int i, Room room) {
         Log.d(TAG, "onRoomConnected: ");
-        byte[] data = "MESSAGE".getBytes();
-        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, room.getRoomId());
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("Puzzles").child("medium");
+        
     }
 
     @Override
