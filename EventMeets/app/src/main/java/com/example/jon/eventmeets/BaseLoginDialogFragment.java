@@ -88,13 +88,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                         String username = mAccountName.getText().toString();
                         String password = mPassword.getText().toString();
                         String confirm = mHiddenConfirm.getText().toString();
-                        if(mPresenter.onNewAccountRequested(username, password, confirm)) {
-                            mHiddenConfirm.setVisibility(View.GONE);
-                            mHiddenConfirmPassword.setVisibility(View.GONE);
-                            revertOnClickListener(mCreateAccount);
-                        } else {
-                            Toast.makeText(getContext(), "failure", Toast.LENGTH_SHORT).show();
-                        }
+                        mPresenter.onNewAccountRequested(username, password, confirm);
                     }
                 });
                 break;
@@ -109,5 +103,14 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private void revertOnClickListener(View view) {
         view.setOnClickListener(this);
         mLoginButton.setVisibility(View.VISIBLE);
+    }
+
+    void showAccountCreationResult(String result) {
+        if(result.equals("success")) {
+            mPresenter.notifyLoginSuccess(true);
+            revertOnClickListener(mCreateAccount);
+        } else {
+            mHiddenConfirm.setError(result);
+        }
     }
 }

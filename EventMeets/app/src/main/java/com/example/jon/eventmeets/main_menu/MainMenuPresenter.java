@@ -1,6 +1,7 @@
 package com.example.jon.eventmeets.main_menu;
 
 import com.example.jon.eventmeets.Model.EventParent;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 

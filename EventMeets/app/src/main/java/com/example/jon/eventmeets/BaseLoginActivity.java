@@ -3,30 +3,27 @@ package com.example.jon.eventmeets;
 import android.content.Intent;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.example.jon.eventmeets.EventCategoryBrowser.EventBrowseViewActivity;
 import com.example.jon.eventmeets.main_menu.MainMenuView;
 
 public class BaseLoginActivity extends AppCompatActivity implements BaseLoginContract.View, View.OnClickListener{
     private BaseLoginContract.Presenter mPresenter;
+    private BaseLoginDialogFragment mFragment;
 
     @Override
     protected void onStart() {
         super.onStart();
+        mPresenter.addFirebaseListener();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        mPresenter.removeFirebaseListener();
     }
 
     @Override
@@ -45,8 +42,10 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     @Override
     public void displayLoginDialog() {
         FragmentManager manager = getSupportFragmentManager();
+        mFragment = new BaseLoginDialogFragment(mPresenter);
+
         manager.beginTransaction()
-                .add(new BaseLoginDialogFragment(mPresenter), "login")
+                .add(mFragment, "login")
                 .commit();
     }
 
@@ -63,6 +62,16 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         Intent intent = new Intent(this, MainMenuView.class);
         intent.putExtra("logged in", false);
         startActivity(intent);
+    }
+
+    @Override
+    public void notifyFragmentSuccess() {
+        mFragment.showAccountCreationResult("success");
+    }
+
+    @Override
+    public void notifyFragmentFailure() {
+        mFragment.showAccountCreationResult("failure");
     }
 
     @Override
