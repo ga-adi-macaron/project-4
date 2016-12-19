@@ -18,33 +18,18 @@ public class MainMenuRecyclerAdapter extends RecyclerView.Adapter<MainMenuEventP
 
     @Override
     public MainMenuEventParentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch(parent.getId()) {
-            case R.layout.game_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.game_event_layout, parent, false));
-            case R.layout.conversation_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.conversation_event_layout, parent, false));
-            case R.layout.drink_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.drink_event_layout, parent, false));
-            case R.layout.nature_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.nature_event_layout, parent, false));
-            case R.layout.taste_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.taste_event_layout, parent, false));
-            case R.layout.theater_event_layout:
-                return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.theater_event_layout, parent, false));
-            default:
-                return null;
-        }
+        return new MainMenuEventParentViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.main_menu_event_layout, parent, false));
     }
 
     @Override
     public void onBindViewHolder(MainMenuEventParentViewHolder holder, int position) {
-
+//        EventParent parent = mEventList.get(position);
+//
+//        holder.mLocationText.setText(parent.getLocation());
+//        holder.mParentName.setText(parent.getParentName());
+//
+//        parent.setIcon(holder.mParentIcon);
     }
 
     @Override

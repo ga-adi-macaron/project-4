@@ -25,13 +25,16 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
     private MainMenuRecyclerAdapter mAdapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
         mBrowseButton = (Button)findViewById(R.id.fab);
-        mLoginMainMenuButton = (Button)findViewById(R.id.main_menu_login_btn);
-        mEventHeader = (TextView)findViewById(R.id.main_event_header);
+        mLoginMainMenuButton = (Button)findViewById(R.id.main_menu_login);
+
+        mMainEventsRecycler = (RecyclerView)findViewById(R.id.main_menu_recycler);
+
+        mEventHeader = (TextView)findViewById(R.id.recommended_events_header);
 
         Intent intent = getIntent();
         if(intent.getBooleanExtra("logged in", false))

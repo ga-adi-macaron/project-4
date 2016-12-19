@@ -81,6 +81,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                 Toast.makeText(getActivity(), "create", Toast.LENGTH_SHORT).show();
                 mHiddenConfirmPassword.setVisibility(View.VISIBLE);
                 mHiddenConfirm.setVisibility(View.VISIBLE);
+                mLoginButton.setVisibility(View.GONE);
                 mCreateAccount.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -107,5 +108,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
 
     private void revertOnClickListener(View view) {
         view.setOnClickListener(this);
+        mLoginButton.setVisibility(View.VISIBLE);
     }
 }

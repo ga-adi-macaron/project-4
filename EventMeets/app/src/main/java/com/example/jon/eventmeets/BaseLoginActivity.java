@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jon.eventmeets.EventCategoryBrowser.EventBrowseViewActivity;
+import com.example.jon.eventmeets.main_menu.MainMenuView;
 
 public class BaseLoginActivity extends AppCompatActivity implements BaseLoginContract.View, View.OnClickListener{
     private BaseLoginContract.Presenter mPresenter;
@@ -51,7 +52,7 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
 
     @Override
     public void startMainMenuActivity() {
-        Intent intent = new Intent(this, EventBrowseViewActivity.class);
+        Intent intent = new Intent(this, MainMenuView.class);
         intent.putExtra("logged in", true);
         startActivity(intent);
         ActivityCompat.finishAffinity(this);
@@ -59,7 +60,7 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
 
     @Override
     public void skipLogin() {
-        Intent intent = new Intent(this, EventBrowseViewActivity.class);
+        Intent intent = new Intent(this, MainMenuView.class);
         intent.putExtra("logged in", false);
         startActivity(intent);
     }
