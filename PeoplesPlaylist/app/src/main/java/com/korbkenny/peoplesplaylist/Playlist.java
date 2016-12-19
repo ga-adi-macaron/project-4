@@ -12,19 +12,21 @@ import java.util.List;
 public class Playlist {
 
     private double mLatitude, mLongitude;
-    private String mTitle, mDescription;
+    private String mTitle, mDescription, mId;
     private URL mCover;
     private List<Song> mSongList;
 
+    //  If you use an empty constructor and push a playlist to the database,
+    //  you can get that entire playlist back with a single query.
     public Playlist(){}
 
-//    public Playlist(double latitude, double longitude, String title, String description) {
-//        mLatitude = latitude;
-//        mLongitude = longitude;
-//        mTitle = title;
-//        mDescription = description;
-//        mSongList = new ArrayList<>();
-//    }
+    public String getId() {
+        return mId;
+    }
+
+    public void setId(String id) {
+        mId = id;
+    }
 
     public double getLat() {
         return mLatitude;
@@ -69,4 +71,10 @@ public class Playlist {
     public List<Song> getSongList() {
         return mSongList;
     }
+
+    public void setSongList(List<Song> songList) {
+        mSongList = songList;
+    }
+
+
 }

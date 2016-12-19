@@ -38,7 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -56,11 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location lastLocation;
     private LocationRequest mLocationRequest;
     private FloatingActionButton fab;
-    private String mPlaylistTitle, mPlaylistDescription;
-    private Playlist mPlaylist;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabasePlaylistReference, mGeofireRef;
-    private LatLngBounds currentScreen;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
 
@@ -94,91 +91,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         setUpMap();
+
         fab = (FloatingActionButton)findViewById(R.id.fab);
+
+        //  FAB to create new playlist. Opens a dialog to do this.
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MapsActivity.this, "Cool.", Toast.LENGTH_SHORT).show();
-                Playlist playlist = new Playlist();
-                playlist.setTitle("sweetyNicey");
-                playlist.setDescription("coolio!");
-                playlist.setLat(43.1234);
-                playlist.setLon(-73.3456);
-                String id = mDatabasePlaylistReference.push().getKey();
-                geoFire.setLocation(id, new GeoLocation(playlist.getLat(), playlist.getLon()), new GeoFire.CompletionListener() {
-                    @Override
-                    public void onComplete(String key, DatabaseError error) {
-                        if (error!=null) {
-                            Toast.makeText(MapsActivity.this, "Nooooooo there was an error...", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(MapsActivity.this, "RAD!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                Log.d(TAG, "onClick: " + id);
-                mDatabasePlaylistReference.child(id).setValue(playlist);
-
-//                if (lastLocation!=null) {
-//                    onCreateDialog().show();
-//                    Log.d(TAG, "onClick: " + lastLocation.getLatitude() + " " + lastLocation.getLongitude());
-//                } else {
-//                    Log.d(TAG, "onClick: WELL COOL, NO CONNECTION?!");
-//                }
+                if (lastLocation!=null) {
+                    onCreateDialog().show();
+                }
             }
         });
-
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                geoQuery = geoFire.queryAtLocation(new GeoLocation(43.3,-73.3),1000);
-                geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                    @Override
-                    public void onKeyEntered(String key, GeoLocation location) {
-                        DatabaseReference ref = mFirebaseDatabase.getReference("Playlists/"+key);
-                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d(TAG, "onDataChange: "+ dataSnapshot.toString());
-                                Playlist playlist = dataSnapshot.getValue(Playlist.class);
-                                Log.d(TAG, "onDataChange: " + playlist.getTitle() + " " + playlist.getDescription());
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onKeyExited(String key) {
-
-                    }
-
-                    @Override
-                    public void onKeyMoved(String key, GeoLocation location) {
-
-                    }
-
-                    @Override
-                    public void onGeoQueryReady() {
-
-                    }
-
-                    @Override
-                    public void onGeoQueryError(DatabaseError error) {
-
-                    }
-                });
-                return true;
-            }
-        });
-
-        currentScreen = mMap.getProjection().getVisibleRegion().latLngBounds;
-
-
     }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
@@ -197,29 +123,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Dialog view = (Dialog)dialog;
                         EditText title = (EditText) view.findViewById(R.id.add_playlist_title);
                         EditText description = (EditText) view.findViewById(R.id.add_playlist_description);
-                        mPlaylistTitle = title.getText().toString();
-                        mPlaylistDescription = description.getText().toString();
-                        //mPlaylist = new Playlist(lastLocation.getLatitude(),lastLocation.getLongitude(),mPlaylistTitle,mPlaylistDescription);
-                        mDatabasePlaylistReference.push().setValue(mPlaylist);
-                        mDatabasePlaylistReference.getKey();
-                        Toast.makeText(MapsActivity.this, "Even cooler", Toast.LENGTH_SHORT).show();
-                        geoFire.setLocation("This Place Yeah!", new GeoLocation(lastLocation.getLatitude(), lastLocation.getLongitude()), new GeoFire.CompletionListener() {
+
+                        //  Create playlist object and set its title, description, lat & lon.
+                        final Playlist playlist = new Playlist();
+                        playlist.setTitle(title.getText().toString());
+                        playlist.setDescription(description.getText().toString());
+                        playlist.setLat(lastLocation.getLatitude());
+                        playlist.setLon(lastLocation.getLongitude());
+
+                        //  Push to the playlists branch of the database, and get the
+                        //  unique, randomly generated key for geofire use.
+                        final String playlistId = mDatabasePlaylistReference.push().getKey();
+                        playlist.setId(playlistId);
+                        geoFire.setLocation(playlistId, new GeoLocation(playlist.getLat(), playlist.getLon()), new GeoFire.CompletionListener() {
                             @Override
                             public void onComplete(String key, DatabaseError error) {
-                                if (error != null){
-                                    Log.d(TAG, "onComplete: BUT NOT COMLETE! OH SHOOT! IT FAILED TO UPLOAD!");
-                                }
-                                else{
-                                    Log.d(TAG, "onComplete: AND WOOOO IT WORKED (SORTA PROBABLY)");
-                                }
+                                //  If the geofire worked, then upload the playlist to the database
+                                mDatabasePlaylistReference.child(playlistId).setValue(playlist);
                             }
                         });
 
-//                        Intent intent = new Intent(MapsActivity.this,PlaylistActivity.class);
-//                        startActivity(intent);
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(mPlaylist.getLat(), mPlaylist.getLon()))
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.covermatters2)).title(mPlaylist.getTitle()));
-
+                        //  Put the Playlist Id into the intent so it can be accessed from
+                        //  the database in the actual playlist activity.
+                        Intent intent = new Intent(MapsActivity.this,PlaylistActivity.class);
+                        intent.putExtra("Playlist Id", playlistId);
+                        startActivity(intent);
                     }
                 })
                 .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
@@ -234,19 +162,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //
     //     For the GeoQuery, add markers when a key enters,
     //     and remove markers when they exit (or don't, not sure yet!)
-    //     There are also extra methods at the bottom, but probably won't need them.
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//    @Override
-//    public void onKeyEntered(String key, GeoLocation location) {
-//        Log.d(TAG, "onKeyEntered: " + key + " " + location.latitude + " " + location.longitude);
-//    }
-//
-//    @Override
-//    public void onKeyExited(String key) {
-//
-//    }
+    public void createGeoQuery(){
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),5);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                DatabaseReference ref = mFirebaseDatabase.getReference("Playlists/"+key);
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Playlist playlist = dataSnapshot.getValue(Playlist.class);
+                        Marker marker = mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(playlist.getLat(),playlist.getLon()))
+                                        .title(playlist.getTitle()));
+                        marker.setTag(playlist.getId());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
+
+
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -254,6 +220,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //     Extra methods I probably won't touch much.
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    //  Build the API client.
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -263,24 +232,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
     }
 
+
+    //  Connect the API client.
     @Override
     protected void onStart() {
         super.onStart();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
-
     }
 
+
+    //  Disconnect the API client & remove listeners.
     @Override
     protected void onStop() {
         super.onStop();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-        geoQuery.removeAllListeners();
+        if (geoQuery != null) {
+            geoQuery.removeAllListeners();
+        }
     }
 
+
+    //  Set up the map by getting permission.
     public void setUpMap() {
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -292,6 +268,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
     }
+
 
     private void moveMapToCurrentLocation(Location lastLocation) {
         if (lastLocation != null) {
@@ -325,7 +302,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)!=null) {
                     lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    Log.d(TAG, "onConnected: " + lastLocation.getLatitude() + "    " + lastLocation.getLongitude());
+                    createGeoQuery();
                     createLocationRequest();
                     startLocationUpdates();
                     moveMapToCurrentLocation(lastLocation);
@@ -351,21 +328,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lastLocation = location;
     }
 
-
-
-
-//    @Override
-//    public void onKeyMoved(String key, GeoLocation location) {
-//
-//    }
-//
-//    @Override
-//    public void onGeoQueryReady() {
-//
-//    }
-//
-//    @Override
-//    public void onGeoQueryError(DatabaseError error) {
-//
-//    }
 }
