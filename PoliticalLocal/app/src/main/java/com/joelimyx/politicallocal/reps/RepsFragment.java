@@ -17,12 +17,6 @@ import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.reps.detail.DetailRepsActivity;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class RepsFragment extends Fragment
         implements RepsAdapter.OnRepsItemSelectedListener{
     private RepsAdapter mAdapter;
@@ -54,7 +48,7 @@ public class RepsFragment extends Fragment
 
         RepsSQLHelper db = RepsSQLHelper.getInstance(getContext());
 
-        mAdapter = new RepsAdapter(db.getRepsList(),getArguments().getString(ARG_STATE),this);
+        mAdapter = new RepsAdapter(db.getRepsList(),getArguments().getString(ARG_STATE),this,getContext());
         recyclerView.setAdapter(mAdapter);
 
     }

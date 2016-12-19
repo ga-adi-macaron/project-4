@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.reps.MyReps;
+import com.squareup.picasso.Picasso;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,8 +50,13 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
         ImageView phoneImage = (ImageView) findViewById(R.id.detail_reps_phone);
         ImageView emailImage = (ImageView) findViewById(R.id.detail_reps_email);
         ImageView websiteImage= (ImageView) findViewById(R.id.detail_reps_website);
+        ImageView detailRepsImage= (ImageView) findViewById(R.id.detail_reps_image);
+
 
         mMyReps = db.getMyRepByID(getIntent().getStringExtra("id"));
+        Picasso.with(this)
+                .load(getFileStreamPath(mMyReps.getFileName()))
+                .fit().into(detailRepsImage);
         namePartyText.setText(mMyReps.getName());
 
         phoneImage.setOnClickListener(this);

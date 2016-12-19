@@ -20,7 +20,7 @@ import java.util.List;
 public class RepsSQLHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "politician.db";
     private static final String REPS_TABLE_NAME = "reps_table";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String COL_BIO_ID = "bio_id";
     private static final String COL_C_ID = "c_id";
@@ -32,6 +32,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
     private static final String COL_TWITTER = "twitter";
     private static final String COL_CHAMBER = "chamber";
     private static final String COL_DISTRICT_CLASS = "district_class";
+    public static final String COL_FILE_NAME = "file_name";
 
     private static final String[] BASIC_COLUMNS = {COL_NAME,COL_PARTY};
     private static final String CREATE_TABLE =
@@ -45,6 +46,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     COL_WEBSITE+" TEXT, "+
                     COL_TWITTER+" TEXT, "+
                     COL_CHAMBER +" TEXT, "+
+                    COL_FILE_NAME+" TEXT, "+
                     COL_DISTRICT_CLASS+" INTEGER)";
 
     private static RepsSQLHelper sInstance;
@@ -71,7 +73,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void addRep(Result legislator){
+    public void addRep(Result legislator, String fileName){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -98,6 +100,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
         }
 
         values.put(COL_CHAMBER,legislator.getChamber());
+        values.put(COL_FILE_NAME, fileName+".jpg");
 
         db.insert(REPS_TABLE_NAME,null,values);
         db.close();
@@ -125,7 +128,8 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
                         cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
                         cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
-                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS))
+                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
+                        cursor.getString(cursor.getColumnIndex(COL_FILE_NAME))
                         ));
                 cursor.moveToNext();
             }
@@ -155,7 +159,8 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
                     cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
                     cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
-                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)));
+                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
+                    cursor.getString(cursor.getColumnIndex(COL_FILE_NAME)));
         }
         cursor.close();
         return myReps;

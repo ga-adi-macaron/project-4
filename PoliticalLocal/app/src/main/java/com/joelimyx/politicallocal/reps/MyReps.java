@@ -5,10 +5,10 @@ package com.joelimyx.politicallocal.reps;
  */
 
 public class MyReps {
-    private String mBioId, mCId, mName, mParty, mPhone,mEmail,mWebsite, mTwitter, mChamber;
+    private String mBioId, mCId, mName, mParty, mPhone,mEmail,mWebsite, mTwitter, mChamber, mFileName;
     private int mDistrictClass;
 
-    public MyReps(String bioId, String CId, String name, String party, String phone, String email, String website, String twitter, String chamber, int districtClass) {
+    public MyReps(String bioId, String CId, String name, String party, String phone, String email, String website, String twitter, String chamber, int districtClass,  String fileName) {
         mBioId = bioId;
         mCId = CId;
         mName = name;
@@ -19,6 +19,7 @@ public class MyReps {
         mTwitter = twitter;
         mChamber = chamber;
         mDistrictClass = districtClass;
+        mFileName = fileName;
     }
 
     public String getBioId() {
@@ -62,5 +63,9 @@ public class MyReps {
 
     public String getChamber() {
         return mChamber;
+    }
+
+    public String getFileName() {
+        return mFileName;
     }
 }

@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -14,20 +16,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.vision.CameraSource;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.DBAssetHelper;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.news.NewsFragment;
 import com.joelimyx.politicallocal.reps.RepsFragment;
+import com.joelimyx.politicallocal.reps.gson.bingsearch.Portrait;
 import com.joelimyx.politicallocal.reps.gson.congress.RepsList;
 import com.joelimyx.politicallocal.reps.gson.congress.Result;
+import com.joelimyx.politicallocal.reps.service.BingImageService;
 import com.joelimyx.politicallocal.reps.service.CongressService;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -191,8 +206,10 @@ public class MainActivity extends AppCompatActivity
                 editor.putString(getString(R.string.state),result.get(0).getState());
                 editor.commit();
                 for (Result current: result) {
-                    db.addRep(current);
+                    String name = current.getFirstName()+" "+current.getLastName();
+                    db.addRep(current, name);
                     // TODO: 12/18/16 Get image and store
+                    loadImageFromWeb(name);
                 }
             }
 
@@ -203,5 +220,47 @@ public class MainActivity extends AppCompatActivity
         });
 
     }
+    private void loadImageFromWeb(final String person){
 
+        //Search for the image
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.cognitive.microsoft.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        Call<Portrait> call = retrofit.create(BingImageService.class).getImage(person+" congress",2);
+        call.enqueue(new Callback<Portrait>() {
+            @Override
+            public void onResponse(Call<Portrait> call, Response<Portrait> response) {
+
+                //Download the image to bitmap
+                ImageRequest request = new ImageRequest(response.body().getValue().get(0).getThumbnailUrl(), new com.android.volley.Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap response) {
+
+                        saveImageToFile(response,person);
+                    }
+                }, 0, 0, null, null, new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MainActivity.this, "Failed image download", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Volley.newRequestQueue(MainActivity.this).add(request);            }
+
+            @Override
+            public void onFailure(Call<Portrait> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed image search", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void saveImageToFile(Bitmap image, String person){
+        try {
+            FileOutputStream fos = openFileOutput(person+".jpg",MODE_PRIVATE);
+            image.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

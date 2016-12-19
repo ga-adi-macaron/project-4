@@ -1,13 +1,16 @@
 package com.joelimyx.politicallocal.reps;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -19,15 +22,17 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
     private List<MyReps> mRepList;
     private OnRepsItemSelectedListener mListener;
     private String mState;
+    private Context mContext;
 
     interface OnRepsItemSelectedListener{
         void OnRepsItemSelected(String id);
     }
 
-    public RepsAdapter(List<MyReps> repList, String state, OnRepsItemSelectedListener listener) {
+    public RepsAdapter(List<MyReps> repList, String state, OnRepsItemSelectedListener listener, Context context) {
         mRepList = repList;
         mListener = listener;
         mState = state;
+        mContext = context;
     }
 
     @Override
@@ -40,6 +45,11 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
     @Override
     public void onBindViewHolder(RepsViewHolder holder, int position) {
         final MyReps current = mRepList.get(position);
+        Picasso.with(mContext)
+                .load(mContext.getFileStreamPath(current.getFileName()))
+                .fit()
+                .into(holder.mRepsPortrait);
+
         String repsNameParty = current.getName()+" ("+current.getParty()+"-"+mState+")";
         holder.mRepsName.setText(repsNameParty);
 
@@ -71,6 +81,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
     class RepsViewHolder extends RecyclerView.ViewHolder{
         private TextView mRepsName, mRepsDistrictRank;
         private RelativeLayout mRepsItem;
+        private ImageView mRepsPortrait;
 
         public RepsViewHolder(View itemView) {
             super(itemView);
@@ -78,6 +89,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
             mRepsName = (TextView) itemView.findViewById(R.id.reps_name);
             mRepsDistrictRank = (TextView) itemView.findViewById(R.id.reps_district_rank);
             mRepsItem = (RelativeLayout) itemView.findViewById(R.id.reps_item);
+            mRepsPortrait = (ImageView) itemView.findViewById(R.id.reps_portrait);
         }
     }
 }
