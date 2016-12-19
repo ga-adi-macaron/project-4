@@ -37,6 +37,9 @@ public class MainMenuActivity extends AppCompatActivity {
         getWindow().setSharedElementEnterTransition(transition);
         getWindow().setSharedElementReturnTransition(transition);
 
+//        getWindow().setExitTransition(new Explode());
+//        getWindow().setEnterTransition(new Explode());
+
         setContentView(R.layout.activity_main);
 
         DBAssetHelper dbAssetSetUp = new DBAssetHelper(MainMenuActivity.this);
@@ -63,15 +66,16 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Pair<View, String> pair1 =
-                        Pair.create(findViewById(R.id.solo_card), getString(R.string.solo_transition_1));
+                        Pair.create(findViewById(R.id.solo_card), getString(R.string.transition1));
                 Pair<View, String> pair2 =
-                        Pair.create(findViewById(R.id.race_card), getString(R.string.solo_transition_2));
+                        Pair.create(findViewById(R.id.race_card), getString(R.string.transition2));
                 Pair<View, String> pair3 =
-                        Pair.create(findViewById(R.id.settings_card), getString(R.string.solo_transition_3));
+                        Pair.create(findViewById(R.id.settings_card), getString(R.string.transition3));
                 Pair<View, String> pair4 =
-                        Pair.create(findViewById(R.id.stats_card), getString(R.string.solo_transition_4));
+                        Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
                 ActivityOptions options =
-                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair1, pair2, pair3, pair4);
+                        ActivityOptions.makeSceneTransitionAnimation(
+                                MainMenuActivity.this, pair1, pair2, pair3, pair4);
                 startActivity(new Intent(MainMenuActivity.this, SoloActivity.class), options.toBundle());
             }
         });
@@ -80,6 +84,17 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainMenuActivity.this, RaceActivity.class));
+            }
+        });
+
+        mStatsCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Pair<View, String> pair =
+                        Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+                ActivityOptions options =
+                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair);
+                startActivity(new Intent(MainMenuActivity.this, StatsActivity.class), options.toBundle());
             }
         });
     }

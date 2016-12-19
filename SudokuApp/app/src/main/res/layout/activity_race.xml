@@ -5,6 +5,7 @@
     android:id="@+id/activity_race"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:transitionName="@string/background_transition"
     android:background="#4b4b4b"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".RaceActivity">
