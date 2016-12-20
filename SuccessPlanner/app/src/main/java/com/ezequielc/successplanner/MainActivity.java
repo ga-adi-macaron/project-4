@@ -24,6 +24,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     public static final String URL = "https://apimk.com/motivationalquotes?get_quote=yes";
+    public static final String DATE_FORMATTED = "dateFormatted";
 
     TextView mQuote;
     CalendarView mCalendarView;
@@ -47,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int dayOfMonth) {
-//                Intent intent = new Intent();
+                Intent intent = new Intent(MainActivity.this, DailyActivity.class);
+                intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
+                startActivity(intent);
             }
         });
     }
