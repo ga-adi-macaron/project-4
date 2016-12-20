@@ -24,12 +24,8 @@ public class MainMenuRecyclerAdapter extends RecyclerView.Adapter<MainMenuEventP
 
     @Override
     public void onBindViewHolder(MainMenuEventParentViewHolder holder, int position) {
-//        EventParent parent = mEventList.get(position);
-//
-//        holder.mLocationText.setText(parent.getLocation());
-//        holder.mParentName.setText(parent.getParentName());
-//
-//        parent.setIcon(holder.mParentIcon);
+//        EventParent event = mEventList.get(position);
+//        event.setIcon(holder.mParentIcon);
     }
 
     @Override

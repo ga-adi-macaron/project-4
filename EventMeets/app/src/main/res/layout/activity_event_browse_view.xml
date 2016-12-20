@@ -1,34 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.example.jon.eventmeets.EventCategoryBrowser.EventBrowseViewActivity">
+    android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <TextView
+        android:id="@+id/category_conversation"
+        android:textSize="48sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:text="Conversational"/>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+    <TextView
+        android:id="@+id/category_drink"
+        android:textSize="48sp"
+        android:text="Drinks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-    </android.support.design.widget.AppBarLayout>
+    <TextView
+        android:id="@+id/category_game"
+        android:textSize="48sp"
+        android:text="Games"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-    <include layout="@layout/content_event_browse_view" />
+    <TextView
+        android:id="@+id/category_nature"
+        android:textSize="48sp"
+        android:text="Nature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+    <TextView
+        android:id="@+id/category_taste"
+        android:textSize="48sp"
+        android:text="Tastes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/category_theater"
+        android:textSize="48sp"
+        android:text="Theater"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

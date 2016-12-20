@@ -6,7 +6,6 @@ import java.util.List;
 
 interface EventBrowserContract {
     interface View {
-        void setBrowserAdapter(List<Category> list);
         void openCategory(Category category);
     }
 

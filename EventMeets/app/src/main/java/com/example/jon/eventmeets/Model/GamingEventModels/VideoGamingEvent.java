@@ -124,7 +124,7 @@ public class VideoGamingEvent extends GamingEventParent {
     }
 
     @Override
-    public String parentName() {
+    public String getParent() {
         return null;
     }
 }

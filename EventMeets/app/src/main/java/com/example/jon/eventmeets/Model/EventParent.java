@@ -7,7 +7,7 @@ import android.view.View;
  */
 
 public interface EventParent {
-    String parentName();
+    String getParent();
 //    String getLocation();
 //    void setIcon(View view);
 }

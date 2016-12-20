@@ -20,7 +20,7 @@ interface MainMenuContract {
         void setupRecyclerView(List<EventParent> list);
         void hideLoginButton();
         void openEventDetail(EventParent event);
-        void openBrowseActivity(Category category);
+        void openBrowseActivity();
         void displayLoginButton();
         void openSettingsActivity();
     }
