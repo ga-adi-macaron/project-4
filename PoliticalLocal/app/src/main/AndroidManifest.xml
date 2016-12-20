@@ -29,6 +29,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.joelimyx.politicallocal.main.MainActivity"/>
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="0001e0084b67cc852c91550c7544674228cc6e53" />
     </application>
 
 </manifest>

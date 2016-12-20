@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.vision.CameraSource;
 import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.bills.BillFragment;
 import com.joelimyx.politicallocal.database.DBAssetHelper;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.news.NewsFragment;
@@ -38,6 +39,9 @@ import com.joelimyx.politicallocal.reps.service.BingImageService;
 import com.joelimyx.politicallocal.reps.service.CongressService;
 import com.squareup.picasso.Picasso;
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,6 +59,11 @@ public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "V2RCaymY8YS5r2hQLtKPf1A5s";
+    private static final String TWITTER_SECRET = "FX3mhvuWzZQJkBxF6Idm8SwrJdwPamBh8yL3UgYTyfYP9pwKCd";
+
 
     private static final String TAG = "MainActivity";
     public static final int LOCATION_REQUEST_CODE = 1;
@@ -78,6 +87,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main);
 
         new AsyncTask<Void, Void, Void>(){
@@ -106,9 +117,9 @@ public class MainActivity extends AppCompatActivity
         //todo: Default show as news fragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_container, RepsFragment.newInstance(mState))
+                .replace(R.id.main_container, BillFragment.newInstance())
                 .commit();
-        mBottomBar.getMenu().getItem(0).setChecked(true);
+        mBottomBar.getMenu().getItem(2).setChecked(true);
     }
 
     /*---------------------------------------------------------------------------------
@@ -132,6 +143,10 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.bills:
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_container, BillFragment.newInstance())
+                        .commit();
                 break;
         }
         return true;
@@ -208,8 +223,7 @@ public class MainActivity extends AppCompatActivity
                 for (Result current: result) {
                     String name = current.getFirstName()+" "+current.getLastName();
                     db.addRep(current, name);
-                    // TODO: 12/18/16 Get image and store
-                    loadImageFromWeb(name);
+                    //loadImageFromWeb(name);
                 }
             }
 
@@ -220,6 +234,8 @@ public class MainActivity extends AppCompatActivity
         });
 
     }
+
+    // TODO: 12/20/16 Call only one time to get reps image
     private void loadImageFromWeb(final String person){
 
         //Search for the image
@@ -239,7 +255,7 @@ public class MainActivity extends AppCompatActivity
 
                         saveImageToFile(response,person);
                     }
-                }, 0, 0, null, null, new com.android.volley.Response.ErrorListener() {
+                }, 80, 80, null, null, new com.android.volley.Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(MainActivity.this, "Failed image download", Toast.LENGTH_SHORT).show();

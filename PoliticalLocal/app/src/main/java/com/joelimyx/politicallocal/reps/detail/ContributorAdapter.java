@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
-import com.joelimyx.politicallocal.reps.gson.opensecret.Attributes;
 import com.joelimyx.politicallocal.reps.gson.opensecret.Attributes_;
 import com.joelimyx.politicallocal.reps.gson.opensecret.Contributor;
 
@@ -41,7 +40,7 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
         for (int i = 1; i <= comma; i++) {
             amount.insert(current.getTotal().length()-(i*3),",");
         }
-        holder.mContributorAmount.setText(amount.toString());
+        holder.mContributorAmount.setText("$"+amount.toString());
     }
 
     @Override

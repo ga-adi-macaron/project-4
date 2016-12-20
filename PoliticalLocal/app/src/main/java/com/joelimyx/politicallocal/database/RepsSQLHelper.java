@@ -115,7 +115,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                null);
+                COL_CHAMBER);
         if (cursor.moveToFirst()){
             while (!cursor.isAfterLast()){
                 myRepsList.add(new MyReps(
