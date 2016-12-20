@@ -31,6 +31,13 @@
         </activity>
         <activity android:name=".event_category.CategoryWithSubsActivity">
         </activity>
+        <activity
+            android:name=".event_detail_components.EventDetailActivity"
+            android:label="@string/title_activity_event_detail"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".event_detail_components.EventMessageActivity">
+        </activity>
     </application>
 
 </manifest>
