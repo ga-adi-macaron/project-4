@@ -17,6 +17,10 @@ public interface BaseLoginContract {
         void notifyFragmentSuccess();
 
         void notifyFragmentFailure();
+
+        void checkSharedPreferences();
+
+        void addAccountInfoToSharedPreferences(String username, String password);
     }
 
     interface Presenter {
@@ -28,7 +32,7 @@ public interface BaseLoginContract {
 
         void checkLoginDetails(String username, String password);
 
-        void onUserReturn();
+        void onUserReturn(String username, String password);
 
         void onNewAccountRequested(String username, String password, String confirmPassword);
 

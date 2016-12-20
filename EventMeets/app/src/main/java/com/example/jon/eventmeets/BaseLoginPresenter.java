@@ -1,5 +1,7 @@
 package com.example.jon.eventmeets;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,8 +22,9 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private boolean mLoggedIn = true;
     private String mLoginError;
+    private Context mContext;
 
-    public BaseLoginPresenter(BaseLoginContract.View view) {
+    public BaseLoginPresenter(BaseLoginContract.View view, Context context) {
         mView = view;
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -58,12 +61,13 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     }
 
     @Override
-    public void checkLoginDetails(String username, String password) {
+    public void checkLoginDetails(final String username, final String password) {
         mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
+                            mView.addAccountInfoToSharedPreferences(username, password);
                             notifyLoginSuccess(true);
                         }
                     }
@@ -71,11 +75,11 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     }
 
     @Override
-    public void onUserReturn() {
-//        FirebaseUser user = mAuth.getCurrentUser();
-//        if(user != null) {
-//            mView.startMainMenuActivity();
-//        }
+    public void onUserReturn(String username, String password) {
+        if(username != null && password != null) {
+            mAuth.signInWithEmailAndPassword(username, password);
+            notifyLoginSuccess(true);
+        }
     }
 
     @Override

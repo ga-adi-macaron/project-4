@@ -1,6 +1,7 @@
 package com.example.jon.eventmeets;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -34,9 +35,9 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         findViewById(R.id.login_main_btn).setOnClickListener(this);
         findViewById(R.id.skip_login_btn).setOnClickListener(this);
 
-        mPresenter = new BaseLoginPresenter(this);
+        mPresenter = new BaseLoginPresenter(this, this);
 
-        mPresenter.onUserReturn();
+        checkSharedPreferences();
     }
 
     @Override
@@ -72,6 +73,20 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     @Override
     public void notifyFragmentFailure() {
         mFragment.showAccountCreationResult("failure");
+    }
+
+    @Override
+    public void checkSharedPreferences() {
+        SharedPreferences preferences = getSharedPreferences("account", MODE_PRIVATE);
+        if(preferences.getString("username", null) != null && preferences.getString("password", null) != null) {
+            mPresenter.onUserReturn(preferences.getString("username", null), preferences.getString("password", null));
+        }
+    }
+
+    @Override
+    public void addAccountInfoToSharedPreferences(String username, String password) {
+        SharedPreferences preferences = getSharedPreferences("account", MODE_PRIVATE);
+        preferences.edit().putString("username", username).putString("password", password).apply();
     }
 
     @Override
