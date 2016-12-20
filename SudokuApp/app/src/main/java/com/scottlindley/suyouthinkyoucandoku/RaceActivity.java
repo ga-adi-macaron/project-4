@@ -44,6 +44,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     public static final String TOO_MANY_GUESSES_MESSAGE = "too many guesses";
     public static final String OPPONENT_FINISHED_MESSAGE = "opponent finished";
     private boolean mOpponentQuit, mOpponentDisconnected, mOpponentTooManyGuesses, mOpponentFinished;
+    private boolean mUserDisconnected;
     private String mRoomID;
     private boolean mResolvingConnectionFailure = false;
     private GoogleApiClient mGoogleApiClient;
@@ -125,6 +126,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,data,mRoomID);
             } else if (mOpponentFinished){
                 resultDetailText.setText("Your opponent has finished the puzzle");
+            } else if (mUserDisconnected){
+                resultDetailText.setText("You have disconnected from the game");
             }
             resultDetailText.setVisibility(View.VISIBLE);
         }
@@ -136,6 +139,12 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        RaceActivity.this.finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
                         RaceActivity.this.finish();
                     }
                 })
@@ -175,6 +184,23 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         if(mGoogleApiClient!=null) {
             mGoogleApiClient.connect();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        mUserDisconnected = true;
+        super.onStop();
+        if(mGoogleApiClient!=null) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        if (mUserDisconnected){
+            endGame(false);
+        }
+        super.onResume();
     }
 
     @Override
@@ -342,18 +368,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onPeerJoined(Room room, List<String> list) {}
     @Override
-    public void onPeerLeft(Room room, List<String> list) {
-        mOpponentQuit = true;
-        endGame(true);
-    }
+    public void onPeerLeft(Room room, List<String> list) {}
     @Override
     public void onConnectedToRoom(Room room) {}
     @Override
-    public void onDisconnectedFromRoom(Room room) { endGame(false);
-        byte[] data = OPPONENT_DISCONNECTED_MESSAGE.getBytes();
-        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
-        RaceActivity.this.finish();
-    }
+    public void onDisconnectedFromRoom(Room room) {}
     @Override
     public void onPeersConnected(Room room, List<String> list) {}
     @Override
@@ -364,7 +383,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onP2PConnected(String s) {}
     @Override
-    public void onP2PDisconnected(String s) {}
+    public void onP2PDisconnected(String s) {
+        Log.d(TAG, "onP2PDisconnected: ");
+    }
     @Override
     public void onRoomCreated(int i, Room room) {}
     @Override
@@ -374,5 +395,14 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         RaceActivity.this.finish();
         byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
         Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mRoomID!=null) {
+            byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        }
+        super.onBackPressed();
     }
 }
