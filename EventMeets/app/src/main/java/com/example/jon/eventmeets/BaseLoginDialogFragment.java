@@ -78,7 +78,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                 mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString());
                 break;
             case R.id.create_account_btn:
-                Toast.makeText(getActivity(), "create", Toast.LENGTH_SHORT).show();
                 mHiddenConfirmPassword.setVisibility(View.VISIBLE);
                 mHiddenConfirm.setVisibility(View.VISIBLE);
                 mLoginButton.setVisibility(View.GONE);
@@ -93,7 +92,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                 });
                 break;
             case R.id.skip_login:
-                Toast.makeText(getActivity(), "skip", Toast.LENGTH_SHORT).show();
+                mPresenter.onLoginSkipped();
                 break;
             default:
                 Toast.makeText(getActivity(), "Extra listener", Toast.LENGTH_SHORT).show();

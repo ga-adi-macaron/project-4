@@ -5,11 +5,19 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.jon.eventmeets.Model.BaseUser;
+import com.example.jon.eventmeets.Model.EventParent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Jon on 12/16/2016.
@@ -90,6 +98,8 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
                                 mView.notifyFragmentFailure();
                             } else {
                                 mView.notifyFragmentSuccess();
+                                String userKey = mAuth.getCurrentUser().getUid();
+                                addUserToDatabase(userKey);
                             }
                         }
                     });
@@ -104,5 +114,12 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     @Override
     public void removeFirebaseListener() {
         mAuth.removeAuthStateListener(mAuthListener);
+    }
+
+    private void addUserToDatabase(String userKey) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("users");
+        BaseUser user = new BaseUser(userKey, "Jon");
+        ref.child(userKey).setValue(user);
     }
 }
