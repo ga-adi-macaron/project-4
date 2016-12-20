@@ -40,6 +40,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -62,11 +64,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DatabaseReference mDatabasePlaylistReference, mGeofireRef;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user != null){
+
+                } else {
+                    Intent intent = new Intent(MapsActivity.this,LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
 
         //Create Google Api Client
         buildGoogleApiClient();
@@ -276,6 +294,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStart() {
         super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
@@ -291,6 +310,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         if (geoQuery != null) {
             geoQuery.removeAllListeners();
+        }
+        if (mAuthListener != null){
+            mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
@@ -339,6 +361,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
                 lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                moveMapToCurrentLocation(lastLocation);
             }
             else{
                 ActivityCompat.requestPermissions(MapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_LOCATION);
