@@ -1,6 +1,4 @@
-package com.example.jon.eventmeets.Model.GamingEventModels;
-
-import com.example.jon.eventmeets.Model.GamingEventModels.GamingEventParent;
+package com.example.jon.eventmeets.model.game_models;
 
 /**
  * Created by Jon on 12/16/2016.

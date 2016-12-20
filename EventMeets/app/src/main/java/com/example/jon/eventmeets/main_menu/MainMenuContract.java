@@ -1,10 +1,6 @@
 package com.example.jon.eventmeets.main_menu;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
-import com.example.jon.eventmeets.Model.Category;
-import com.example.jon.eventmeets.Model.EventParent;
+import com.example.jon.eventmeets.model.EventParent;
 
 import java.util.List;
 

@@ -1,7 +1,6 @@
-package com.example.jon.eventmeets.Model.NatureEventModels;
+package com.example.jon.eventmeets.model.nature_models;
 
-import com.example.jon.eventmeets.Model.BaseUser;
-import com.example.jon.eventmeets.Model.NatureEventModels.NatureEventParent;
+import com.example.jon.eventmeets.model.BaseUser;
 
 import java.util.ArrayList;
 

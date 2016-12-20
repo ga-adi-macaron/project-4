@@ -1,4 +1,4 @@
-package com.example.jon.eventmeets.Model;
+package com.example.jon.eventmeets.model;
 
 /**
  * Created by Jon on 12/16/2016.

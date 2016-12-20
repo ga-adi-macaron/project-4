@@ -1,13 +1,10 @@
 package com.example.jon.eventmeets.main_menu;
 
-import com.example.jon.eventmeets.Model.BaseEvent;
-import com.example.jon.eventmeets.Model.ConversationEventModels.ConversationEventParent;
-import com.example.jon.eventmeets.Model.DrinkEventModels.DrinkEventParent;
-import com.example.jon.eventmeets.Model.EventParent;
-import com.example.jon.eventmeets.Model.GamingEventModels.VideoGamingEvent;
-import com.example.jon.eventmeets.Model.NatureEventModels.HikingEvent;
-import com.example.jon.eventmeets.Model.TasteEventModels.TasteEventParent;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.jon.eventmeets.model.conversation_models.ConversationEventParent;
+import com.example.jon.eventmeets.model.drink_models.DrinkEventParent;
+import com.example.jon.eventmeets.model.EventParent;
+import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
+import com.example.jon.eventmeets.model.nature_models.HikingEvent;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 

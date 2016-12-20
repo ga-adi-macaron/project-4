@@ -1,6 +1,6 @@
-package com.example.jon.eventmeets.Model.NatureEventModels;
+package com.example.jon.eventmeets.model.nature_models;
 
-import com.example.jon.eventmeets.Model.EventParent;
+import com.example.jon.eventmeets.model.EventParent;
 
 /**
  * Created by Jon on 12/16/2016.

@@ -4,7 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.example.jon.eventmeets.Model.EventParent;
+import com.example.jon.eventmeets.model.EventParent;
 import com.example.jon.eventmeets.R;
 
 import java.util.List;

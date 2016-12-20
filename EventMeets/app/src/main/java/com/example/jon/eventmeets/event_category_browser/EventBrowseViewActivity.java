@@ -1,18 +1,13 @@
-package com.example.jon.eventmeets.EventCategoryBrowser;
+package com.example.jon.eventmeets.event_category_browser;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.jon.eventmeets.EventCategory.CategoryWithSubsActivity;
-import com.example.jon.eventmeets.Model.Category;
+import com.example.jon.eventmeets.event_category.CategoryWithSubsActivity;
 import com.example.jon.eventmeets.R;
-
-import java.util.List;
 
 public class EventBrowseViewActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mConversation, mDrink, mGame, mNature, mTaste, mTheater;

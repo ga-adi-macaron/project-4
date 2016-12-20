@@ -1,6 +1,4 @@
-package com.example.jon.eventmeets.Model;
-
-import android.view.View;
+package com.example.jon.eventmeets.model;
 
 /**
  * Created by Jon on 12/16/2016.

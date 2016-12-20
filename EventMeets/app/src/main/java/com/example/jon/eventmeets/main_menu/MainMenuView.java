@@ -2,7 +2,6 @@ package com.example.jon.eventmeets.main_menu;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,9 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.jon.eventmeets.EventCategoryBrowser.EventBrowseViewActivity;
-import com.example.jon.eventmeets.Model.Category;
-import com.example.jon.eventmeets.Model.EventParent;
+import com.example.jon.eventmeets.event_category_browser.EventBrowseViewActivity;
+import com.example.jon.eventmeets.model.EventParent;
 import com.example.jon.eventmeets.R;
 
 import java.util.List;

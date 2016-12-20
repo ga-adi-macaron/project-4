@@ -1,4 +1,4 @@
-package com.example.jon.eventmeets.EventCategory;
+package com.example.jon.eventmeets.event_category;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
