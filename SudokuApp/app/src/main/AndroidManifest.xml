@@ -29,8 +29,6 @@
 
         <activity android:name=".SoloActivity">
         </activity>
-        <activity android:name=".OldRaceActivity">
-        </activity>
 
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"

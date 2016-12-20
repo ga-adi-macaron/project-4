@@ -83,29 +83,6 @@ public class PuzzleRefreshService extends JobService {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
-
-//        ref.addChildEventListener(new ChildEventListener() {
-//
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                adoptLittlePuzzleChild(dataSnapshot, difficulty);
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {}
-//        });
     }
 
     private void adoptLittlePuzzleChild(DataSnapshot dataSnapshot, String difficulty) {

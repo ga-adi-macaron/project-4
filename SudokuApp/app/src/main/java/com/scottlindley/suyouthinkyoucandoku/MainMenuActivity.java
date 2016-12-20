@@ -48,7 +48,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         setUpCardViews();
 
-        
+
 //        addPuzzle();
 
         checkForNewPuzzles();
