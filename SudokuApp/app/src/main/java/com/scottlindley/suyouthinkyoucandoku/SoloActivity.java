@@ -17,6 +17,7 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_solo);
 
+
         mEasyText = (TextView)findViewById(R.id.easyText);
         mMediumText = (TextView)findViewById(R.id.mediumText);
         mHardText = (TextView)findViewById(R.id.hardText);

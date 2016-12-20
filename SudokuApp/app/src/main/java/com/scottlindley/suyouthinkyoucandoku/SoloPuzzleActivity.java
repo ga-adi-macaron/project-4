@@ -20,6 +20,8 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
 
+        mDBHelper = DBHelper.getInstance(this);
+
         getPuzzleKey();
         initializeGame();
     }
@@ -38,7 +40,6 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
             for (int i=0; i<jsonKey.length(); i++){
                 mKey[i] = Integer.parseInt(jsonKey.get(i).toString());
             }
-            mUserAnswers = mKey;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -56,7 +57,7 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
             mTimer.cancel();
         }
 
-        View dialogView = getLayoutInflater().inflate(R.layout.end_game_dialog, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.end_solo_game_dialog, null);
         TextView gameResultText = (TextView)dialogView.findViewById(R.id.game_result_text);
         TextView currentScore = (TextView)dialogView.findViewById(R.id.current_score);
         TextView highScore = (TextView)dialogView.findViewById(R.id.high_score);

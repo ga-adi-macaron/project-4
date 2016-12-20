@@ -12,7 +12,6 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +39,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private static final String TAG = "RaceActivity";
     public static final int RC_SIGN_IN = 5667;
     public static final int RC_AUTOMATCH = 6980;
+    private String mRoomID;
     private boolean mResolvingConnectionFailure = false;
     private GoogleApiClient mGoogleApiClient;
 
@@ -48,12 +48,21 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
 
+        mDBHelper = DBHelper.getInstance(this);
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
+    }
+
+    @Override
+    public void checkCellInput(TextView cell) {
+        byte[] data = String.valueOf(cell.getId()).getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        super.checkCellInput(cell);
     }
 
     /**
@@ -68,7 +77,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             mTimer.cancel();
         }
 
-        View dialogView = getLayoutInflater().inflate(R.layout.end_game_dialog, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.end_solo_game_dialog, null);
         TextView gameResultText = (TextView)dialogView.findViewById(R.id.game_result_text);
         TextView currentScore = (TextView)dialogView.findViewById(R.id.current_score);
         TextView highScore = (TextView)dialogView.findViewById(R.id.high_score);
@@ -132,6 +141,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         return random.nextInt(range);
     }
 
+    private void tintCell(int cellLocation){
+        Log.d(TAG, "tintCell: "+cellLocation);
+        mCellViews.get(cellLocation).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -180,8 +194,15 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(TAG, "onConnected: "+mGoogleApiClient.isConnected());
-        Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-        startActivityForResult(intent, RC_AUTOMATCH);
+        Bundle autoMatch = RoomConfig.createAutoMatchCriteria(1, 1, 0);
+        RoomConfig roomConfig = RoomConfig.builder(RaceActivity.this)
+                .setRoomStatusUpdateListener(RaceActivity.this)
+                .setMessageReceivedListener(RaceActivity.this)
+                .setAutoMatchCriteria(autoMatch)
+                .build();
+        Games.RealTimeMultiplayer.create(mGoogleApiClient, roomConfig);
+//        Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+//        startActivityForResult(intent, RC_AUTOMATCH);
     }
 
     /**
@@ -218,7 +239,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      */
     @Override
     public void onRoomConnected(int i, final Room room) {
-        Log.d(TAG, "onRoomConnected: ");
+        mRoomID = room.getRoomId();
+
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("Puzzles").child("medium");
 
@@ -227,10 +249,21 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Puzzle> puzzles = new ArrayList<>();
                 for (DataSnapshot childSnap : dataSnapshot.getChildren()){
-                    puzzles.add(childSnap.getValue(Puzzle.class));
+                    ArrayList<Long> longKey = (ArrayList<Long>) childSnap.getValue();
+                    ArrayList<Integer> intKey = new ArrayList<>();
+                    for (Long longNum : longKey){
+                        intKey.add((int)(long)longNum);
+                    }
+                    Puzzle puzzle = new Puzzle();
+                    puzzle.setKey(intKey);
+                    puzzles.add(puzzle);
                 }
+                Log.d(TAG, "onDataChange: "+room.getParticipantIds().size());
+                Log.d(TAG, "onDataChange: "+room.getParticipantIds().get(0));
+                Log.d(TAG, "onDataChange: "+room.getParticipantIds().get(1));
+                String participants = room.getParticipantIds().get(0) + room.getParticipantIds().get(1);
 
-                int randomIndex = getRandomNumberFromString(room.getRoomId(), puzzles.size());
+                int randomIndex = getRandomNumberFromString(participants, puzzles.size());
 
                 mKey = puzzles.get(randomIndex).getKeyIntArray();
                 initializeGame();
@@ -250,8 +283,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
         String data = new String(realTimeMessage.getMessageData(), StandardCharsets.UTF_8);
+        int cellLocation = Integer.parseInt(data);
         Log.d(TAG, "onRealTimeMessageReceived: " + data);
-        Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
+        tintCell(cellLocation);
     }
 
     //All methods below are required interface overrides

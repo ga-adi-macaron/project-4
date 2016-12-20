@@ -78,8 +78,6 @@ public class PuzzleSolver {
             if (!mSolution.contains(0)) {
                 break;
             }
-//            Log.d(TAG, "cell value = " + cellValue);
-//            Log.d(TAG, "index = " + indexNumber);
             //if this cell was not given in the key, attempt to solve
             if (mKey[indexNumber] == 0) {
                 /*Attempt to place n=1 in this cell. If a conflict is found, n++ and try again.

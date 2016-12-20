@@ -83,29 +83,37 @@ public class DBHelper extends SQLiteOpenHelper{
      * The puzzles are then sent off to the {@link #replacePuzzles(List)} method.
      */
     public void setUpBroadcastReceiver(){
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(PUZZLE_TABLE, null, null);
-        db.close();
         BroadcastReceiver receiver = new BroadcastReceiver() {
+            List<Puzzle> puzzles = new ArrayList<>();
+
             @Override
             public void onReceive(Context context, Intent intent) {
-                String difficulty = intent.getStringExtra(PuzzleRefreshService.DIFFICULTIES_INTENT_KEY);
-                try {
-                    JSONArray jarray =
-                            new JSONArray(intent.getStringExtra(PuzzleRefreshService.KEYS_INTENT_KEY));
-                    ArrayList<Integer> intKey = new ArrayList<>();
-                    for (int i=0; i<jarray.length(); i++){
-                        intKey.add(jarray.getInt(i));
+                int puzzleCount = intent.getIntExtra(PuzzleRefreshService.PUZZLE_COUNT_INTENT_KEY, -1);
+                for (int i = 0; i < puzzleCount; i++) {
+                    String difficulty = intent.getStringExtra(PuzzleRefreshService.DIFFICULTIES_INTENT_KEY+i);
+                    try {
+                        JSONArray jarray =
+                                new JSONArray(intent.getStringExtra(PuzzleRefreshService.KEYS_INTENT_KEY+i));
+                        ArrayList<Integer> intKey = new ArrayList<>();
+                        for (int j = 0; j < jarray.length(); j++) {
+                            intKey.add(jarray.getInt(j));
+                        }
+                        puzzles.add(new Puzzle(
+                                intKey,
+                                difficulty));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-//                    removePuzzle(difficulty);
-                    addPuzzle(new Puzzle(
-                            intKey,
-                            difficulty));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                }
+                SQLiteDatabase db = getWritableDatabase();
+                db.delete(PUZZLE_TABLE, null, null);
+                db.close();
+                for (Puzzle puzzle : puzzles){
+                    addPuzzle(puzzle);
                 }
             }
         };
+
 
         LocalBroadcastManager.getInstance(mContext)
                 .registerReceiver(receiver, new IntentFilter(PuzzleRefreshService.PUZZLE_REFRESH_SERVICE));
@@ -146,8 +154,8 @@ public class DBHelper extends SQLiteOpenHelper{
                 COL_DIFFICULTY+" LIKE ?", new String[]{"easy"}, null, null, null);
         List<Puzzle> easyPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
-        int randomIndex = (int) (Math.random()*(easyPuzzles.size()));
         if(easyPuzzles!=null && !easyPuzzles.isEmpty()) {
+            int randomIndex = (int) (Math.random() * (easyPuzzles.size()));
             return easyPuzzles.get(randomIndex);
         }
         return null;
@@ -176,8 +184,8 @@ public class DBHelper extends SQLiteOpenHelper{
                 COL_DIFFICULTY+" LIKE ?", new String[]{"medium"}, null, null, null);
         List<Puzzle> mediumPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
-        int randomIndex = (int) (Math.random()*(mediumPuzzles.size()-1));
         if(mediumPuzzles!=null && !mediumPuzzles.isEmpty()) {
+            int randomIndex = (int) (Math.random() * (mediumPuzzles.size() - 1));
             return mediumPuzzles.get(randomIndex);
         }
         return null;
@@ -206,8 +214,8 @@ public class DBHelper extends SQLiteOpenHelper{
                 COL_DIFFICULTY+" LIKE ?", new String[]{"hard"}, null, null, null);
         List<Puzzle> hardPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
-        int randomIndex = (int) (Math.random()*(hardPuzzles.size()));
         if (hardPuzzles!=null && !hardPuzzles.isEmpty()) {
+            int randomIndex = (int) (Math.random() * (hardPuzzles.size()));
             return hardPuzzles.get(randomIndex);
         }
         return null;
@@ -236,8 +244,8 @@ public class DBHelper extends SQLiteOpenHelper{
                 COL_DIFFICULTY+" LIKE ?", new String[]{"expert"}, null, null, null);
         List<Puzzle> expertPuzzles = getPuzzlesOutOfCursor(cursor);
         cursor.close();
-        int randomIndex = (int) (Math.random()*(expertPuzzles.size()));
         if (expertPuzzles!=null && !expertPuzzles.isEmpty()) {
+            int randomIndex = (int) (Math.random() * (expertPuzzles.size()));
             return expertPuzzles.get(randomIndex);
         }
         return null;

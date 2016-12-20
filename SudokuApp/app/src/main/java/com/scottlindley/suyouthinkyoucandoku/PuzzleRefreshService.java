@@ -4,16 +4,12 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +23,14 @@ public class PuzzleRefreshService extends JobService {
     public static final String PUZZLE_REFRESH_SERVICE = "puzzle refresh service";
     public static final String KEYS_INTENT_KEY = "keys";
     public static final String DIFFICULTIES_INTENT_KEY = "difficulties";
+    public static final String PUZZLE_COUNT_INTENT_KEY = "puzzle count";
+    private List<Puzzle> puzzles;
+    private int totalPuzzleCount, easyCount, mediumCount, hardCount, expertCount;
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
+        puzzles = new ArrayList<>();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("Puzzles");
         grabPuzzles(ref.child("easy"), "easy");
@@ -50,41 +51,61 @@ public class PuzzleRefreshService extends JobService {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                dataSnapshot.getChildrenCount();
+                int count = (int)(long)dataSnapshot.getChildrenCount();
+                for (DataSnapshot childSnap : dataSnapshot.getChildren()){
+                    adoptLittlePuzzleChild(childSnap, difficulty);
+                }
+                switch (difficulty){
+                    case "easy":
+                        easyCount = count;
+                        break;
+                    case "medium":
+                        mediumCount = count;
+                        break;
+                    case "hard":
+                        hardCount = count;
+                        break;
+                    case "expert":
+                        expertCount = count;
+                        break;
+                }
+
+                //Only check if it's time to broadcast when all four counts have been initialized
+                if(easyCount>0 && mediumCount>0 && hardCount>0 && expertCount>0) {
+                    totalPuzzleCount = easyCount + mediumCount + hardCount + expertCount;
+
+                    if (puzzles.size() == totalPuzzleCount) {
+                        broadcastIntent(puzzles);
+                    }
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
 
-        ref.addChildEventListener(new ChildEventListener() {
-
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                adoptLittlePuzzleChild(dataSnapshot, difficulty);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "onCancelled: " + databaseError.getDetails());
-                Log.d(TAG, "onCancelled: " + databaseError.getMessage());
-                Log.d(TAG, "onCancelled: " + databaseError.getCode());
-            }
-        });
+//        ref.addChildEventListener(new ChildEventListener() {
+//
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                adoptLittlePuzzleChild(dataSnapshot, difficulty);
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {}
+//        });
     }
 
     private void adoptLittlePuzzleChild(DataSnapshot dataSnapshot, String difficulty) {
@@ -96,16 +117,18 @@ public class PuzzleRefreshService extends JobService {
         }
         puzzle.setKey(intKey);
         puzzle.setDifficulty(difficulty);
-        JSONArray jsonKey = puzzle.getKeyJSONArray();
-        broadcastIntent(jsonKey, difficulty);
+        puzzles.add(puzzle);
     }
 
-    private void broadcastIntent(JSONArray jsonKey, String difficulty) {
+    private void broadcastIntent(List<Puzzle> puzzles) {
         Intent intent = new Intent(PUZZLE_REFRESH_SERVICE);
 
-        intent.putExtra(KEYS_INTENT_KEY, jsonKey.toString());
-        intent.putExtra(DIFFICULTIES_INTENT_KEY, difficulty);
+        for (int i=0; i<puzzles.size(); i++) {
+            intent.putExtra(KEYS_INTENT_KEY+i, puzzles.get(i).getKeyJSONArray().toString());
+            intent.putExtra(DIFFICULTIES_INTENT_KEY+i, puzzles.get(i).getDifficulty());
+        }
 
+        intent.putExtra(PUZZLE_COUNT_INTENT_KEY, puzzles.size());
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 }

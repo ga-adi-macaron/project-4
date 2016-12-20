@@ -16,6 +16,7 @@ import android.widget.GridLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,6 +31,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
     public int[] mKey, mSolution, mUserAnswers;
     public int mSelectedNum, mScore, mStrikes;
     public ArrayList<TextView> mChoiceTiles;
+    public List<TextView> mCellViews;
     private PuzzleSolver mPuzzleSolver;
     public CountDownTimer mTimer;
 
@@ -37,8 +39,6 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
         setContentView(R.layout.activity_puzzle);
-
-        mDBHelper = DBHelper.getInstance(this);
     }
 
     public void initializeGame(){
@@ -84,6 +84,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * (first cell ID: 0 - last cell ID: 80)
      */
     public void createCells(){
+        mCellViews = new ArrayList<>();
         mBoardView = (SudokuGridLayout) findViewById(R.id.board_view);
 
         for (int i=0; i<81; i++){
@@ -109,6 +110,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
             setCellClickListener(cell);
 
             mBoardView.addView(cell);
+            mCellViews.add(cell);
         }
     }
 
@@ -200,6 +202,8 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * Sets up the input selection tiles at the bottom of the screen
      */
     public void setUpChoiceTiles() {
+        mUserAnswers = mKey;
+
         mChoiceTiles = new ArrayList<>();
         mChoiceTiles.add((TextView) findViewById(R.id.tile1));
         mChoiceTiles.add((TextView) findViewById(R.id.tile2));
