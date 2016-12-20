@@ -156,7 +156,7 @@ public class DBHelper extends SQLiteOpenHelper{
     /**
      * @return returns all medium puzzles
      */
-    public List<Puzzle> getAllMediumPuzzle(){
+    public List<Puzzle> getAllMediumPuzzles(){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
@@ -186,7 +186,7 @@ public class DBHelper extends SQLiteOpenHelper{
     /**
      * @return returns all hard puzzles
      */
-    public List<Puzzle> getAllHardPuzzle(){
+    public List<Puzzle> getAllHardPuzzles(){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,
@@ -216,7 +216,7 @@ public class DBHelper extends SQLiteOpenHelper{
     /**
      * @return returns all expert puzzles
      */
-    public List<Puzzle> getALLExpertPuzzle(){
+    public List<Puzzle> getALLExpertPuzzles(){
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(
                 PUZZLE_TABLE, null,

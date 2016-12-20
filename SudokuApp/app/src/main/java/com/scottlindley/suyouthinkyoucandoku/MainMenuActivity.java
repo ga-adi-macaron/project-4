@@ -84,7 +84,7 @@ public class MainMenuActivity extends AppCompatActivity {
         mRaceCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainMenuActivity.this, PuzzleActivity.class);
+                Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
                 intent.putExtra(RACE_INTENT_EXTRA, true);
                 startActivity(intent);
             }

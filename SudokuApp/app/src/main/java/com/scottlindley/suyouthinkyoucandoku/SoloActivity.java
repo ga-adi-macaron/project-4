@@ -56,7 +56,7 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
                 difficulty = "error";
                 stringKey = "error";
         }
-        Intent intent = new Intent(SoloActivity.this, PuzzleActivity.class);
+        Intent intent = new Intent(SoloActivity.this, SoloPuzzleActivity.class);
         intent.putExtra(DIFFICULTY_INTENT_KEY, difficulty);
         intent.putExtra(PUZZLE_KEY_INTENT_KEY, stringKey);
         startActivity(intent);
