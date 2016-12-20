@@ -39,7 +39,5 @@ public interface BaseLoginContract {
         void addFirebaseListener();
 
         void removeFirebaseListener();
-
-        void onLoginError();
     }
 }

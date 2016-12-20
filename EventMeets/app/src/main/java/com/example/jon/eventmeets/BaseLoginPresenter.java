@@ -1,7 +1,6 @@
 package com.example.jon.eventmeets;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,9 +19,6 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private BaseLoginContract.View mView;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private boolean mLoggedIn = true;
-    private String mLoginError;
-    private Context mContext;
 
     public BaseLoginPresenter(BaseLoginContract.View view, Context context) {
         mView = view;
@@ -108,14 +104,5 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     @Override
     public void removeFirebaseListener() {
         mAuth.removeAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onLoginError() {
-        mLoginError = "Error";
-    }
-
-    private void onLoginTest() {
-        mLoginError = "Success";
     }
 }
