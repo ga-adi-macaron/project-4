@@ -76,6 +76,7 @@ public class NewsFragment extends Fragment
                 .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        // TODO: 12/17/16 Customize call
         mCall = retrofit.create(BingSearchService.class).getNews("bernie", 12);
         mCall.enqueue(new Callback<News>() {
             @Override

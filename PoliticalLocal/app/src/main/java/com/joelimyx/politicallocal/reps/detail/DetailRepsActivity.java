@@ -1,0 +1,218 @@
+package com.joelimyx.politicallocal.reps.detail;
+
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.support.customtabs.CustomTabsClient;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsServiceConnection;
+import android.support.customtabs.CustomTabsSession;
+import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.database.RepsSQLHelper;
+import com.joelimyx.politicallocal.reps.MyReps;
+import com.joelimyx.politicallocal.reps.service.TwitterIdClient;
+import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.GuestSession;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.User;
+
+import io.fabric.sdk.android.Fabric;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class DetailRepsActivity extends AppCompatActivity implements View.OnClickListener{
+
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+
+    private MyReps mMyReps;
+    private GuestSession mSession;
+    private TwitterIdClient mClient;
+    private static final String TAG = "DetailRepsActivity";
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail_reps);
+
+        TwitterAuthConfig authConfig = new TwitterAuthConfig("V2RCaymY8YS5r2hQLtKPf1A5s","FX3mhvuWzZQJkBxF6Idm8SwrJdwPamBh8yL3UgYTyfYP9pwKCd");
+        Fabric.with(DetailRepsActivity.this, new Twitter(authConfig));
+        mSession = TwitterCore.getInstance().getGuestSessionProvider().getCurrentSession();
+
+
+        RepsSQLHelper db = RepsSQLHelper.getInstance(this);
+        /*---------------------------------------------------------------------------------
+        // Basic info
+        ---------------------------------------------------------------------------------*/
+        TextView namePartyText = (TextView) findViewById(R.id.detail_reps_name_party);
+        ImageView detailRepsImage= (ImageView) findViewById(R.id.detail_reps_image);
+
+        ImageView phoneImage = (ImageView) findViewById(R.id.detail_reps_phone);
+        ImageView emailImage = (ImageView) findViewById(R.id.detail_reps_email);
+        ImageView websiteImage= (ImageView) findViewById(R.id.detail_reps_website);
+        ImageView twitterImage= (ImageView) findViewById(R.id.detail_reps_twitter);
+
+
+
+        mMyReps = db.getMyRepByID(getIntent().getStringExtra("id"));
+        Picasso.with(this)
+                .load(getFileStreamPath(mMyReps.getFileName()))
+                .fit().into(detailRepsImage);
+        namePartyText.setText(mMyReps.getName());
+
+        phoneImage.setOnClickListener(this);
+        emailImage.setOnClickListener(this);
+        websiteImage.setOnClickListener(this);
+        twitterImage.setOnClickListener(this);
+
+        /*---------------------------------------------------------------------------------
+        // Toolbar Area
+        ---------------------------------------------------------------------------------*/
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        /*---------------------------------------------------------------------------------
+        // ViewPagers and tab layout
+        ---------------------------------------------------------------------------------*/
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.detail_reps_container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.detail_reps_phone:
+                //Show up the phone dial for user to decide whether to call
+                Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+mMyReps.getPhone()));
+                startActivity(phoneIntent);
+
+                break;
+            case R.id.detail_reps_email:
+                //Open email app for user to send email with their desire email app
+                Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{mMyReps.getEmail()});
+                emailIntent.setType("plain/text");
+                startActivity(Intent.createChooser(emailIntent,"Send Email..."));
+                break;
+            case R.id.detail_reps_website:
+                //Launch a custom chrome tab for the legislator website
+                String packageName = "com.android.chrome";
+                CustomTabsClient.bindCustomTabsService(this, packageName, new CustomTabsServiceConnection() {
+                    @Override
+                    public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
+                        client.warmup(10L);
+
+                        Uri uri = Uri.parse(mMyReps.getWebsite());
+                        CustomTabsSession session = client.newSession(null);
+                        session.mayLaunchUrl(uri,null,null);
+
+                        //Create intent with the loaded session and change the toolbar color of custom chrome tab
+                        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(session)
+                                .setToolbarColor(ContextCompat.getColor(DetailRepsActivity.this,R.color.colorPrimary))
+                                .build();
+                        customTabsIntent.launchUrl(DetailRepsActivity.this,uri);
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName componentName) {
+                        Toast.makeText(DetailRepsActivity.this, "Connection Lost", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                break;
+            case R.id.detail_reps_twitter:
+                mClient = new TwitterIdClient(new OkHttpClient.Builder().build());
+                Call<User> call = mClient.getIdService().getId(mMyReps.getTwitter());
+                call.enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        long id = response.body().id;
+                        Intent twitterIntent;
+                        try {
+                            getPackageManager().getPackageInfo("com.twitter.android",0);
+                            Log.d(TAG, "onClick: "+ mMyReps.getTwitter());
+                            twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?user_id="+id));
+                        } catch (Exception e) {
+                            // no Twitter app, revert to browser
+                            twitterIntent= new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/"+mMyReps.getTwitter()));
+                        }
+                        startActivity(twitterIntent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+
+                    }
+                });
+                break;
+        }
+    }
+
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position==1){
+                return ContributorFragment.newInstance(mMyReps.getCId());
+            }
+            // TODO: 12/20/16 Add a issue fragment basic info
+            return ContributorFragment.newInstance(mMyReps.getCId());
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Issues";
+                case 1:
+                    return "Contributors";
+                default:
+                    return null;
+            }
+        }
+    }
+}

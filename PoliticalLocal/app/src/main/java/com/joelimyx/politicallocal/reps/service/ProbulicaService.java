@@ -1,6 +1,6 @@
-package com.joelimyx.politicallocal.reps;
+package com.joelimyx.politicallocal.reps.service;
 
-import com.joelimyx.politicallocal.reps.gson.Reps;
+import com.joelimyx.politicallocal.reps.gson.probulica.Reps;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

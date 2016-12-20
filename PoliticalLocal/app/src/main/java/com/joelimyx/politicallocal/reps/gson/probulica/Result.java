@@ -1,5 +1,5 @@
 
-package com.joelimyx.politicallocal.reps.gson;
+package com.joelimyx.politicallocal.reps.gson.probulica;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

@@ -13,5 +13,5 @@
 
     <item android:id="@+id/bills"
           android:title="Bills"
-          android:icon="@drawable/ic_news"/>
+          android:icon="@drawable/ic_bill"/>
 </menu>
