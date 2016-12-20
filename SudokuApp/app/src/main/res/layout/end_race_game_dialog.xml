@@ -11,8 +11,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         android:textSize="18sp"
-        android:textStyle="bold"
-        />
+        android:textStyle="bold"/>
     <ImageView
         android:id="@+id/border"
         android:layout_width="match_parent"
@@ -29,44 +28,19 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
         android:textSize="18sp"/>
-    <LinearLayout
-        android:id="@+id/current_game_info"
+    <TextView
         android:layout_below="@id/lost_game_message"
-        android:layout_margin=""
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/current_score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:gravity="center"/>
-        <TextView
-            android:id="@+id/current_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:gravity="center"/>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/best_game_info"
-        android:layout_width="match_parent"
+        android:id="@+id/races_won"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_below="@id/current_game_info">
-        <TextView
-            android:id="@+id/high_score"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:gravity="center"/>
-        <TextView
-            android:id="@+id/best_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:gravity="center"/>
-    </LinearLayout>
-
-
+        android:gravity="center"/>
+    <TextView
+        android:layout_below="@id/races_won"
+        android:id="@+id/races_lost"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"/>
 </RelativeLayout>

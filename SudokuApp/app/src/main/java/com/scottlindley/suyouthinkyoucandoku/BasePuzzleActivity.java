@@ -27,6 +27,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
     public DBHelper mDBHelper;
     private SudokuGridLayout mBoardView;
     public TextView mTimerView;
+    public boolean isCorrect;
     public long mTime;
     public int[] mKey, mSolution, mUserAnswers;
     public int mSelectedNum, mScore, mStrikes;
@@ -246,14 +247,16 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * If it has been completed, the game is ended.
      */
     private void checkForWin(){
-        boolean isCorrect = true;
+        isCorrect = true;
         for (int i=0; i<81; i++){
             if (mUserAnswers[i] != mSolution[i]){
                 isCorrect = false;
             }
         }
         if (isCorrect){
-            mTimer.cancel();
+            if(mTimer!=null) {
+                mTimer.cancel();
+            }
             endGame(true);
         }
     }

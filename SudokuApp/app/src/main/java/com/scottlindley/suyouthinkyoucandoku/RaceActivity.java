@@ -8,9 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,6 +39,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private static final String TAG = "RaceActivity";
     public static final int RC_SIGN_IN = 5667;
     public static final int RC_AUTOMATCH = 6980;
+    public static final String OPPONENT_DISCONNECTED_MESSAGE = "opponent disconnected";
+    public static final String OPPONENT_QUIT_MESSAGE = "opponent quit";
+    public static final String TOO_MANY_GUESSES_MESSAGE = "too many guesses";
+    public static final String OPPONENT_FINISHED_MESSAGE = "opponent finished";
+    private boolean mOpponentQuit, mOpponentDisconnected, mOpponentTooManyGuesses, mOpponentFinished;
     private String mRoomID;
     private boolean mResolvingConnectionFailure = false;
     private GoogleApiClient mGoogleApiClient;
@@ -60,8 +65,18 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
 
     @Override
     public void checkCellInput(TextView cell) {
-        byte[] data = String.valueOf(cell.getId()).getBytes();
-        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        //If it's correct then send the opponent a message
+        if (mSelectedNum != 0) {
+            if (mSolution[cell.getId()] == mSelectedNum) {
+                byte[] data = String.valueOf(cell.getId()).getBytes();
+                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+            }
+        } else {
+            if (mStrikes > 2) {
+                byte[] data = TOO_MANY_GUESSES_MESSAGE.getBytes();
+                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+            }
+        }
         super.checkCellInput(cell);
     }
 
@@ -74,53 +89,61 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     public void endGame(boolean win){
         for (TextView tile : mChoiceTiles){
             ((CardView)tile.getParent()).setVisibility(View.INVISIBLE);
-            mTimer.cancel();
         }
 
-        View dialogView = getLayoutInflater().inflate(R.layout.end_solo_game_dialog, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.end_race_game_dialog, null);
         TextView gameResultText = (TextView)dialogView.findViewById(R.id.game_result_text);
-        TextView currentScore = (TextView)dialogView.findViewById(R.id.current_score);
-        TextView highScore = (TextView)dialogView.findViewById(R.id.high_score);
-        TextView currentTime = (TextView)dialogView.findViewById(R.id.current_time);
-        TextView bestTime = (TextView)dialogView.findViewById(R.id.best_time);
-        TextView lostMessage = (TextView)dialogView.findViewById(R.id.lost_game_message);
+        TextView resultDetailText = (TextView)dialogView.findViewById(R.id.lost_game_message);
+        TextView racesWon = (TextView)dialogView.findViewById(R.id.races_won);
+        TextView racesLost = (TextView)dialogView.findViewById(R.id.races_lost);
 
+        Stats stats = mDBHelper.getStats();
         if(win) {
             gameResultText.setText("You Win!");
-            Stats stats = mDBHelper.getStats();
-            if (mScore > stats.getHighscore()) {
-                mDBHelper.updateHighScore(mScore);
-                stats = mDBHelper.getStats();
+            if(isCorrect) {
+                resultDetailText.setText("You completed the puzzle before the enemy");
+                byte[] data = OPPONENT_FINISHED_MESSAGE.getBytes();
+                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+            } else if (mOpponentTooManyGuesses){
+                resultDetailText.setText("Your opponent guessed made too many incorrect guesses");
+            } else if (mOpponentQuit){
+                resultDetailText.setText("Your opponent quit");
+            } else if (mOpponentDisconnected){
+                resultDetailText.setText("Your opponent was disconnected");
             }
-            if (mTime < stats.getBestTime() || stats.getBestTime() == 0) {
-                mDBHelper.updateBestTime((int)(long) mTime);
-                stats = mDBHelper.getStats();
-            }
-            currentScore.setText("Score: " + mScore);
-            currentTime.setText("Time: " + mTimerView.getText());
-            highScore.setText("High Score: " + stats.getHighscore());
-            bestTime.setText("Best Time: " + DateUtils.formatElapsedTime((long)(int)stats.getBestTime()));
+            resultDetailText.setVisibility(View.VISIBLE);
+            mDBHelper.updateRacesWon(stats.getRacesWon() + 1);
+            stats = mDBHelper.getStats();
         } else {
+            //The game was lost
             gameResultText.setText("You Lose");
+            mDBHelper.updateRacesLost(stats.getRacesLost()+1);
+            stats = mDBHelper.getStats();
             if (mStrikes > 2){
-                lostMessage.setText("Three incorrect answers");
-            } else {
-                lostMessage.setText("Ran out of time! Maximum 20 minutes.");
+                resultDetailText.setText("Three incorrect answers");
+                byte[] data = "too many guesses".getBytes();
+                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,data,mRoomID);
+            } else if (mOpponentFinished){
+                resultDetailText.setText("Your opponent has finished the puzzle");
             }
-            lostMessage.setVisibility(View.VISIBLE);
+            resultDetailText.setVisibility(View.VISIBLE);
         }
+
+        racesWon.setText("Races Won: "+ stats.getRacesWon());
+        racesLost.setText("Races Lost: "+ stats.getRacesLost());
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
+                        RaceActivity.this.finish();
                     }
                 })
                 .setView(dialogView)
                 .create();
         dialog.show();
 
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**
@@ -152,6 +175,13 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         if(mGoogleApiClient!=null) {
             mGoogleApiClient.connect();
         }
+    }
+
+    @Override
+    public void setUpScoreCard() {
+        mStrikes = 0;
+        mTimerView = (TextView)findViewById(R.id.score_text);
+        mTimerView.setText("Race!");
     }
 
     /**
@@ -201,8 +231,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 .setAutoMatchCriteria(autoMatch)
                 .build();
         Games.RealTimeMultiplayer.create(mGoogleApiClient, roomConfig);
-//        Intent intent = Games.RealTimeMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-//        startActivityForResult(intent, RC_AUTOMATCH);
     }
 
     /**
@@ -228,7 +256,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "ERROR BASE GAME UTILS")){
             mResolvingConnectionFailure = false;
         }
-
     }
 
     /**
@@ -239,6 +266,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      */
     @Override
     public void onRoomConnected(int i, final Room room) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         mRoomID = room.getRoomId();
 
         FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -283,9 +312,22 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onRealTimeMessageReceived(RealTimeMessage realTimeMessage) {
         String data = new String(realTimeMessage.getMessageData(), StandardCharsets.UTF_8);
-        int cellLocation = Integer.parseInt(data);
-        Log.d(TAG, "onRealTimeMessageReceived: " + data);
-        tintCell(cellLocation);
+        if(data.equals(OPPONENT_QUIT_MESSAGE)){
+            mOpponentQuit = true;
+            endGame(true);
+        } else if(data.equals(OPPONENT_DISCONNECTED_MESSAGE)){
+            mOpponentDisconnected = true;
+            endGame(true);
+        } else if(data.equals(TOO_MANY_GUESSES_MESSAGE)){
+            mOpponentTooManyGuesses = true;
+            endGame(true);
+        } else if(data.equals(OPPONENT_FINISHED_MESSAGE)){
+            mOpponentFinished = true;
+            endGame(false);
+        } else {
+            int cellLocation = Integer.parseInt(data);
+            tintCell(cellLocation);
+        }
     }
 
     //All methods below are required interface overrides
@@ -300,15 +342,25 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onPeerJoined(Room room, List<String> list) {}
     @Override
-    public void onPeerLeft(Room room, List<String> list) {}
+    public void onPeerLeft(Room room, List<String> list) {
+        mOpponentQuit = true;
+        endGame(true);
+    }
     @Override
     public void onConnectedToRoom(Room room) {}
     @Override
-    public void onDisconnectedFromRoom(Room room) {}
+    public void onDisconnectedFromRoom(Room room) { endGame(false);
+        byte[] data = OPPONENT_DISCONNECTED_MESSAGE.getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        RaceActivity.this.finish();
+    }
     @Override
     public void onPeersConnected(Room room, List<String> list) {}
     @Override
-    public void onPeersDisconnected(Room room, List<String> list) {}
+    public void onPeersDisconnected(Room room, List<String> list) {
+        mOpponentDisconnected = true;
+        endGame(true);
+    }
     @Override
     public void onP2PConnected(String s) {}
     @Override
@@ -318,5 +370,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onJoinedRoom(int i, Room room) {}
     @Override
-    public void onLeftRoom(int i, String s) {}
+    public void onLeftRoom(int i, String s) {
+        RaceActivity.this.finish();
+        byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+    }
 }
