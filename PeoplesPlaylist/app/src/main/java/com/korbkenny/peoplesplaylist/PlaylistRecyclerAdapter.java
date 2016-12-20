@@ -25,9 +25,9 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
 
     @Override
     public void onBindViewHolder(PlaylistViewHolder holder, int position) {
-        holder.mSongTitle.setText(mSongList.get(position).mTitle);
+        holder.mSongTitle.setText(mSongList.get(position).getTitle());
         holder.mUserName.setText("UserName123");
-        if(position % 2 == 0){
+        if(position % 2 == 1){
             holder.mLayout.setBackgroundColor(Color.parseColor("#dddddd"));
         }
     }

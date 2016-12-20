@@ -47,6 +47,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     private static final String TAG = "MapsActivity: ";
     private static final int REQUEST_CODE_LOCATION = 505;
@@ -129,7 +131,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
     //     Create Playlist Dialog
@@ -154,6 +155,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         playlist.setDescription(description.getText().toString());
                         playlist.setLat(lastLocation.getLatitude());
                         playlist.setLon(lastLocation.getLongitude());
+                        playlist.setSongList(new ArrayList<Song>());
 
                         //  Push to the playlists branch of the database, and get the
                         //  unique, randomly generated key for geofire use.

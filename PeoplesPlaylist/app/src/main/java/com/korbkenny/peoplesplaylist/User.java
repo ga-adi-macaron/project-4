@@ -5,5 +5,16 @@ package com.korbkenny.peoplesplaylist;
  */
 
 public class User {
+    String mUserName;
 
+    public User() {
+    }
+
+    public String getUserName() {
+        return mUserName;
+    }
+
+    public void setUserName(String userName) {
+        mUserName = userName;
+    }
 }
