@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    android:layout_marginBottom="8dp"
+    android:id="@+id/gameclips_cardview">
+
+    <RelativeLayout
+        android:id="@+id/gameclips_item_relativelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/screenshot_item_img"
+            android:layout_width="match_parent"
+            android:layout_height="200sp" />
+
+        <TextView
+            android:id="@+id/screenshot_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_below="@id/screenshot_item_img"
+            android:layout_marginLeft="8sp"
+            android:text="Clip Title"/>
+
+        <TextView
+            android:id="@+id/screeshot_item_game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_below="@id/screenshot_item_img"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8sp"
+            android:text="Game Title"/>
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
