@@ -1,4 +1,4 @@
-package com.ezequielc.successplanner;
+package com.ezequielc.successplanner.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ezequielc.successplanner.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
