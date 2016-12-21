@@ -1,4 +1,4 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.playlist;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -16,7 +15,6 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -31,9 +29,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.objects.Playlist;
+import com.korbkenny.peoplesplaylist.objects.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,6 +167,7 @@ public class PlaylistActivity extends AppCompatActivity {
     private void setupEverything(){
         PLAYLIST_ID = getIntent().getStringExtra("Playlist Id");
         db = FirebaseDatabase.getInstance();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         mPlaylistRef = db.getReference("Playlists/"+PLAYLIST_ID);
         mSongListRef = db.getReference("Playlists/"+PLAYLIST_ID+"/SongList");
 

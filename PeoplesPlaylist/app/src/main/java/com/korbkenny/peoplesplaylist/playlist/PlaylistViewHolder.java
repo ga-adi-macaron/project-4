@@ -1,9 +1,11 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.playlist;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.korbkenny.peoplesplaylist.R;
 
 /**
  * Created by KorbBookProReturns on 12/19/16.

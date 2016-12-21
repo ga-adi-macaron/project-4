@@ -1,9 +1,12 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.playlist;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.objects.Song;
 
 import java.util.List;
 

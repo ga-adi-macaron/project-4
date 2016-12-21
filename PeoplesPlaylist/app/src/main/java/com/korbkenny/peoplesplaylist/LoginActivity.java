@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
 
 public class LoginActivity extends AppCompatActivity{
     private FirebaseAuth mAuth;
@@ -117,6 +118,10 @@ public class LoginActivity extends AppCompatActivity{
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Failed to sign up", Toast.LENGTH_SHORT).show();
+                        }
+                        if(task.isSuccessful()){
+                            Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
+                            startActivity(intent);
                         }
                     }
                 });

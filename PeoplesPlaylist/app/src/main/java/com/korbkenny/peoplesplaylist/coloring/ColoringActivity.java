@@ -1,14 +1,35 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.coloring;
 
 import android.app.Dialog;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.objects.User;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 public class ColoringActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "Coloring Activity: ";
     private DrawingView drawView;
     private ImageButton currPaint;
     private float smallBrush, mediumBrush, largeBrush;
@@ -24,6 +45,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
         TextView drawButton = (TextView)findViewById(R.id.brush);
         TextView eraseButton = (TextView)findViewById(R.id.erase);
+        TextView saveButton = (TextView)findViewById(R.id.save);
 
         drawView = (DrawingView)findViewById(R.id.drawing);
 
@@ -33,6 +55,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
         drawButton.setOnClickListener(this);
         eraseButton.setOnClickListener(this);
+        saveButton.setOnClickListener(this);
 
         drawView.setBrushSize(mediumBrush);
     }
@@ -129,6 +152,44 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
                 }
             });
             brushDialog.show();
+        }
+
+        else if(view.getId()==R.id.save){
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                Log.d(TAG, "onClick: SAVE: USER ID:"+ user.getUid());
+                drawView.setDrawingCacheEnabled(true);
+
+                Bitmap bitmap = drawView.getDrawingCache();
+//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//                bitmap.compress(Bitmap.CompressFormat.PNG,0,bos);
+//                byte[] bitmapdata = bos.toByteArray();
+
+
+                Uri file = Uri.fromFile(new File("gs://peoplesplaylist-9c5d9.appspot.com/usericons/"+user.getUid()+".bmp"));
+                StorageReference ref = FirebaseStorage.getInstance().getReference().child("usericons/"+user.getUid()+".bmp");
+                ref.putFile(file)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                User myUser = new User();
+                                myUser.setId(user.getUid());
+                                myUser.setUserName(user.getDisplayName());
+                                myUser.setUserImage(downloadUrl);
+
+                                FirebaseDatabase db = FirebaseDatabase.getInstance();
+                                DatabaseReference dbRef = db.getReference("Users/"+user.getUid());
+                                dbRef.setValue(myUser);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(ColoringActivity.this, "Try again?", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
         }
     }
 }

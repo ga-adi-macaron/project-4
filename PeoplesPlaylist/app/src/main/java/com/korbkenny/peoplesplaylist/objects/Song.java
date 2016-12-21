@@ -1,4 +1,4 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.objects;
 
 import android.net.Uri;
 

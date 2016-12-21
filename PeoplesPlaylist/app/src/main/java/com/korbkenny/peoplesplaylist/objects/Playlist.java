@@ -1,9 +1,6 @@
-package com.korbkenny.peoplesplaylist;
-
-import android.graphics.Bitmap;
+package com.korbkenny.peoplesplaylist.objects;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

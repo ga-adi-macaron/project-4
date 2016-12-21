@@ -1,4 +1,4 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.coloring;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,6 +12,8 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.korbkenny.peoplesplaylist.R;
 
 /**
  * Created by KorbBookProReturns on 12/20/16.
