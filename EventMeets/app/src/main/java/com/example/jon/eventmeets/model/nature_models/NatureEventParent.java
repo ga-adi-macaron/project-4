@@ -11,4 +11,9 @@ public abstract class NatureEventParent implements EventParent {
     abstract String getCategory();
     abstract String getSubCategory();
     abstract String getLocation();
+
+    @Override
+    public String[] getChildren() {
+        return new String[]{"Hiking", "Wheel to Trail", "Water-based", "Sightseeing", "Geocaching"};
+    }
 }

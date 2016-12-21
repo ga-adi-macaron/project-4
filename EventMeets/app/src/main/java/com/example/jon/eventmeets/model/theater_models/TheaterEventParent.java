@@ -12,4 +12,9 @@ public abstract class TheaterEventParent implements EventParent {
     abstract boolean hasSpecificChoice();
     abstract String getMaxDuration();
     abstract String getEstimatedDuration();
+
+    @Override
+    public String[] getChildren() {
+        return new String[]{"New Movies", "Private Viewings", "Musical Theater", };
+    }
 }

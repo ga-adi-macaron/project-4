@@ -9,7 +9,7 @@ import com.example.jon.eventmeets.model.EventParent;
 public class ConversationEventParent implements EventParent {
 
     @Override
-    public String getParent() {
-        return "Conversational";
+    public String[] getChildren() {
+        return null;
     }
 }

@@ -5,7 +5,7 @@ package com.example.jon.eventmeets.model;
  */
 
 public interface EventParent {
-    String getParent();
+    String[] getChildren();
 //    String getLocation();
 //    void setIcon(View view);
 }

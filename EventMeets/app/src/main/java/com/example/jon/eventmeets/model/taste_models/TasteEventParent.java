@@ -11,4 +11,9 @@ public abstract class TasteEventParent implements EventParent {
     abstract String getCuisine();
     abstract boolean isHomemade();
     abstract String getLocation();
+
+    @Override
+    public String[] getChildren() {
+        return new String[]{"Let's cook!", "Fine Dining", "Hidden Gems < $10", "Unique Tastes"};
+    }
 }

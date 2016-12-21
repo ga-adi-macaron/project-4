@@ -8,7 +8,7 @@ import com.example.jon.eventmeets.model.EventParent;
 
 public class DrinkEventParent implements EventParent {
     @Override
-    public String getParent() {
-        return "Drinking";
+    public String[] getChildren() {
+        return null;
     }
 }

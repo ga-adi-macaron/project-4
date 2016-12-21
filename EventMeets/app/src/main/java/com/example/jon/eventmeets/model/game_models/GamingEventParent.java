@@ -16,4 +16,9 @@ public abstract class GamingEventParent implements EventParent {
 
     }
     public GamingEventParent(){}
+
+    @Override
+    public String[] getChildren() {
+        return new String[]{"Video Games, Board Games, Card Games"};
+    }
 }

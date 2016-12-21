@@ -55,7 +55,7 @@ public class HikingEvent extends NatureEventParent {
     }
 
     @Override
-    public String getParent() {
+    public String getChildren() {
         return null;
     }
 }
