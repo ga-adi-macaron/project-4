@@ -5,10 +5,30 @@ package com.ezequielc.successplanner.models;
  */
 
 public class Schedule {
+    private long mID;
+    private String mDate;
     private String mSchedule;
 
-    public Schedule(String mSchedule) {
+    public Schedule(long mID, String mDate, String mSchedule) {
+        this.mID = mID;
+        this.mDate = mDate;
         this.mSchedule = mSchedule;
+    }
+
+    public long getID() {
+        return mID;
+    }
+
+    public void setID(long mID) {
+        this.mID = mID;
+    }
+
+    public String getDate() {
+        return mDate;
+    }
+
+    public void setDate(String mDate) {
+        this.mDate = mDate;
     }
 
     public String getSchedule() {
