@@ -1,8 +1,8 @@
 package com.example.jon.eventmeets.main_menu;
 
+import com.example.jon.eventmeets.model.EventParent;
 import com.example.jon.eventmeets.model.conversation_models.ConversationEventParent;
 import com.example.jon.eventmeets.model.drink_models.DrinkEventParent;
-import com.example.jon.eventmeets.model.EventParent;
 import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
 import com.example.jon.eventmeets.model.nature_models.HikingEvent;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +23,7 @@ class MainMenuPresenter implements MainMenuContract.Presenter {
     MainMenuPresenter(MainMenuView view) {
         mView = view;
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        firebase.setPersistenceEnabled(true);
         mReference = firebase.getReference();
     }
 

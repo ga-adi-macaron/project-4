@@ -1,5 +1,7 @@
 package com.example.jon.eventmeets.event_category;
 
+import com.example.jon.eventmeets.model.EventParent;
+
 /**
  * Created by Jon on 12/21/2016.
  */
@@ -17,6 +19,12 @@ public interface EventCategoriesContract {
          * and displaying only the items matching the selected subcategory
          */
         void displaySubCategory(String subcategory);
+
+        /**
+         *
+         * @param category - A string representing the type of {@link EventParent} for the adapter
+         */
+        void setRecyclerView(EventParent category);
     }
 
     interface Presenter {

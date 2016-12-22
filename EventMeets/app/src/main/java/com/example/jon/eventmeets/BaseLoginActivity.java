@@ -2,10 +2,10 @@ package com.example.jon.eventmeets;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
@@ -35,7 +35,7 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         findViewById(R.id.login_main_btn).setOnClickListener(this);
         findViewById(R.id.skip_login_btn).setOnClickListener(this);
 
-        mPresenter = new BaseLoginPresenter(this, this);
+        mPresenter = new BaseLoginPresenter(this);
 
         checkSharedPreferences();
     }

@@ -73,26 +73,6 @@ public class VideoGamingEvent extends GamingEventParent {
         }
     }
 
-    @Override
-    public String getTitle() {
-        return mTitle;
-    }
-
-    @Override
-    public String getCategory() {
-        return mCategory;
-    }
-
-    @Override
-    public boolean needsNearby() {
-        return mNeedsNearby;
-    }
-
-    @Override
-    public boolean canBeNearby() {
-        return mCanBeNearby;
-    }
-
     public String getSubCategory() {
         return mSubCategory;
     }
@@ -119,10 +99,5 @@ public class VideoGamingEvent extends GamingEventParent {
 
     public void setCanbeNearby(boolean canBeNearby) {
         mCanBeNearby = canBeNearby;
-    }
-
-    @Override
-    public String getChildren() {
-        return null;
     }
 }

@@ -1,8 +1,6 @@
 package com.example.jon.eventmeets;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.example.jon.eventmeets.model.BaseUser;
@@ -10,7 +8,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -23,18 +20,13 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    public BaseLoginPresenter(BaseLoginContract.View view, Context context) {
+    public BaseLoginPresenter(BaseLoginContract.View view) {
         mView = view;
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    Log.d("firebase presenter", "onAuthStateChanged: "+user.getUid());
-                } else {
-                    Log.d("firebase presenter", "onAuthStateChanged: not logged in");
-                }
+
             }
         };
     }

@@ -5,6 +5,9 @@ package com.example.jon.eventmeets.model;
  */
 
 public interface EventParent {
+    /**
+     * Returns an array of Strings for the category, or null if no child categories exist
+     */
     String[] getChildren();
 //    String getLocation();
 //    void setIcon(View view);

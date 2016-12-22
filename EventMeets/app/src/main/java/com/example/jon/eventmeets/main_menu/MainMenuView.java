@@ -11,9 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.event_category_browser.EventBrowseViewActivity;
 import com.example.jon.eventmeets.model.EventParent;
-import com.example.jon.eventmeets.R;
 
 import java.util.List;
 

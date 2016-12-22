@@ -33,29 +33,4 @@ public class HikingEvent extends NatureEventParent {
     public void addMember(BaseUser user) {
         mAttendees.add(user);
     }
-
-    @Override
-    public String getTitle() {
-        return mTitle;
-    }
-
-    @Override
-    public String getCategory() {
-        return mCategory;
-    }
-
-    @Override
-    public String getSubCategory() {
-        return SUB_CATEGORY;
-    }
-
-    @Override
-    public String getLocation() {
-        return mLocation;
-    }
-
-    @Override
-    public String getChildren() {
-        return null;
-    }
 }

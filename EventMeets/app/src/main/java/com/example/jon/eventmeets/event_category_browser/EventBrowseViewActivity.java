@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.jon.eventmeets.event_category.CategoryWithSubsActivity;
 import com.example.jon.eventmeets.R;
+import com.example.jon.eventmeets.event_category.CategoryWithSubsActivity;
 
 public class EventBrowseViewActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mConversation, mDrink, mGame, mNature, mTaste, mTheater;

@@ -38,6 +38,8 @@
         </activity>
         <activity android:name=".event_detail_components.EventMessageActivity">
         </activity>
+        <activity android:name=".event_detail_components.VideoGameEventsActivity">
+        </activity>
     </application>
 
 </manifest>
