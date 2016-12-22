@@ -28,27 +28,47 @@
             android:layout_marginLeft="8sp"
             android:text="Clip Title"/>
 
-        <TextView
-            android:id="@+id/gameclips_item_game"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
+
+
+        <ImageButton
+            android:id="@+id/play_gc_button"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@color/colorAccent"
             android:layout_below="@id/gameclips_item_img"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="8sp"
+            android:layout_margin="4sp"/>
+
+        <ImageButton
+            android:id="@+id/download_gc_button"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@color/colorPrimaryDark"
+            android:layout_margin="4sp"
+            android:layout_below="@id/gameclips_item_img"
+            android:layout_toLeftOf="@id/play_gc_button"/>
+
+
+        <TextView
+            android:id="@+id/gameclips_item_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_below="@id/gameclips_item_title"
+            android:layout_marginLeft="8sp"
+            android:layout_toLeftOf="@id/download_gc_button"
             android:text="Game Title"/>
 
         <TextView
             android:id="@+id/gameclips_item_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:layout_below="@id/gameclips_item_title"
-            android:text="game description goes here blah"
+            android:textSize="15sp"
+            android:layout_below="@id/gameclips_item_game"
+            android:text="game clip description goes here blah"
             android:layout_marginLeft="4sp"
             android:layout_marginRight="4sp"
             android:layout_marginTop="4sp"/>
-
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

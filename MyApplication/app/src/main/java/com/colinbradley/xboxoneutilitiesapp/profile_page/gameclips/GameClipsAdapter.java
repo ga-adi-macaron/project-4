@@ -26,7 +26,7 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
     }
 
     public interface OnItemSelectedListener{
-        void onItemSelected(String url);
+        void onItemSelected(String clipURL, String imgURL, String title);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
         holder.mRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.onItemSelected(currentClip.getClipURL());
+                mOnItemSelectedListener.onItemSelected(currentClip.getClipURL(), currentClip.getImgURL(), currentClip.getClipName());
             }
         });
 

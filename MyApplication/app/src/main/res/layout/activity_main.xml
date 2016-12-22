@@ -32,7 +32,12 @@
         android:layout_below="@id/users_gt_input"
         android:text="GO"/>
 
-    
+    <Button
+        android:id="@+id/go_to_video_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_button"
+        android:text="video testing"/>
 
 
 </RelativeLayout>

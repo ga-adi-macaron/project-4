@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -32,16 +31,20 @@ public class MainActivity extends AppCompatActivity {
 
     EditText mEditText;
     Button mStartButton;
+    Button mTestingButton;
 
     AsyncTask<Void,Void,String> mTask;
 
 
     String mGamertag;
     String mXUID;
+    String mResponse;
     String mGamerscore;
     String mProfilePic;
     String mAccountTier;
     String mURLforPreferedColor;
+
+    boolean mIsCanceled;
 
 
 
@@ -49,6 +52,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mTestingButton = (Button)findViewById(R.id.go_to_video_player);
+        mTestingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(),VideoPlayerActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
 
 
@@ -59,56 +71,93 @@ public class MainActivity extends AppCompatActivity {
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mGamertag = mEditText.getText().toString();
-                ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected()) {
 
-                    mTask = new AsyncTask<Void, Void, String>() {
-                        @Override
-                        protected String doInBackground(Void... voids) {
-                            OkHttpClient client = new OkHttpClient();
+                mIsCanceled = false;
 
-                            Request request = new Request.Builder()
-                                    .url("https://xboxapi.com/v2/xuid/" + mGamertag)
-                                    .headers(mHeaders)
-                                    .build();
-                            Log.d(TAG, "doInBackground: built Request:  " + request.toString());
+                if (mEditText.getText().toString().isEmpty()){
+                    Toast.makeText(MainActivity.this, "Please Enter A Gamertag", Toast.LENGTH_SHORT).show();
+                }else {
 
-                            try {
-                                Response response = client.newCall(request).execute();
-                                Log.d(TAG, "doInBackground: recieved Response:  " + response.body().toString());
+                    mGamertag = mEditText.getText().toString();
+                    ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
 
-                                mXUID = response.body().string();
-                                Log.d(TAG, "doInBackground: XUID ---- " + mXUID);
+                        mTask = new AsyncTask<Void, Void, String>() {
+                            @Override
+                            protected String doInBackground(Void... voids) {
+                                OkHttpClient client = new OkHttpClient();
+
+                                Request request = new Request.Builder()
+                                        .url("https://xboxapi.com/v2/xuid/" + mGamertag)
+                                        .headers(mHeaders)
+                                        .build();
+                                Log.d(TAG, "doInBackground: built Request:  " + request.toString());
+
+                                try {
+                                    Response response = client.newCall(request).execute();
+                                    mResponse = response.body().string();
+                                    Log.d(TAG, "doInBackground: recieved Response:  " + mResponse);
+
+                                    if (mResponse.contains("XUID not found")){
+                                        Log.d(TAG, "doInBackground: recieved error...Cancelling");
+                                        mIsCanceled = true;
+                                    }
+
+
+                                    if (mIsCanceled){
+                                        Log.d(TAG, "doInBackground: CANCELED");
+                                        mTask.cancel(true);
+                                    }
+
+
+                                    mXUID = mResponse;
+                                    Log.d(TAG, "doInBackground: XUID ---- " + mXUID);
+
+                                    if (mXUID == null){
+                                        Toast.makeText(MainActivity.this, "System Error", Toast.LENGTH_SHORT).show();
+                                    }
+                                    return null;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 return null;
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
 
-                            return null;
-                        }
+                            @Override
+                            protected void onCancelled() {
+                                super.onCancelled();
+                                    onResume();
+                                    Toast.makeText(MainActivity.this, "Please Enter a Valid Gamertag", Toast.LENGTH_SHORT).show();
 
-                        @Override
-                        protected void onPostExecute(String aVoid) {
-                            Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                            intent.putExtra("xuid", mXUID);
-                            startActivity(intent);
-                        }
+                            }
 
-                    }.execute();
-                } else {
-                    Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_SHORT).show();
+                            @Override
+                            protected void onPostExecute(String aVoid) {
+                                Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                intent.putExtra("xuid", mXUID);
+                                startActivity(intent);
+                            }
+
+                        }.execute();
+
+                    } else {
+                        Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_SHORT).show();
+                    }
+
+
+
                 }
-
-
 
             }
         });
     }
 
-
-
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+        mEditText.setText("");
+    }
 }

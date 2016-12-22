@@ -10,6 +10,7 @@ import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 
 public class VideoPlayerActivity extends AppCompatActivity {
+    JCVideoPlayerStandard mVideoPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +22,26 @@ public class VideoPlayerActivity extends AppCompatActivity {
         String title = "Testing Video Player";
 
 
-        JCVideoPlayerStandard videoPlayer = (JCVideoPlayerStandard)findViewById(R.id.video_player);
-        videoPlayer.setUp(videoURL, JCVideoPlayer.SCREEN_LAYOUT_LIST, title);
-        ImageView mayb = videoPlayer.thumbImageView;
+        mVideoPlayer = (JCVideoPlayerStandard)findViewById(R.id.video_player);
+        mVideoPlayer.setUp(videoURL, JCVideoPlayer.SCREEN_LAYOUT_LIST, title);
+        ImageView mayb = mVideoPlayer.thumbImageView;
         Picasso.with(this).load(imageURL).into(mayb);
+    }
 
+    @Override
+    public void onBackPressed() {
+        if (mVideoPlayer.backPress()){
+            return;
+        }
 
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mVideoPlayer.releaseAllVideos();
 
     }
 }

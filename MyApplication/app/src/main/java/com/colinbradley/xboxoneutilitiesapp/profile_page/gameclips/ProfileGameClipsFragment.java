@@ -37,6 +37,11 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
     GameClipsAdapter mAdapter;
     List<GameClip> mClipsList;
     AsyncTask<Void,Void,Void> mTask;
+    String mGCtitle;
+    String mGCgameName;
+    String mGCdescription;
+    String mGCurl;
+    String mGCimgUrl;
 
     @Nullable
     @Override
@@ -61,26 +66,26 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
                         JSONArray urlInfo = clipObj.getJSONArray("gameClipUris");
                         JSONArray imgURLs = clipObj.getJSONArray("thumbnails");
 
-                        String title = clipObj.getString("clipName");
-                        String game = clipObj.getString("titleName");
-                        String description = clipObj.getString("userCaption");
-                        String clipURL = urlInfo.getJSONObject(0).getString("uri");
-                        String imgURL = imgURLs.getJSONObject(0).getString("uri");
+                        mGCtitle = clipObj.getString("clipName");
+                        mGCgameName = clipObj.getString("titleName");
+                        mGCdescription = clipObj.getString("userCaption");
+                        mGCurl = urlInfo.getJSONObject(0).getString("uri");
+                        mGCimgUrl = imgURLs.getJSONObject(0).getString("uri");
 
                         int j = i + 1;
-                        if (title.equals("")){
-                            title = "Clip #" + j;
+                        if (mGCtitle.equals("")){
+                            mGCtitle = "Clip #" + j;
                         }
-                        if (description.equals("")){
-                            description = "no description";
+                        if (mGCdescription.equals("")){
+                            mGCdescription = "no description";
                         }
 
-                        Log.d(TAG, "doInBackground: created new Clip: " + clipURL);
-                        Log.d(TAG, "doInBackground: ^^clip name: " + title);
-                        Log.d(TAG, "doInBackground: ^^clip description: " + description);
-                        Log.d(TAG, "doInBackground: ^^game clip came from: " + game);
+                        Log.d(TAG, "doInBackground: created new Clip: " + mGCurl);
+                        Log.d(TAG, "doInBackground: ^^clip name: " + mGCtitle);
+                        Log.d(TAG, "doInBackground: ^^clip description: " + mGCdescription);
+                        Log.d(TAG, "doInBackground: ^^game clip came from: " + mGCgameName);
 
-                        mClipsList.add(new GameClip(title,game,description,clipURL,imgURL));
+                        mClipsList.add(new GameClip(mGCtitle,mGCgameName,mGCdescription,mGCurl,mGCimgUrl));
                         Log.d(TAG, "doInBackground: added clip...size = " + mClipsList.size());
                     }
                 } catch (IOException | JSONException e) {
@@ -106,8 +111,9 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
         return rootView;
     }
 
+
     @Override
-    public void onItemSelected(String url) {
+    public void onItemSelected(String clipURL, String imgURL, String title) {
 
     }
 }
