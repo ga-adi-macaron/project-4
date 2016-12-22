@@ -91,6 +91,7 @@ public class SummaryFragment extends Fragment {
                     });
                 }else{
                     mBillSummary.setText("No Summary available");
+                    mExpandMoreOrLess.setVisibility(View.GONE);
                 }
                 StringBuilder tags = new StringBuilder();
                 tags.append("Tags: ");

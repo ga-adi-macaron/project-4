@@ -23,7 +23,6 @@
         </activity>
         <activity
             android:name=".reps.detail.DetailRepsActivity"
-            android:label="@string/title_activity_detail_reps"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -37,7 +36,7 @@
 
         <activity
             android:name=".bills.detail.DetailBillActivity"
-            android:label="@string/title_activity_detail_bill"
+            android:label=""
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

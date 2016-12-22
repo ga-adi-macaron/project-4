@@ -13,12 +13,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import com.joelimyx.politicallocal.bills.BillFragment;
 import com.joelimyx.politicallocal.bills.PropublicaService;
 import com.joelimyx.politicallocal.bills.detail.gson.propublica.DetailBill;
 import com.joelimyx.politicallocal.bills.detail.gson.propublica.Result;
+import com.squareup.picasso.Picasso;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,7 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailBillActivity extends AppCompatActivity {
 
     private Result mDetailBill;
-    private TextView mDetailBillNumber,mDetailBillTitle,mDetailBillSponsor,mDetailBillPDF;
+    private TextView mDetailBillTitle,mDetailBillSponsor,mDetailBillPDF;
     private DetailBillPagerAdapter mDetailBillPagerAdapter;
     private ViewPager mViewPager;
 
@@ -47,9 +50,11 @@ public class DetailBillActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_bill);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mDetailBillNumber = (TextView) findViewById(R.id.detail_bill_number);
+//        Picasso.with(this).load(R.mipmap.bill_background).fit().into((ImageView)findViewById(R.id.bill_background));
+
         mDetailBillTitle= (TextView) findViewById(R.id.detail_bill_title);
         mDetailBillSponsor= (TextView) findViewById(R.id.detail_bill_sponsor);
         mDetailBillPDF= (TextView) findViewById(R.id.detail_bill_pdf);
@@ -64,7 +69,7 @@ public class DetailBillActivity extends AppCompatActivity {
             public void onResponse(Call<DetailBill> call, Response<DetailBill> response) {
                 if (call.isExecuted()) {
                     mDetailBill = response.body().getResults().get(0);
-                    mDetailBillNumber.setText(mDetailBill.getBill());
+                    toolbar.setTitle(mDetailBill.getBill());
                     mDetailBillTitle.setText(mDetailBill.getTitle());
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
