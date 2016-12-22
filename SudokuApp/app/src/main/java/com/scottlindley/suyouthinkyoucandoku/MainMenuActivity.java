@@ -15,6 +15,7 @@ import android.transition.TransitionSet;
 import android.util.Pair;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -38,16 +39,12 @@ public class MainMenuActivity extends AppCompatActivity {
         getWindow().setSharedElementEnterTransition(transition);
         getWindow().setSharedElementReturnTransition(transition);
 
-//        getWindow().setExitTransition(new Explode());
-//        getWindow().setEnterTransition(new Explode());
-
         setContentView(R.layout.activity_main);
 
         DBAssetHelper dbAssetSetUp = new DBAssetHelper(MainMenuActivity.this);
         dbAssetSetUp.getReadableDatabase();
 
         setUpCardViews();
-
 
 //        addPuzzle();
 
@@ -84,9 +81,14 @@ public class MainMenuActivity extends AppCompatActivity {
         mRaceCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
-                intent.putExtra(RACE_INTENT_EXTRA, true);
-                startActivity(intent);
+                NetworkConnectivityChecker networkChecker = new NetworkConnectivityChecker(MainMenuActivity.this);
+                if (networkChecker.isConnected()) {
+                    Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
+                    intent.putExtra(RACE_INTENT_EXTRA, true);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainMenuActivity.this, "No network detected", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -102,15 +104,17 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
-    //TODO: DELETES EVERYTHING
     private void checkForNewPuzzles(){
-        DBHelper.getInstance(this).setUpBroadcastReceiver();
-        JobInfo puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
-                new ComponentName(this, PuzzleRefreshService.class))
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                .build();
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        scheduler.schedule(puzzleRefreshJob);
+        NetworkConnectivityChecker networkChecker = new NetworkConnectivityChecker(MainMenuActivity.this);
+        if (networkChecker.isConnected()) {
+            DBHelper.getInstance(this).setUpBroadcastReceiver();
+            JobInfo puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
+                    new ComponentName(this, PuzzleRefreshService.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                    .build();
+            JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            scheduler.schedule(puzzleRefreshJob);
+        }
     }
 
     private void addPuzzle() {

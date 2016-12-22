@@ -159,8 +159,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      * Helper method that takes a string and produces long value seed. The method then returns a
      * random integer from that seed. The connected room ID is used to ensure that the two players
      * grab the same 'random' puzzle from the remote database.
-     * @param stringSeed
-     * @param range
+     * @param stringSeed is a string that will be used to product a seed for the random number generator.
+     * @param range constricts the returned number from 0 to range.
      * @return
      */
     private int getRandomNumberFromString(String stringSeed, int range){

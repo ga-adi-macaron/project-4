@@ -36,6 +36,8 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:1.0.1'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
     compile 'com.android.support:support-v4:25.0.1'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
     testCompile 'junit:junit:4.12'
 }
 
