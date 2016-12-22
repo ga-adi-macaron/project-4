@@ -80,7 +80,7 @@
                 android:textColor="#eee"/>
         </android.support.v7.widget.CardView>
         <android.support.v7.widget.CardView
-            android:id="@+id/settings_card"
+            android:id="@+id/armory_card"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:transitionName="@string/transition2"

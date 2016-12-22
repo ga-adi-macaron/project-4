@@ -45,6 +45,8 @@
             android:name=".SoloPuzzleActivity"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".ArmoryActivity">
+        </activity>
     </application>
 
 </manifest>

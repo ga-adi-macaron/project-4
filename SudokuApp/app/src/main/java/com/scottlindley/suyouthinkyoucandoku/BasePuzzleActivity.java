@@ -53,15 +53,37 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * with each 1 second tick.
      */
     public void setUpScoreCard(){
+        final int scoreDropInterval;
+        String difficulty = getIntent().getStringExtra(SoloActivity.DIFFICULTY_INTENT_KEY);
+        switch (difficulty){
+            case "easy":
+                mScore = 1200;
+                scoreDropInterval = 1;
+                break;
+            case "medium":
+                mScore = 2400;
+                scoreDropInterval = 2;
+                break;
+            case "hard":
+                mScore = 3600;
+                scoreDropInterval = 3;
+                break;
+            case "expert":
+                mScore = 4800;
+                scoreDropInterval = 4;
+                break;
+            default:
+                scoreDropInterval = 0;
+                mScore = 0;
+        }
         mStrikes = 0;
         mTimerView = (TextView)findViewById(R.id.score_text);
-        mScore = 1201;
         mTime = 0;
         mTimerView.setText(DateUtils.formatElapsedTime(mTime));
-        mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(20), 1000){
+        mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(1000), 1000){
             @Override
             public void onTick(long l) {
-                mScore--;
+                mScore = mScore - scoreDropInterval;
                 mTime++;
                 if (mScore <= 0){
                     onFinish();
@@ -174,7 +196,6 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
             } else {
                 //Choice was wrong
                 cell.setText("");
-                mScore = mScore - 100;
                 //Vibrate the phone to give a negative feedback
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
 

@@ -26,7 +26,7 @@ import java.util.List;
 public class MainMenuActivity extends AppCompatActivity {
     private static final String TAG = "MainMenuActivity";
     private static final int PUZZLE_REFRESH_JOB_ID = 88;
-    private CardView mSoloCard, mRaceCard, mStatsCard, mSettingsCard;
+    private CardView mSoloCard, mRaceCard, mStatsCard, mArmoryCard;
     public static final String RACE_INTENT_EXTRA = "race extra";
 
     @Override
@@ -58,7 +58,7 @@ public class MainMenuActivity extends AppCompatActivity {
         mSoloCard = (CardView) findViewById(R.id.solo_card);
         mRaceCard = (CardView) findViewById(R.id.race_card);
         mStatsCard = (CardView) findViewById(R.id.stats_card);
-        mSettingsCard = (CardView) findViewById(R.id.settings_card);
+        mArmoryCard = (CardView) findViewById(R.id.armory_card);
 
         mSoloCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +68,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 Pair<View, String> pair2 =
                         Pair.create(findViewById(R.id.race_card), getString(R.string.transition2));
                 Pair<View, String> pair3 =
-                        Pair.create(findViewById(R.id.settings_card), getString(R.string.transition3));
+                        Pair.create(findViewById(R.id.armory_card), getString(R.string.transition3));
                 Pair<View, String> pair4 =
                         Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
                 ActivityOptions options =
@@ -100,6 +100,13 @@ public class MainMenuActivity extends AppCompatActivity {
                 ActivityOptions options =
                         ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair);
                 startActivity(new Intent(MainMenuActivity.this, StatsActivity.class), options.toBundle());
+            }
+        });
+
+        mArmoryCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainMenuActivity.this, ArmoryActivity.class));
             }
         });
     }

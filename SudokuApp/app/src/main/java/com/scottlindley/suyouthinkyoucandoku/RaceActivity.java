@@ -137,6 +137,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             }
             resultDetailText.setVisibility(View.VISIBLE);
         }
+        mTimer.cancel();
 
         racesWon.setText("Races Won: "+ stats.getRacesWon());
         racesLost.setText("Races Lost: "+ stats.getRacesLost());
@@ -241,11 +242,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                                 new NetworkConnectivityChecker(RaceActivity.this);
                         if(networkChecker.isConnected()) {
                             mOpponentDisconnected = true;
-                            cancel();
                             endGame(true);
                         } else {
                             mUserDisconnected = true;
-                            cancel();
                             endGame(false);
                         }
                     }
