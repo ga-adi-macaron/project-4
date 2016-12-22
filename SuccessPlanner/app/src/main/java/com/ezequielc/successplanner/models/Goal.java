@@ -9,6 +9,11 @@ public class Goal {
     private String mDate;
     private String mGoal;
 
+    public Goal(String mDate, String mGoal) {
+        this.mDate = mDate;
+        this.mGoal = mGoal;
+    }
+
     public Goal(long mID, String mDate, String mGoal) {
         this.mID = mID;
         this.mDate = mDate;

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            getQuote();
+//            getQuote();
         } else {
             Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_SHORT).show();
         }

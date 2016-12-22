@@ -9,6 +9,11 @@ public class Schedule {
     private String mDate;
     private String mSchedule;
 
+    public Schedule(String mDate, String mSchedule) {
+        this.mDate = mDate;
+        this.mSchedule = mSchedule;
+    }
+
     public Schedule(long mID, String mDate, String mSchedule) {
         this.mID = mID;
         this.mDate = mDate;

@@ -9,6 +9,11 @@ public class Affirmation {
     private String mDate;
     private String mAffirmation;
 
+    public Affirmation(String mDate, String mAffirmation) {
+        this.mDate = mDate;
+        this.mAffirmation = mAffirmation;
+    }
+
     public Affirmation(long mID, String mDate, String mAffirmation) {
         this.mID = mID;
         this.mDate = mDate;

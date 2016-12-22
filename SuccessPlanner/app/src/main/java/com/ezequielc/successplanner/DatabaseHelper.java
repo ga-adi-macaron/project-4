@@ -2,6 +2,7 @@ package com.ezequielc.successplanner;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -9,6 +10,9 @@ import com.ezequielc.successplanner.models.Affirmation;
 import com.ezequielc.successplanner.models.DailyData;
 import com.ezequielc.successplanner.models.Goal;
 import com.ezequielc.successplanner.models.Schedule;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by student on 12/21/16.
@@ -38,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper mInstance;
 
-    private static DatabaseHelper getInstance(Context context){
+    public static DatabaseHelper getInstance(Context context){
         if (mInstance == null) {
             mInstance = new DatabaseHelper(context.getApplicationContext());
         } return mInstance;
@@ -112,5 +116,99 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert(SCHEDULE_TABLE, null, values);
         schedule.setID(id);
         db.close();
+    }
+
+    // TODO: Is this method necessary? Should I use JOIN instead
+    public void insertDailyDate(DailyData data){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_DATE, data.getDate());
+        long id = db.insert(DAILY_DATA_TABLE, null, values);
+        data.setID(id);
+        db.close();
+    }
+
+    public List<Goal> getAllGoals(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(GOALS_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        List<Goal> goalList = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                long id = cursor.getLong(cursor.getColumnIndex(COL_ID));
+                String date = cursor.getString(cursor.getColumnIndex(COL_DATE));
+                String goal = cursor.getString(cursor.getColumnIndex(COL_GOALS));
+
+                Goal goals = new Goal(id, date, goal);
+                goalList.add(goals);
+
+                cursor.moveToNext();
+            }
+        }
+        return goalList;
+    }
+
+    public List<Affirmation> getAllAffirmations(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(AFFIRMATIONS_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        List<Affirmation> affirmationList = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                long id = cursor.getLong(cursor.getColumnIndex(COL_ID));
+                String date = cursor.getString(cursor.getColumnIndex(COL_DATE));
+                String affirmation = cursor.getString(cursor.getColumnIndex(COL_AFFIRMATIONS));
+
+                Affirmation affirmations = new Affirmation(id, date, affirmation);
+                affirmationList.add(affirmations);
+
+                cursor.moveToNext();
+            }
+        }
+        return affirmationList;
+    }
+
+    public List<Schedule> getAllSchedule(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(SCHEDULE_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        List<Schedule> scheduleList = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                long id = cursor.getLong(cursor.getColumnIndex(COL_ID));
+                String date = cursor.getString(cursor.getColumnIndex(COL_DATE));
+                String schedule = cursor.getString(cursor.getColumnIndex(COL_SCHEDULE));
+
+                Schedule schedules = new Schedule(id, date, schedule);
+                scheduleList.add(schedules);
+
+                cursor.moveToNext();
+            }
+        }
+        return scheduleList;
     }
 }
