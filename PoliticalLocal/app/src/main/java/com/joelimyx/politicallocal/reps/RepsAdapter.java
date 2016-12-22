@@ -14,6 +14,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by Joe on 12/15/16.
  */
@@ -65,12 +67,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
             }
         }
         holder.mRepsDistrictRank.setText(districtRank);
-        holder.mRepsItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.OnRepsItemSelected(current.getBioId());
-            }
-        });
+        holder.mRepsItem.setOnClickListener(v -> mListener.OnRepsItemSelected(current.getBioId()));
     }
 
     @Override
@@ -81,7 +78,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
     class RepsViewHolder extends RecyclerView.ViewHolder{
         private TextView mRepsName, mRepsDistrictRank;
         private RelativeLayout mRepsItem;
-        private ImageView mRepsPortrait;
+        private CircleImageView mRepsPortrait;
 
         public RepsViewHolder(View itemView) {
             super(itemView);
@@ -89,7 +86,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
             mRepsName = (TextView) itemView.findViewById(R.id.reps_name);
             mRepsDistrictRank = (TextView) itemView.findViewById(R.id.reps_district_rank);
             mRepsItem = (RelativeLayout) itemView.findViewById(R.id.reps_item);
-            mRepsPortrait = (ImageView) itemView.findViewById(R.id.reps_portrait);
+            mRepsPortrait = (CircleImageView) itemView.findViewById(R.id.reps_portrait);
         }
     }
 }

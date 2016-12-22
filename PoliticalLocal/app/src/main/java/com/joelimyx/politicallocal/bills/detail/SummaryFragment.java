@@ -2,12 +2,15 @@ package com.joelimyx.politicallocal.bills.detail;
 
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.joelimyx.politicallocal.R;
@@ -25,9 +28,9 @@ public class SummaryFragment extends Fragment {
     public static final String congress_baseurl = "https://congress.api.sunlightfoundation.com/";
     private static final String TAG = "SummaryFragment";
 
-    private String mBillId;
+    private String mBillId, mLongSummary;
     private TextView mBillSummary, mBillTags;
-    private String mLongSummary;
+    private ImageView mExpandMoreOrLess;
     private boolean mIsExpanded = false;
 
     public SummaryFragment() {
@@ -59,6 +62,8 @@ public class SummaryFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mBillSummary = (TextView) view.findViewById(R.id.bill_summary_text);
+        mBillTags = (TextView) view.findViewById(R.id.bill_tags);
+        mExpandMoreOrLess= (ImageView) view.findViewById(R.id.expand_more_or_less);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(congress_baseurl)
@@ -71,20 +76,32 @@ public class SummaryFragment extends Fragment {
                 Result summary = response.body().getResults().get(0);
                 if (summary.getSummaryShort()!=null) {
                     mBillSummary.setText(summary.getSummaryShort());
-                    mLongSummary =summary.getSummary();
+                    mLongSummary = summary.getSummary();
                     mBillSummary.setOnClickListener(v -> {
+                        //Toggle Long or short summary
                         if (!mIsExpanded) {
                             mBillSummary.setText(mLongSummary);
                             mIsExpanded = !mIsExpanded;
+                            mExpandMoreOrLess.setImageResource(R.drawable.ic_expand_less);
                         }else{
                             mBillSummary.setText(summary.getSummaryShort());
                             mIsExpanded = !mIsExpanded;
+                            mExpandMoreOrLess.setImageResource(R.drawable.ic_expand_more);
                         }
                     });
                 }else{
                     mBillSummary.setText("No Summary available");
                 }
-                mBillTags.setText(summary.getKeywords().get(0));
+                StringBuilder tags = new StringBuilder();
+                tags.append("Tags: ");
+
+                for (String keyword : summary.getKeywords()) {
+                    tags.append("<u>");
+                    tags.append(keyword);
+                    tags.append("</u>, ");
+                }
+                tags.replace(tags.lastIndexOf(","),tags.lastIndexOf(" "),"");
+                mBillTags.setText(Html.fromHtml(tags.toString()));
             }
 
             @Override

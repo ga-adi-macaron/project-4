@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.widget.TextView;
@@ -65,13 +66,14 @@ public class DetailBillActivity extends AppCompatActivity {
                     mDetailBill = response.body().getResults().get(0);
                     mDetailBillNumber.setText(mDetailBill.getBill());
                     mDetailBillTitle.setText(mDetailBill.getTitle());
+                    mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
+                    mDetailBillTitle.setMarqueeRepeatLimit(3);
                     mDetailBillSponsor.setText(mDetailBill.getSponsor());
                     SpannableString content = new SpannableString("More detail");
                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                     mDetailBillPDF.setText(content);
-                    mDetailBillPDF.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) { String packageName = "com.android.chrome";
+                    mDetailBillPDF.setOnClickListener(v ->{
+                            String packageName = "com.android.chrome";
                             CustomTabsClient.bindCustomTabsService(DetailBillActivity.this, packageName, new CustomTabsServiceConnection() {
                                 @Override
                                 public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
@@ -93,9 +95,8 @@ public class DetailBillActivity extends AppCompatActivity {
                                     Toast.makeText(DetailBillActivity.this, "Connection Lost", Toast.LENGTH_SHORT).show();
                                 }
                             });
-
                         }
-                    });
+                    );
                 }
             }
 
