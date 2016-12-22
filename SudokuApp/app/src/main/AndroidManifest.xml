@@ -20,7 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".RaceActivity">
+        <activity
+            android:name=".RaceActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <service
@@ -39,7 +41,9 @@
 
         <activity android:name=".StatsActivity">
         </activity>
-        <activity android:name=".SoloPuzzleActivity">
+        <activity
+            android:name=".SoloPuzzleActivity"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -33,12 +34,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener {
     private static final String TAG = "RaceActivity";
     public static final int RC_SIGN_IN = 5667;
     public static final int RC_AUTOMATCH = 6980;
+    public static final String STILL_CONNECTED_MESSAGE = "opponent still connected";
     public static final String OPPONENT_DISCONNECTED_MESSAGE = "opponent disconnected";
     public static final String OPPONENT_QUIT_MESSAGE = "opponent quit";
     public static final String TOO_MANY_GUESSES_MESSAGE = "too many guesses";
@@ -46,7 +49,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private boolean mOpponentQuit, mOpponentDisconnected, mOpponentTooManyGuesses, mOpponentFinished;
     private boolean mUserDisconnected;
     private String mRoomID;
-    private boolean mResolvingConnectionFailure = false;
+    private int mNumberOfParticipants;
+    private boolean mResolvingConnectionFailure, mStillConnected;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -55,6 +59,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         setContentView(R.layout.activity_puzzle);
 
         mDBHelper = DBHelper.getInstance(this);
+
+        (findViewById(R.id.loading_wheel)).setVisibility(View.INVISIBLE);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -207,6 +213,81 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     public void setUpScoreCard() {
         mStrikes = 0;
         mTimerView = (TextView)findViewById(R.id.score_text);
+        mTimerView.setText("Looking for match...");
+        mTime = 0;
+        mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(1000), 1000) {
+            @Override
+            public void onTick(long l) {
+                if(mTime>20 && mNumberOfParticipants < 2){
+                    cancel();
+                    launchNoMatchFoundDialog();
+                    (findViewById(R.id.loading_wheel)).setVisibility(View.INVISIBLE);
+                }
+                //Send a message to the other player every second to say we're still connected
+                if(mNumberOfParticipants == 2 && mGoogleApiClient.isConnected()){
+                    byte[] data = STILL_CONNECTED_MESSAGE.getBytes();
+                    Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,data,mRoomID);
+                }
+                /*
+                Every 5 seconds check to see if the opponent is still sending messages. If the opponent
+                has been sending the STILL_CONNECTED_MESSAGE, then mStillConnected must be true. If it
+                isn't then it is assumed the opponent has disconnected.
+                 */
+                if(mTime%5==0 & mNumberOfParticipants == 2){
+                    if (mStillConnected){
+                        mStillConnected = false;
+                    } else {
+                        NetworkConnectivityChecker networkChecker =
+                                new NetworkConnectivityChecker(RaceActivity.this);
+                        if(networkChecker.isConnected()) {
+                            mOpponentDisconnected = true;
+                            cancel();
+                            endGame(true);
+                        } else {
+                            mUserDisconnected = true;
+                            cancel();
+                            endGame(false);
+                        }
+                    }
+                }
+                mTime++;
+            }
+            @Override
+            public void onFinish() {
+                RaceActivity.this.finish();
+            }
+        }.start();
+    }
+
+    @Override
+    public void initializeGame() {
+        mPuzzleSolver = new PuzzleSolver(mKey, this);
+        createCells();
+        setUpChoiceTiles();
+    }
+
+    private void launchNoMatchFoundDialog(){
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setPositiveButton("okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        RaceActivity.this.finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        RaceActivity.this.finish();
+                    }
+                })
+                .setTitle("No match found. Please try again!")
+                .create();
+        dialog.show();
+    }
+
+    @Override
+    public void grabSolution() {
+        super.grabSolution();
         mTimerView.setText("Race!");
     }
 
@@ -244,12 +325,16 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     /**
-     * Once connected, launches player invite dialog.
+     * Once connected, creates a mulitplayer room and sets up the score card.
+     * The score card setup also initializes a timer.
      * @param bundle
      */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected: "+mGoogleApiClient.isConnected());
+        (findViewById(R.id.loading_wheel)).setVisibility(View.VISIBLE);
+
+        setUpScoreCard();
+
         Bundle autoMatch = RoomConfig.createAutoMatchCriteria(1, 1, 0);
         RoomConfig roomConfig = RoomConfig.builder(RaceActivity.this)
                 .setRoomStatusUpdateListener(RaceActivity.this)
@@ -295,7 +380,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mRoomID = room.getRoomId();
-
+        mNumberOfParticipants = room.getParticipantIds().size();
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("Puzzles").child("medium");
 
@@ -313,9 +398,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                     puzzle.setKey(intKey);
                     puzzles.add(puzzle);
                 }
-                Log.d(TAG, "onDataChange: "+room.getParticipantIds().size());
-                Log.d(TAG, "onDataChange: "+room.getParticipantIds().get(0));
-                Log.d(TAG, "onDataChange: "+room.getParticipantIds().get(1));
                 String participants = room.getParticipantIds().get(0) + room.getParticipantIds().get(1);
 
                 int randomIndex = getRandomNumberFromString(participants, puzzles.size());
@@ -350,10 +432,21 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         } else if(data.equals(OPPONENT_FINISHED_MESSAGE)){
             mOpponentFinished = true;
             endGame(false);
+        } else if(data.equals(STILL_CONNECTED_MESSAGE)){
+            mStillConnected = true;
         } else {
             int cellLocation = Integer.parseInt(data);
             tintCell(cellLocation);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mRoomID!=null) {
+            byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
+            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        }
+        super.onBackPressed();
     }
 
     //All methods below are required interface overrides
@@ -397,12 +490,4 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
     }
 
-    @Override
-    public void onBackPressed() {
-        if(mRoomID!=null) {
-            byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
-            Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
-        }
-        super.onBackPressed();
-    }
 }

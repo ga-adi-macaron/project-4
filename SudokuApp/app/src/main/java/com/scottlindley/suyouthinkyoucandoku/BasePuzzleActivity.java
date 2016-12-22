@@ -33,7 +33,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
     public int mSelectedNum, mScore, mStrikes;
     public ArrayList<TextView> mChoiceTiles;
     public List<TextView> mCellViews;
-    private PuzzleSolver mPuzzleSolver;
+    public PuzzleSolver mPuzzleSolver;
     public CountDownTimer mTimer;
 
     @Override
