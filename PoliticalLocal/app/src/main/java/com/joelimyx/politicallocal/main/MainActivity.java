@@ -205,33 +205,37 @@ public class MainActivity extends AppCompatActivity
         double latitude = mCurrentLocation.getLatitude();
         double longitude = mCurrentLocation.getLongitude();
 
+        SharedPreferences preference = getSharedPreferences(getString(R.string.district_file),MODE_PRIVATE);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(district_base_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Call<RepsList> call = retrofit.create(CongressService.class).getLegislatures(latitude,longitude);
-        call.enqueue(new Callback<RepsList>() {
-            @Override
-            public void onResponse(Call<RepsList> call, Response<RepsList> response) {
-                List<Result> result = response.body().getResults();
-                RepsSQLHelper db = RepsSQLHelper.getInstance(MainActivity.this);
+        if (preference.getBoolean(getString(R.string.is_first),true)) {
+            call.enqueue(new Callback<RepsList>() {
+                @Override
+                public void onResponse(Call<RepsList> call, Response<RepsList> response) {
+                    List<Result> result = response.body().getResults();
+                    RepsSQLHelper db = RepsSQLHelper.getInstance(MainActivity.this);
 
-                SharedPreferences preference = getSharedPreferences(getString(R.string.district_file),MODE_PRIVATE);
-                SharedPreferences.Editor editor = preference.edit();
-                editor.putString(getString(R.string.state),result.get(0).getState());
-                editor.commit();
-                for (Result current: result) {
-                    String name = current.getFirstName()+" "+current.getLastName();
-                    db.addRep(current, name);
-                    //loadImageFromWeb(name);
+                    SharedPreferences.Editor editor = preference.edit();
+                    editor.putString(getString(R.string.state), result.get(0).getState());
+                    editor.putBoolean(getString(R.string.is_first), false);
+                    editor.commit();
+                    for (Result current : result) {
+                        String name = current.getFirstName() + " " + current.getLastName();
+                        db.addRep(current, name);
+                        loadImageFromWeb(name);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<RepsList> call, Throwable t) {
+                @Override
+                public void onFailure(Call<RepsList> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
     }
 
@@ -249,18 +253,14 @@ public class MainActivity extends AppCompatActivity
             public void onResponse(Call<Portrait> call, Response<Portrait> response) {
 
                 //Download the image to bitmap
-                ImageRequest request = new ImageRequest(response.body().getValue().get(0).getThumbnailUrl(), new com.android.volley.Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap response) {
-
-                        saveImageToFile(response,person);
-                    }
-                }, 80, 80, null, null, new com.android.volley.Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this, "Failed image download", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                ImageRequest request = new ImageRequest(
+                        response.body().getValue().get(0).getThumbnailUrl(),
+                        response1 -> saveImageToFile(response1,person),
+                        0,
+                        0,
+                        null,
+                        null,
+                        e-> Toast.makeText(MainActivity.this, "Failed image download", Toast.LENGTH_SHORT).show());
                 Volley.newRequestQueue(MainActivity.this).add(request);            }
 
             @Override

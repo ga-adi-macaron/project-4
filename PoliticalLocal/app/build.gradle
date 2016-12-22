@@ -7,6 +7,9 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
+plugins {
+    id "me.tatarka.retrolambda" version "3.4.0"
+}
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
@@ -25,6 +28,12 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    android {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
     }
     buildTypes {
         release {
@@ -55,5 +64,10 @@ dependencies {
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
     compile 'com.google.android.gms:play-services:10.0.1'
     compile 'com.android.volley:volley:1.0.0'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
     testCompile 'junit:junit:4.12'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+
 }
+
+apply plugin: 'com.google.gms.google-services'

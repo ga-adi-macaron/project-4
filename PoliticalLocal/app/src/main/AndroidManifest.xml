@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,9 +30,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.joelimyx.politicallocal.main.MainActivity"/>
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="0001e0084b67cc852c91550c7544674228cc6e53" />
+            android:value="0001e0084b67cc852c91550c7544674228cc6e53"/>
+
+        <activity
+            android:name=".bills.detail.DetailBillActivity"
+            android:label="@string/title_activity_detail_bill"
+            android:parentActivityName=".main.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.joelimyx.politicallocal.main.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

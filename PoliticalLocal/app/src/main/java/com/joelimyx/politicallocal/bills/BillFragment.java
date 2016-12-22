@@ -1,16 +1,20 @@
 package com.joelimyx.politicallocal.bills;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.joelimyx.politicallocal.R;
+import com.joelimyx.politicallocal.bills.detail.DetailBillActivity;
 import com.joelimyx.politicallocal.bills.gson.Bill;
 import com.joelimyx.politicallocal.bills.gson.RecentBills;
 
@@ -26,6 +30,9 @@ public class BillFragment extends Fragment
         implements BillAdapter.OnBillItemSelectedListener {
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
+    private static final String TAG = "BillFragment";
+    private SwipeRefreshLayout mRefreshLayout;
+
     public BillFragment() {
         // Required empty public constructor
     }
@@ -46,6 +53,8 @@ public class BillFragment extends Fragment
         final RecyclerView billRecyclerview = (RecyclerView) view.findViewById(R.id.bill_recyclerview);
         billRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
 
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bill_swiperefresh);
+        mRefreshLayout.setRefreshing(true);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -56,6 +65,7 @@ public class BillFragment extends Fragment
             public void onResponse(Call<RecentBills> call, Response<RecentBills> response) {
                 List<Bill> bills = response.body().getResults().get(0).getBills();
                 billRecyclerview.setAdapter(new BillAdapter(bills,BillFragment.this));
+                mRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -68,6 +78,8 @@ public class BillFragment extends Fragment
 
     @Override
     public void onBillItemSelected(String billId) {
-
+        Intent intent = new Intent(getContext(), DetailBillActivity.class);
+        intent.putExtra("id",billId.toLowerCase());
+        getActivity().startActivity(intent);
     }
 }

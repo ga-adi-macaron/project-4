@@ -2,9 +2,7 @@ package com.joelimyx.politicallocal.reps.detail;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
@@ -20,9 +18,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,11 +30,7 @@ import com.joelimyx.politicallocal.reps.MyReps;
 import com.joelimyx.politicallocal.reps.service.TwitterIdClient;
 import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.GuestSession;
-import com.twitter.sdk.android.core.TwitterApiClient;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterCore;
-import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.User;
 
 import io.fabric.sdk.android.Fabric;
@@ -46,16 +38,13 @@ import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DetailRepsActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private DetailRepsPagerAdapter mDetailRepsPagerAdapter;
     private ViewPager mViewPager;
 
     private MyReps mMyReps;
-    private GuestSession mSession;
     private TwitterIdClient mClient;
     private static final String TAG = "DetailRepsActivity";
 
@@ -67,8 +56,6 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
 
         TwitterAuthConfig authConfig = new TwitterAuthConfig("V2RCaymY8YS5r2hQLtKPf1A5s","FX3mhvuWzZQJkBxF6Idm8SwrJdwPamBh8yL3UgYTyfYP9pwKCd");
         Fabric.with(DetailRepsActivity.this, new Twitter(authConfig));
-        mSession = TwitterCore.getInstance().getGuestSessionProvider().getCurrentSession();
-
 
         RepsSQLHelper db = RepsSQLHelper.getInstance(this);
         /*---------------------------------------------------------------------------------
@@ -105,15 +92,17 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
         /*---------------------------------------------------------------------------------
         // ViewPagers and tab layout
         ---------------------------------------------------------------------------------*/
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mDetailRepsPagerAdapter = new DetailRepsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.detail_reps_container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(mDetailRepsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.detail_reps_tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
     }
 
+    /*---------------------------------------------------------------------------------
+    // On Click AREA
+    ---------------------------------------------------------------------------------*/
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -182,10 +171,13 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
                 break;
         }
     }
+    /*---------------------------------------------------------------------------------
+    // Page Adapter Section
+    ---------------------------------------------------------------------------------*/
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class DetailRepsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public DetailRepsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

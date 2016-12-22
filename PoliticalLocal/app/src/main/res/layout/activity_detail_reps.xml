@@ -35,31 +35,24 @@
             android:layout_height="0dp"
             android:layout_weight="2"
             android:layout_margin="6dp">
-            <android.support.v7.widget.CardView
-                android:id="@+id/detail_reps_image_card"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="40dp"
-                android:layout_margin="6dp">
-                <ImageView
-                    android:id="@+id/detail_reps_image"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"/>
-            </android.support.v7.widget.CardView>
-
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/detail_reps_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="6dp"/>
             <TextView
                 android:id="@+id/detail_reps_name_party"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:layout_toEndOf="@id/detail_reps_image_card"/>
+                android:layout_toEndOf="@id/detail_reps_image"/>
             <TextView
                 android:id="@+id/detail_contact_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/detail_reps_name_party"
-                android:layout_toEndOf="@id/detail_reps_image_card"
+                android:layout_toEndOf="@id/detail_reps_image"
                 android:text="@string/contact_information"/>
 
             <ImageView
@@ -68,7 +61,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_below="@id/detail_contact_text"
-                android:layout_toEndOf="@id/detail_reps_image_card"/>
+                android:layout_toEndOf="@id/detail_reps_image"/>
             <ImageView
                 android:id="@+id/detail_reps_email"
                 android:src="@mipmap/ic_email"
@@ -105,7 +98,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
+                android:id="@+id/detail_reps_tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:tabSelectedTextColor="#eee"
