@@ -118,26 +118,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    // TODO: Is this method necessary? Should I use JOIN instead
-    public void insertDailyDate(DailyData data){
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_DATE, data.getDate());
-        long id = db.insert(DAILY_DATA_TABLE, null, values);
-        data.setID(id);
-        db.close();
-    }
-
-    public List<Goal> getAllGoals(){
+    public List<Goal> getGoalsForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.query(GOALS_TABLE,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        String[] columns = new String[]{COL_ID, COL_DATE, COL_GOALS};
+        String selection = COL_DATE + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(currentDate)};
+
+        Cursor cursor = db.query(GOALS_TABLE, columns, selection, selectionArgs, null, null, null, null);
 
         List<Goal> goalList = new ArrayList<>();
 
@@ -156,16 +144,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return goalList;
     }
 
-    public List<Affirmation> getAllAffirmations(){
+    public List<Affirmation> getAffirmationsForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.query(AFFIRMATIONS_TABLE,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        String[] columns = new String[]{COL_ID, COL_DATE, COL_AFFIRMATIONS};
+        String selection = COL_DATE + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(currentDate)};
+
+        Cursor cursor = db.query(AFFIRMATIONS_TABLE, columns, selection, selectionArgs, null, null, null, null);
 
         List<Affirmation> affirmationList = new ArrayList<>();
 
@@ -184,16 +170,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return affirmationList;
     }
 
-    public List<Schedule> getAllSchedule(){
+    public List<Schedule> getScheduleForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.query(SCHEDULE_TABLE,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
+        String[] columns = new String[]{COL_ID, COL_DATE, COL_SCHEDULE};
+        String selection = COL_DATE + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(currentDate)};
+
+        Cursor cursor = db.query(SCHEDULE_TABLE, columns, selection, selectionArgs, null, null, null, null);
 
         List<Schedule> scheduleList = new ArrayList<>();
 
@@ -211,4 +195,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return scheduleList;
     }
+
+
 }

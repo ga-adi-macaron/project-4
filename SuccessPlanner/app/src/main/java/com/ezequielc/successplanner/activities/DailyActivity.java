@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ezequielc.successplanner.DatabaseHelper;
 import com.ezequielc.successplanner.models.DailyData;
@@ -44,8 +45,6 @@ public class DailyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily);
 
-        // TODO: Add Database Asset Helper
-
         // References to Views
         mCurrentDate = (TextView) findViewById(R.id.current_date);
         mAddGoals = (Button) findViewById(R.id.add_goals_button);
@@ -55,8 +54,13 @@ public class DailyActivity extends AppCompatActivity {
         mAffirmationsRecyclerView = (RecyclerView) findViewById(R.id.affirmations_recycler_view);
         mScheduleRecyclerView = (RecyclerView) findViewById(R.id.schedule_recycler_view);
 
+        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
+        String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
+        mCurrentDate.setText(currentDate);
+
         // RecyclerView for Goals
-        mGoalList = new ArrayList<>();
+        mGoalList = databaseHelper.getGoalsForDate(currentDate);
+
         mGoalAdapter = new GoalRecyclerViewAdapter(mGoalList);
         LinearLayoutManager goalLinearLayoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -64,7 +68,7 @@ public class DailyActivity extends AppCompatActivity {
         mGoalsRecyclerView.setAdapter(mGoalAdapter);
 
         // RecyclerView for Affirmations
-        mAffirmationList = new ArrayList<>();
+        mAffirmationList = databaseHelper.getAffirmationsForDate(currentDate);
         mAffirmationAdapter = new AffirmationRecyclerViewAdapter(mAffirmationList);
         LinearLayoutManager affirmationLinearLayoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -72,15 +76,12 @@ public class DailyActivity extends AppCompatActivity {
         mAffirmationsRecyclerView.setAdapter(mAffirmationAdapter);
 
         // RecyclerView for Schedules
-        mScheduleList = new ArrayList<>();
+        mScheduleList = databaseHelper.getScheduleForDate(currentDate);
         mScheduleAdapter = new ScheduleRecyclerViewAdapter(mScheduleList);
         LinearLayoutManager ScheduleLinearLayoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mScheduleRecyclerView.setLayoutManager(ScheduleLinearLayoutManager);
         mScheduleRecyclerView.setAdapter(mScheduleAdapter);
-
-        String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
-        mCurrentDate.setText(currentDate);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -115,51 +116,42 @@ public class DailyActivity extends AppCompatActivity {
         builder.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (editText.length() == 0) {
-                    editText.setError("Please fill field!");
+                if (editText.getText().toString().trim().length() == 0) {
+                    Toast.makeText(DailyActivity.this, "Please fill field!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
                 String input = editText.getText().toString();
                 String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
-
                 DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
 
                 switch (id) {
                     case R.id.goal_edit_text:
                         Goal goal = new Goal(currentDate, input);
 
-//                        databaseHelper.insertGoals(goal);
-//                        List<Goal> goalList = databaseHelper.getAllGoals();
-
+                        databaseHelper.insertGoals(goal);
                         mGoalList.add(goal);
-                        mGoalAdapter.notifyItemInserted(mGoalList.size() -1);
+                        mGoalAdapter.notifyItemInserted(mGoalList.size() - 1);
                         break;
 
                     case R.id.affirmations_edit_text:
                         Affirmation affirmation = new Affirmation(currentDate, input);
 
-//                        databaseHelper.insertAffirmations(affirmation);
-//                        List<Affirmation> affirmationList = databaseHelper.getAllAffirmations();
-
+                        databaseHelper.insertAffirmations(affirmation);
                         mAffirmationList.add(affirmation);
-                        mAffirmationAdapter.notifyItemInserted(mAffirmationList.size() -1);
+                        mAffirmationAdapter.notifyItemInserted(mAffirmationList.size() - 1);
                         break;
 
                     case R.id.schedule_edit_text:
                         Schedule schedule = new Schedule(currentDate, input);
-
-//                        databaseHelper.insertSchedule(schedule);
-//                        List<Schedule> scheduleList = databaseHelper.getAllSchedule();
-
+                        databaseHelper.insertSchedule(schedule);
                         mScheduleList.add(schedule);
-                        mScheduleAdapter.notifyItemInserted(mScheduleList.size() -1);
+                        mScheduleAdapter.notifyItemInserted(mScheduleList.size() - 1);
                         break;
 
                     default:
                         break;
                 }
-               //TODO: EDIT
-//                DailyData dailyData = new DailyData(currentDate, null, null, null);
-//                databaseHelper.insertDailyDate(dailyData);
             }
         })
                 .setNegativeButton("Cancel", null);
