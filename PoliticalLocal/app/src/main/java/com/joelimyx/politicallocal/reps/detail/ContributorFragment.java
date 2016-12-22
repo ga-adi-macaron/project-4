@@ -62,8 +62,7 @@ public class ContributorFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         final RecyclerView contributor_recyclerView = (RecyclerView) view.findViewById(R.id.contributor_recyclerview);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bill_swiperefresh);
-        mSwipeRefreshLayout.setRefreshing(true);
+
         contributor_recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -76,7 +75,6 @@ public class ContributorFragment extends Fragment {
             public void onResponse(Call<ContributorsList> call, Response<ContributorsList> response) {
                 List<Contributor> contributors = response.body().getResponse().getContributors().getContributor();
                 contributor_recyclerView.setAdapter(new ContributorAdapter(contributors));
-                mSwipeRefreshLayout.setRefreshing(false);
             }
 
             @Override

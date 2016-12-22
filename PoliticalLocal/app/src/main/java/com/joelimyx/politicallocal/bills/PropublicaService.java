@@ -1,6 +1,6 @@
 package com.joelimyx.politicallocal.bills;
 
-import com.joelimyx.politicallocal.bills.detail.gson.DetailBill;
+import com.joelimyx.politicallocal.bills.detail.gson.propublica.DetailBill;
 import com.joelimyx.politicallocal.bills.gson.RecentBills;
 
 import retrofit2.Call;

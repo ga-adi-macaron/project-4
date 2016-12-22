@@ -22,6 +22,27 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_detail_bill"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/content_detail_bill"/>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/detail_bill_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.7"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/detail_bill_tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabSelectedTextColor="#eee"
+                android:background="#0066ec"/>
+        </android.support.v4.view.ViewPager>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,7 +1,8 @@
 
-package com.joelimyx.politicallocal.bills.detail.gson;
+package com.joelimyx.politicallocal.bills.detail.gson.propublica;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

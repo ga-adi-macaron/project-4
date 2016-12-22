@@ -79,8 +79,7 @@ public class BillFragment extends Fragment
     @Override
     public void onBillItemSelected(String billId) {
         Intent intent = new Intent(getContext(), DetailBillActivity.class);
-        Log.d(TAG, "onBillItemSelected: "+billId);
-        intent.putExtra("id",billId);
+        intent.putExtra("id",billId.toLowerCase());
         getActivity().startActivity(intent);
     }
 }

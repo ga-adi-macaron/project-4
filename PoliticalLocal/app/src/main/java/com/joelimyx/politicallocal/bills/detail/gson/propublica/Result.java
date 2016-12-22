@@ -1,7 +1,8 @@
 
-package com.joelimyx.politicallocal.bills.detail.gson;
+package com.joelimyx.politicallocal.bills.detail.gson.propublica;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -37,9 +38,12 @@ public class Result {
     @SerializedName("senate_passage_vote")
     @Expose
     private Object senatePassageVote;
-    @SerializedName("versions")
+    @SerializedName("latest_major_action_date")
     @Expose
-    private List<Object> versions = null;
+    private String latest_major_action_date;
+    @SerializedName("latest_major_action")
+    @Expose
+    private String latest_major_action;
     @SerializedName("actions")
     @Expose
     private List<Action> actions = null;
@@ -48,9 +52,6 @@ public class Result {
         return congress;
     }
 
-    public void setCongress(String congress) {
-        this.congress = congress;
-    }
 
     public String getBill() {
         return bill;
@@ -124,12 +125,12 @@ public class Result {
         this.senatePassageVote = senatePassageVote;
     }
 
-    public List<Object> getVersions() {
-        return versions;
+    public String  getLatest_major_action_date() {
+        return latest_major_action_date;
     }
 
-    public void setVersions(List<Object> versions) {
-        this.versions = versions;
+    public String getLatest_major_action() {
+        return latest_major_action;
     }
 
     public List<Action> getActions() {
