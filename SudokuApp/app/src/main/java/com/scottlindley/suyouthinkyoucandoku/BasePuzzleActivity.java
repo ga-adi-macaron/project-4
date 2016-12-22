@@ -45,7 +45,6 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
     public void initializeGame(){
         mPuzzleSolver = new PuzzleSolver(mKey, this);
         createCells();
-        setUpScoreCard();
         setUpChoiceTiles();
     }
 

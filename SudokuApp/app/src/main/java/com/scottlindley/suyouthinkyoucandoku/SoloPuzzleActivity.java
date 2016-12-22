@@ -24,6 +24,13 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
 
         getPuzzleKey();
         initializeGame();
+        for (TextView tile : mChoiceTiles){
+            tile.setClickable(false);
+        }
+        for (TextView cell : mCellViews){
+            cell.setVisibility(View.INVISIBLE);
+        }
+        ((TextView)findViewById(R.id.score_text)).setText("Loading puzzle...");
     }
 
     /**
@@ -100,7 +107,17 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
                 .setView(dialogView)
                 .create();
         dialog.show();
-
     }
 
+    @Override
+    public void grabSolution() {
+        super.grabSolution();
+        for (TextView tile : mChoiceTiles){
+            tile.setClickable(true);
+        }
+        for (TextView cell : mCellViews){
+            cell.setVisibility(View.VISIBLE);
+        }
+        setUpScoreCard();
+    }
 }

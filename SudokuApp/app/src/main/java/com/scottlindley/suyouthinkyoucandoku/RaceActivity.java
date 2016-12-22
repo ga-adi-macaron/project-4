@@ -259,13 +259,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }.start();
     }
 
-    @Override
-    public void initializeGame() {
-        mPuzzleSolver = new PuzzleSolver(mKey, this);
-        createCells();
-        setUpChoiceTiles();
-    }
-
     private void launchNoMatchFoundDialog(){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {
