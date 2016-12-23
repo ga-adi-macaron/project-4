@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ezequielc.successplanner.DatabaseHelper;
 import com.ezequielc.successplanner.models.Schedule;
 
 import java.util.List;
@@ -28,8 +29,19 @@ public class ScheduleRecyclerViewAdapter extends RecyclerView.Adapter<ScheduleRe
     }
 
     @Override
-    public void onBindViewHolder(ScheduleViewHolder holder, int position) {
+    public void onBindViewHolder(final ScheduleViewHolder holder, int position) {
         holder.mSchedule.setText(mScheduleList.get(position).getSchedule());
+
+        holder.mSchedule.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                databaseHelper.deleteSchedule(mScheduleList.get(holder.getAdapterPosition()));
+                mScheduleList.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+                return false;
+            }
+        });
     }
 
     @Override

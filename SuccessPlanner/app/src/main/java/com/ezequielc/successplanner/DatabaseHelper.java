@@ -196,5 +196,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return scheduleList;
     }
 
+    public void deleteGoal(Goal goal){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(goal.getID())};
+        db.delete(GOALS_TABLE, selection, selectionArgs);
+        db.close();
+    }
 
+    public void deleteAffirmations(Affirmation affirmation){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(affirmation.getID())};
+        db.delete(AFFIRMATIONS_TABLE, selection, selectionArgs);
+        db.close();
+    }
+
+    public void deleteSchedule(Schedule schedule){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(schedule.getID())};
+        db.delete(SCHEDULE_TABLE, selection, selectionArgs);
+        db.close();
+    }
 }

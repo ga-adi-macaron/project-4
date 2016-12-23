@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ezequielc.successplanner.DatabaseHelper;
 import com.ezequielc.successplanner.models.Affirmation;
 
 import java.util.List;
@@ -28,8 +29,19 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
     }
 
     @Override
-    public void onBindViewHolder(AffirmationViewHolder holder, int position) {
+    public void onBindViewHolder(final AffirmationViewHolder holder, int position) {
         holder.mAffirmation.setText(mAffirmationList.get(position).getAffirmation());
+
+        holder.mAffirmation.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                databaseHelper.deleteAffirmations(mAffirmationList.get(holder.getAdapterPosition()));
+                mAffirmationList.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+                return true;
+            }
+        });
     }
 
     @Override
