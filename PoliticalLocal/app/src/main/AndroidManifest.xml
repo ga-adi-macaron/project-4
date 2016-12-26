@@ -5,8 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -38,7 +36,7 @@
             android:name=".bills.detail.DetailBillActivity"
             android:label=""
             android:parentActivityName=".main.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.DetailBill">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.joelimyx.politicallocal.main.MainActivity"/>

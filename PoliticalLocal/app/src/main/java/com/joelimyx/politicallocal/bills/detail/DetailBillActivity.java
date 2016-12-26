@@ -7,6 +7,8 @@ import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,23 +40,34 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailBillActivity extends AppCompatActivity {
+public class DetailBillActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private Result mDetailBill;
+    private String mBill,mCoSponsor;
+
     private TextView mDetailBillTitle,mDetailBillSponsor,mDetailBillPDF;
-    private DetailBillPagerAdapter mDetailBillPagerAdapter;
-    private ViewPager mViewPager;
+    private ActionBar mActionBar;
+    private Toolbar mToolbar;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+
+    private static final String TAG = "DetailBillActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_bill);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
 
-//        Picasso.with(this).load(R.mipmap.bill_background).fit().into((ImageView)findViewById(R.id.bill_background));
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.bill_collapsing_toolbar);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
+        appBarLayout.addOnOffsetChangedListener(this);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        Picasso.with(this)
+                .load("http://www.psdgraphics.com/file/old-paper-texture.jpg").fit()
+                .into((ImageView)findViewById(R.id.bill_background));
 
         mDetailBillTitle= (TextView) findViewById(R.id.detail_bill_title);
         mDetailBillSponsor= (TextView) findViewById(R.id.detail_bill_sponsor);
@@ -69,7 +83,12 @@ public class DetailBillActivity extends AppCompatActivity {
             public void onResponse(Call<DetailBill> call, Response<DetailBill> response) {
                 if (call.isExecuted()) {
                     mDetailBill = response.body().getResults().get(0);
-                    toolbar.setTitle(mDetailBill.getBill());
+
+                    //Toolbar titles
+                    mBill = mDetailBill.getBill();
+                    mCoSponsor = mDetailBill.getCosponsors();
+
+
                     mDetailBillTitle.setText(mDetailBill.getTitle());
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
@@ -110,13 +129,25 @@ public class DetailBillActivity extends AppCompatActivity {
 
             }
         });
-        mDetailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.detail_bill_container);
-        mViewPager.setAdapter(mDetailBillPagerAdapter);
+        DetailBillPagerAdapter detailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.detail_bill_container);
+        viewPager.setAdapter(detailBillPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.detail_bill_tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
     }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        int scrollRange = appBarLayout.getTotalScrollRange();
+        if (scrollRange==Math.abs(verticalOffset)){
+            mCollapsingToolbarLayout.setTitle(mBill);
+            mActionBar.setSubtitle(mCoSponsor);
+        }else{
+            mCollapsingToolbarLayout.setTitle(" ");
+        }
+    }
+
 
     public class DetailBillPagerAdapter extends FragmentPagerAdapter {
 
