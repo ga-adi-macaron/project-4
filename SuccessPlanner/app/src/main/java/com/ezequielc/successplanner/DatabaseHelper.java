@@ -23,7 +23,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "successplanner.db";
 
+    // TODO: REMOVE THIS TABLE
     public static final String DAILY_DATA_TABLE = "daily_data_list";
+
     public static final String COL_ID = "id";
     public static final String COL_DATE = "date";
 
@@ -217,6 +219,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selection = COL_ID + " = ?";
         String[] selectionArgs = new String[]{String.valueOf(schedule.getID())};
         db.delete(SCHEDULE_TABLE, selection, selectionArgs);
+        db.close();
+    }
+
+    public void updateGoal(Goal goal){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(goal.getID())};
+        ContentValues values = new ContentValues();
+        values.put(COL_GOALS, goal.getGoal());
+        db.update(GOALS_TABLE, values, selection, selectionArgs);
+        db.close();
+    }
+
+    public void updateAffirmation(Affirmation affirmation){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(affirmation.getID())};
+        ContentValues values = new ContentValues();
+        values.put(COL_AFFIRMATIONS, affirmation.getAffirmation());
+        db.update(AFFIRMATIONS_TABLE, values, selection, selectionArgs);
+        db.close();
+    }
+
+    public void updateSchedule(Schedule schedule){
+        SQLiteDatabase db = getWritableDatabase();
+        String selection = COL_ID + " = ?";
+        String[] selectionArgs = new String[]{String.valueOf(schedule.getID())};
+        ContentValues values = new ContentValues();
+        values.put(COL_SCHEDULE, schedule.getSchedule());
+        db.update(SCHEDULE_TABLE, values, selection, selectionArgs);
         db.close();
     }
 }
