@@ -73,6 +73,7 @@ public class SponsorsFragment extends Fragment {
         List<Sponsor> mSponsorList = new ArrayList<>(100);
         mAdapter = new SponsorsAdapter(mSponsorList,getContext());
         recyclerview.setAdapter(mAdapter);
+
         //Grab individual sponsor basic info
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BillFragment.propublica_baseURL)
@@ -82,9 +83,12 @@ public class SponsorsFragment extends Fragment {
         call.enqueue(new Callback<GsonSponsorsList>() {
             @Override
             public void onResponse(Call<GsonSponsorsList> call, Response<GsonSponsorsList> response) {
-                String majorSponsor = response.body().getResults().get(0).getSponsorId();
 
+                //Major sponsor
+                String majorSponsor = response.body().getResults().get(0).getSponsorId();
                 addSponsorToList(majorSponsor, true);
+
+                //CoSponsors
                 List<Cosponsor> cosponsors = response.body().getResults().get(0).getCosponsors();
                 if (cosponsors != null) {
                     for (Cosponsor current : cosponsors) {
@@ -96,14 +100,13 @@ public class SponsorsFragment extends Fragment {
             @Override
             public void onFailure(Call<GsonSponsorsList> call, Throwable t) {
                 Toast.makeText(getContext(), "Failed to get Sponsor List", Toast.LENGTH_SHORT).show();
-
             }
         });
 
     }
 
     /**
-     * @param isMajor value to pass onto adapter
+     * @param isMajor determine if they are the main bill sponsor
      * @param bioId unique bio ID from Congressional Biographical Directory
      */
     private void addSponsorToList(String bioId, boolean isMajor){
@@ -135,8 +138,8 @@ public class SponsorsFragment extends Fragment {
                                         result.getState(),
                                         result.getParty(),
                                         result.getChamber(),
-                                        result.getDistrict()),
-                                isMajor);
+                                        result.getDistrict(),
+                                        isMajor));
                     } else {
                         mAdapter.addSponsorToList(new Sponsor(
                                         result.getBioguideId(),
@@ -144,8 +147,8 @@ public class SponsorsFragment extends Fragment {
                                         result.getState(),
                                         result.getParty(),
                                         result.getChamber(),
-                                        result.getSenateClass()),
-                                isMajor);
+                                        result.getSenateClass(),
+                                        isMajor));
                     }
                 }
             }
