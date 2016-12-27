@@ -49,6 +49,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
         final MyReps current = mRepList.get(position);
         Picasso.with(mContext)
                 .load(mContext.getFileStreamPath(current.getFileName()))
+                .error(R.drawable.ic_reps)
                 .fit()
                 .into(holder.mRepsPortrait);
 
@@ -60,6 +61,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
         if (current.getChamber().equalsIgnoreCase("Senate")){
             districtRank="Senator Class "+current.getDistrictClass();
         }else{
+            //At Large district or particular district
             if (current.getDistrictClass()==0){
                 districtRank=mState+" At-Large District";
             }else{

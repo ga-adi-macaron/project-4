@@ -7,18 +7,21 @@ import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
-import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,10 @@ import com.joelimyx.politicallocal.bills.BillFragment;
 import com.joelimyx.politicallocal.bills.PropublicaService;
 import com.joelimyx.politicallocal.bills.detail.gson.propublica.DetailBill;
 import com.joelimyx.politicallocal.bills.detail.gson.propublica.Result;
+import com.joelimyx.politicallocal.bills.detail.sponsors.SponsorsFragment;
+import com.joelimyx.politicallocal.bills.detail.summary.SummaryFragment;
+import com.joelimyx.politicallocal.bills.detail.update.UpdateFragment;
+import com.squareup.picasso.Picasso;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,24 +41,37 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DetailBillActivity extends AppCompatActivity {
+public class DetailBillActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private Result mDetailBill;
-    private TextView mDetailBillNumber,mDetailBillTitle,mDetailBillSponsor,mDetailBillPDF;
-    private DetailBillPagerAdapter mDetailBillPagerAdapter;
-    private ViewPager mViewPager;
+    private String mBillNumber,mCoSponsor;
+
+    private TextView mDetailBillNumber, mDetailBillTitle, mDetailBillPDF;
+    private ActionBar mActionBar;
+    private Toolbar mToolbar;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+
+    private static final String TAG = "DetailBillActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_bill);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mDetailBillNumber = (TextView) findViewById(R.id.detail_bill_number);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.bill_collapsing_toolbar);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
+        appBarLayout.addOnOffsetChangedListener(this);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        Picasso.with(this)
+                .load("http://www.psdgraphics.com/file/old-paper-texture.jpg").fit()
+                .into((ImageView)findViewById(R.id.bill_background));
+
+        mDetailBillNumber= (TextView) findViewById(R.id.detail_bill_number);
         mDetailBillTitle= (TextView) findViewById(R.id.detail_bill_title);
-        mDetailBillSponsor= (TextView) findViewById(R.id.detail_bill_sponsor);
         mDetailBillPDF= (TextView) findViewById(R.id.detail_bill_pdf);
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -64,11 +84,15 @@ public class DetailBillActivity extends AppCompatActivity {
             public void onResponse(Call<DetailBill> call, Response<DetailBill> response) {
                 if (call.isExecuted()) {
                     mDetailBill = response.body().getResults().get(0);
-                    mDetailBillNumber.setText(mDetailBill.getBill());
+
+                    //Toolbar titles
+                    mBillNumber = mDetailBill.getBill();
+                    mCoSponsor = mDetailBill.getCosponsors();
+
+                    mDetailBillNumber.setText(mBillNumber);
                     mDetailBillTitle.setText(mDetailBill.getTitle());
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
-                    mDetailBillSponsor.setText(mDetailBill.getSponsor());
                     SpannableString content = new SpannableString("More detail");
                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                     mDetailBillPDF.setText(content);
@@ -105,13 +129,25 @@ public class DetailBillActivity extends AppCompatActivity {
 
             }
         });
-        mDetailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.detail_bill_container);
-        mViewPager.setAdapter(mDetailBillPagerAdapter);
+        DetailBillPagerAdapter detailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.detail_bill_container);
+        viewPager.setAdapter(detailBillPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.detail_bill_tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
     }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        int scrollRange = appBarLayout.getTotalScrollRange();
+        if (scrollRange==Math.abs(verticalOffset)){
+            mCollapsingToolbarLayout.setTitle(mBillNumber);
+            mActionBar.setSubtitle(mCoSponsor);
+        }else{
+            mCollapsingToolbarLayout.setTitle(" ");
+        }
+    }
+
 
     public class DetailBillPagerAdapter extends FragmentPagerAdapter {
 
@@ -121,15 +157,22 @@ public class DetailBillActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if (position==1) {
-                return UpdateFragment.newInstance(getIntent().getStringExtra("id"));
+            String billId = getIntent().getStringExtra("id");
+            switch (position){
+                case 0:
+                    return SummaryFragment.newInstance(billId);
+                case 1:
+                    return SponsorsFragment.newInstance(billId);
+                case 2:
+                    return UpdateFragment.newInstance(billId);
+                default:
+                    return null;
             }
-            return SummaryFragment.newInstance(getIntent().getStringExtra("id"));
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -138,6 +181,8 @@ public class DetailBillActivity extends AppCompatActivity {
                 case 0:
                     return "Summary";
                 case 1:
+                    return "Sponsor(s)";
+                case 2:
                     return "Update";
                 default:
                     return null;

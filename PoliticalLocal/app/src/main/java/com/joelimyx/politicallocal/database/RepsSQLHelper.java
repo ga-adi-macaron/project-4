@@ -123,12 +123,12 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndex(COL_C_ID)),
                         cursor.getString(cursor.getColumnIndex(COL_NAME)),
                         cursor.getString(cursor.getColumnIndex(COL_PARTY)),
+                        cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
+                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
                         cursor.getString(cursor.getColumnIndex(COL_PHONE)),
                         cursor.getString(cursor.getColumnIndex(COL_EMAIL)),
                         cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
                         cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
-                        cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
-                        cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
                         cursor.getString(cursor.getColumnIndex(COL_FILE_NAME))
                         ));
                 cursor.moveToNext();
@@ -154,12 +154,12 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndex(COL_C_ID)),
                     cursor.getString(cursor.getColumnIndex(COL_NAME)),
                     cursor.getString(cursor.getColumnIndex(COL_PARTY)),
+                    cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
+                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
                     cursor.getString(cursor.getColumnIndex(COL_PHONE)),
                     cursor.getString(cursor.getColumnIndex(COL_EMAIL)),
                     cursor.getString(cursor.getColumnIndex(COL_WEBSITE)),
                     cursor.getString(cursor.getColumnIndex(COL_TWITTER)),
-                    cursor.getString(cursor.getColumnIndex(COL_CHAMBER)),
-                    cursor.getInt(cursor.getColumnIndex(COL_DISTRICT_CLASS)),
                     cursor.getString(cursor.getColumnIndex(COL_FILE_NAME)));
         }
         cursor.close();

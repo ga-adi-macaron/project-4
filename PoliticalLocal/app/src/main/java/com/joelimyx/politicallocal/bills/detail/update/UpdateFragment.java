@@ -1,4 +1,4 @@
-package com.joelimyx.politicallocal.bills.detail;
+package com.joelimyx.politicallocal.bills.detail.update;
 
 
 import android.os.Bundle;
@@ -27,12 +27,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class UpdateFragment extends Fragment {
     private static final String ARG_BILL_ID = "bill id";
 
-    // TODO: Rename and change types of parameters
     private String mBillId;
 
 
     public UpdateFragment() {
-        // Required empty public constructor
     }
 
     public static UpdateFragment newInstance(String param1) {

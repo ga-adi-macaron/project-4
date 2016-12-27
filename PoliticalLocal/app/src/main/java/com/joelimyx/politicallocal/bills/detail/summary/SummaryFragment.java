@@ -1,8 +1,7 @@
-package com.joelimyx.politicallocal.bills.detail;
+package com.joelimyx.politicallocal.bills.detail.summary;
 
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -91,17 +90,24 @@ public class SummaryFragment extends Fragment {
                     });
                 }else{
                     mBillSummary.setText("No Summary available");
+                    mExpandMoreOrLess.setVisibility(View.GONE);
                 }
                 StringBuilder tags = new StringBuilder();
-                tags.append("Tags: ");
+                tags.append("Tag(s): ");
 
+                boolean hasTags = false;
                 for (String keyword : summary.getKeywords()) {
                     tags.append("<u>");
                     tags.append(keyword);
                     tags.append("</u>, ");
+                    hasTags=true;
                 }
-                tags.replace(tags.lastIndexOf(","),tags.lastIndexOf(" "),"");
-                mBillTags.setText(Html.fromHtml(tags.toString()));
+                if (hasTags) {
+                    tags.replace(tags.lastIndexOf(","), tags.lastIndexOf(" "), "");
+                    mBillTags.setText(Html.fromHtml(tags.toString()));
+                }else{
+                    mBillTags.setVisibility(View.GONE);
+                }
             }
 
             @Override
