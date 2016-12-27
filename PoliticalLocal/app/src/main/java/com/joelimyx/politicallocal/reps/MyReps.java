@@ -1,5 +1,7 @@
 package com.joelimyx.politicallocal.reps;
 
+import android.support.annotation.Nullable;
+
 /**
  * Created by Joe on 12/17/16.
  */
@@ -8,7 +10,7 @@ public class MyReps {
     private String mBioId, mCId, mName, mParty, mPhone,mEmail,mWebsite, mTwitter, mChamber, mFileName;
     private int mDistrictClass;
 
-    public MyReps(String bioId, String CId, String name, String party, String phone, String email, String website, String twitter, String chamber, int districtClass,  String fileName) {
+    public MyReps(String bioId, String CId, String name, String party, String chamber, int districtClass, @Nullable String phone, @Nullable String email, @Nullable String website, @Nullable String twitter, @Nullable String fileName) {
         mBioId = bioId;
         mCId = CId;
         mName = name;

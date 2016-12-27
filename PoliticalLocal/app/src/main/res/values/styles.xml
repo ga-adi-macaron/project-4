@@ -10,7 +10,8 @@
 
     <style name="AppTheme.DetailBill">
         <item name="colorPrimary">#FF8F00</item>
-        <item name="colorAccent">#FFFF00</item>
+        <item name="colorPrimaryDark">#FF6F00</item>
+        <item name="colorAccent">#ffda4c</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

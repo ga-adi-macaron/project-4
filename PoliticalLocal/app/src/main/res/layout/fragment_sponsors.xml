@@ -2,11 +2,10 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.joelimyx.politicallocal.bills.detail.update.UpdateFragment">
+             tools:context="com.joelimyx.politicallocal.bills.detail.sponsors.SponsorsFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/update_recyclerview"
+        android:id="@+id/sponsor_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
 </FrameLayout>

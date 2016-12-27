@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true"
-            app:contentScrim="#FF8F00"
+            app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="top|center_horizontal">
 
                 <ImageView
@@ -43,8 +43,8 @@
             android:id="@+id/detail_bill_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabSelectedTextColor="#eee"
-            android:background="#FF8F00"/>
+            app:tabSelectedTextColor="?attr/colorAccent"
+            android:background="?attr/colorPrimary"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -52,7 +52,7 @@
             android:id="@+id/detail_bill_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFECB3"
+            android:background="#fff4d3"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         </android.support.v4.view.ViewPager>

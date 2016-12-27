@@ -30,7 +30,6 @@ public class BillFragment extends Fragment
         implements BillAdapter.OnBillItemSelectedListener {
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
-    private static final String TAG = "BillFragment";
     private SwipeRefreshLayout mRefreshLayout;
 
     public BillFragment() {

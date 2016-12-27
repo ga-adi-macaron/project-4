@@ -1,4 +1,4 @@
-package com.joelimyx.politicallocal.bills.detail;
+package com.joelimyx.politicallocal.bills.detail.summary;
 
 import com.joelimyx.politicallocal.bills.detail.gson.summary.BillSummary;
 

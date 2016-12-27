@@ -1,26 +1,15 @@
 
-package com.joelimyx.politicallocal.reps.gson.probulica;
+package com.joelimyx.politicallocal.bills.detail.sponsors.gson;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Reps {
+public class GsonSponsorsList {
 
-    @SerializedName("status")
-    @Expose
-    private String status;
     @SerializedName("results")
     @Expose
     private List<Result> results = null;
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public List<Result> getResults() {
         return results;
