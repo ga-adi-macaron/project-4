@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ChangeTransform;
@@ -31,6 +30,9 @@ import java.util.List;
 
 public class MainMenuActivity extends AppCompatActivity {
     private static final String TAG = "MainMenuActivity";
+    public static final String ARMED_WEAPONS_PREFS = "armed weapons";
+    public static final String WEAPON_SLOT1_KEY = "slot 1";
+    public static final String WEAPON_SLOT2_KEY = "slot 2";
     private static final int PUZZLE_REFRESH_JOB_ID = 88;
     private CardView mSoloCard, mRaceCard, mStatsCard, mArmoryCard;
     public static final String RACE_INTENT_EXTRA = "race extra";
@@ -128,55 +130,65 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void launchWeaponArmingDialog(){
-        View dialogView = getLayoutInflater().inflate(R.layout.arm_weapons_dialog, null);
+        final View dialogView = getLayoutInflater().inflate(R.layout.arm_weapons_dialog, null);
 
-        WeaponDialog dialog = (WeaponDialog) new AlertDialog.Builder(this)
+        final WeaponDialog dialog = (WeaponDialog) new WeaponDialog(this)
                 .setView(dialogView)
-                .setPositiveButton("okay", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
-                        intent.putExtra(RACE_INTENT_EXTRA, true);
-                        startActivity(intent);
-                    }
-                })
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                     }
-                })
-                .create();
-
+                });
         setUpDialogViews(dialogView, dialog);
+        dialog.setPositiveButton("okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                SharedPreferences.Editor prefsEditor =
+                        getSharedPreferences(ARMED_WEAPONS_PREFS, MODE_PRIVATE).edit();
+
+                prefsEditor.putString(WEAPON_SLOT1_KEY, dialog.mWeaponSlot1);
+                prefsEditor.putString(WEAPON_SLOT2_KEY, dialog.mWeaponSlot2);
+                prefsEditor.commit();
+
+                Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
+                intent.putExtra(RACE_INTENT_EXTRA, true);
+                startActivity(intent);
+            }
+        });
+        dialog.create();
         dialog.show();
     }
 
-    private void setUpDialogViews(View dialogView, final WeaponDialog dialog){
+    private void setUpDialogViews(final View dialogView, final WeaponDialog dialog){
         SharedPreferences prefs = getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
 
         final ImageView bombIcon = (ImageView)dialogView.findViewById(R.id.bomb_inventory_icon);
         final ImageView spyIcon = (ImageView)dialogView.findViewById(R.id.spy_inventory_icon);
         final ImageView interfIcon = (ImageView)dialogView.findViewById(R.id.interference_inventory_icon);
 
-        CardView weaponSlot1 = (CardView)dialogView.findViewById(R.id.weapon1);
+        final CardView weaponSlot1 = (CardView)dialogView.findViewById(R.id.weapon1);
         CardView weaponSlot2 = (CardView)dialogView.findViewById(R.id.weapon2);
 
         final int bombCount = prefs.getInt(ArmoryActivity.BOMB_COUNT_KEY, 0);
         final int spyCount = prefs.getInt(ArmoryActivity.SPY_COUNT_KEY, 0);
         final int interfCount = prefs.getInt(ArmoryActivity.INTERFERENCE_COUNT_KEY, 0);
 
-        TextView bombInventoryText = (TextView)dialog.findViewById(R.id.bomb_inventory_count);
-        TextView spyInventoryText = (TextView)dialog.findViewById(R.id.spy_inventory_count);
-        TextView interfInventoryText = (TextView)dialog.findViewById(R.id.interference_inventory_count);
+        final TextView bombInventoryText = (TextView)dialogView.findViewById(R.id.bomb_inventory_count);
+        final TextView spyInventoryText = (TextView)dialogView.findViewById(R.id.spy_inventory_count);
+        final TextView interfInventoryText = (TextView)dialogView.findViewById(R.id.interference_inventory_count);
+
+        bombInventoryText.setText(String.valueOf(bombCount));
+        spyInventoryText.setText(String.valueOf(spyCount));
+        interfInventoryText.setText(String.valueOf(interfCount));
 
         bombIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (bombCount > 0){
-                    spyIcon.setBackgroundColor(Color.WHITE);
-                    interfIcon.setBackgroundColor(Color.WHITE);
-                    view.setBackgroundColor(Color.rgb(75,75,75));
+                if (Integer.parseInt(bombInventoryText.getText().toString()) > 0){
+                    interfIcon.setColorFilter(Color.WHITE);
+                    spyIcon.setColorFilter(Color.WHITE);
+                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
                     dialog.mSelectedWeapon = "bomb";
                 }
             }
@@ -185,10 +197,10 @@ public class MainMenuActivity extends AppCompatActivity {
         spyIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(spyCount > 0){
-                    bombIcon.setBackgroundColor(Color.WHITE);
-                    interfIcon.setBackgroundColor(Color.WHITE);
-                    view.setBackgroundColor(Color.rgb(75,75,75));
+                if(Integer.parseInt(spyInventoryText.getText().toString()) > 0){
+                    bombIcon.setColorFilter(Color.WHITE);
+                    interfIcon.setColorFilter(Color.WHITE);
+                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
                     dialog.mSelectedWeapon = "spy";
                 }
             }
@@ -197,14 +209,113 @@ public class MainMenuActivity extends AppCompatActivity {
         interfIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(interfCount > 0){
-                    bombIcon.setBackgroundColor(Color.WHITE);
-                    spyIcon.setBackgroundColor(Color.WHITE);
-                    view.setBackgroundColor(Color.rgb(75,75,75));
+                if(Integer.parseInt(interfInventoryText.getText().toString()) > 0){
+                    bombIcon.setColorFilter(Color.WHITE);
+                    spyIcon.setColorFilter(Color.WHITE);
+                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
                     dialog.mSelectedWeapon = "interference";
                 }
             }
         });
+
+        View.OnClickListener weaponSlotClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageView weaponImage;
+                String weaponSlot;
+                switch (view.getId()){
+                    case R.id.weapon1:
+                        weaponImage = (ImageView)dialogView.findViewById(R.id.weapon1_image);
+                        weaponSlot = "slot 1";
+                        break;
+                    case R.id.weapon2:
+                        weaponImage = (ImageView)dialogView.findViewById(R.id.weapon2_image);
+                        weaponSlot = "slot 2";
+                        break;
+                    default:
+                        return;
+                }
+
+                String selectedWeapon = dialog.mSelectedWeapon;
+                if(!selectedWeapon.equals("")) {
+                    if (selectedWeapon.equals("bomb")){
+                        weaponImage.setImageResource(R.drawable.explosion);
+                        int bombCount = Integer.parseInt(bombInventoryText.getText().toString());
+                        bombInventoryText.setText(String.valueOf(bombCount-1));
+                    } else if (selectedWeapon.equals("spy")){
+                        weaponImage.setImageResource(R.drawable.eye);
+                        int spyCount = Integer.parseInt(spyInventoryText.getText().toString());
+                        spyInventoryText.setText(String.valueOf(spyCount-1));
+                    } else if (selectedWeapon.equals("interference")){
+                        weaponImage.setImageResource(R.drawable.lightning);
+                        int interfCount = Integer.parseInt(interfInventoryText.getText().toString());
+                        interfInventoryText.setText(String.valueOf(interfCount-1));
+                    }
+                    if (weaponSlot.equals("slot 1")){
+                        dialog.mWeaponSlot1 = selectedWeapon;
+                    } else if (weaponSlot.equals("slot 2")){
+                        dialog.mWeaponSlot2 = selectedWeapon;
+                    }
+                    dialog.mSelectedWeapon = "";
+                    bombIcon.setColorFilter(Color.WHITE);
+                    spyIcon.setColorFilter(Color.WHITE);
+                    interfIcon.setColorFilter(Color.WHITE);
+                }
+
+
+            }
+        };
+
+        View.OnLongClickListener weaponSlotLongListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                SharedPreferences.Editor prefsEditor =
+                        getSharedPreferences(ARMED_WEAPONS_PREFS, MODE_PRIVATE).edit();
+
+                ImageView weaponImage;
+                String weaponSlot;
+                switch (view.getId()){
+                    case R.id.weapon1:
+                        weaponImage = (ImageView)dialogView.findViewById(R.id.weapon1_image);
+                        weaponSlot = "slot 1";
+                        break;
+                    case R.id.weapon2:
+                        weaponImage = (ImageView)dialogView.findViewById(R.id.weapon2_image);
+                        weaponSlot = "slot 2";
+                        break;
+                    default:
+                        return false;
+                }
+                if (weaponSlot.equals("slot 1")){
+                    prefsEditor.putString(WEAPON_SLOT1_KEY, "none");
+                } else if (weaponSlot.equals("slot 2")){
+                    prefsEditor.putString(WEAPON_SLOT2_KEY, "none");
+                }
+                dialog.mSelectedWeapon = "";
+                weaponImage.setImageResource(R.drawable.none);
+                bombIcon.setColorFilter(Color.WHITE);
+                spyIcon.setColorFilter(Color.WHITE);
+                interfIcon.setColorFilter(Color.WHITE);
+                int currentBombText = Integer.parseInt(bombInventoryText.getText().toString());
+                if (currentBombText<bombCount) {
+                    bombInventoryText.setText(String.valueOf(currentBombText + 1));
+                }
+                int currentSpyText = Integer.parseInt(spyInventoryText.getText().toString());
+                if (currentSpyText<spyCount) {
+                    spyInventoryText.setText(String.valueOf(currentSpyText + 1));
+                }
+                int currentInterfText = Integer.parseInt(interfInventoryText.getText().toString());
+                if (currentInterfText<interfCount){
+                    interfInventoryText.setText(String.valueOf(currentInterfText+1));
+                }
+                return true;
+            }
+        };
+
+        weaponSlot1.setOnClickListener(weaponSlotClickListener);
+        weaponSlot1.setOnLongClickListener(weaponSlotLongListener);
+        weaponSlot2.setOnClickListener(weaponSlotClickListener);
+        weaponSlot2.setOnLongClickListener(weaponSlotLongListener);
     }
 
     private void addPuzzle() {

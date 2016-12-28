@@ -3,6 +3,7 @@ package com.scottlindley.suyouthinkyoucandoku;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static com.scottlindley.suyouthinkyoucandoku.R.id.weapon1;
+
 public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener {
     private static final String TAG = "RaceActivity";
@@ -58,6 +61,18 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race);
 
+        setUpWeapons();
+        switch (weapon1){
+            case "bomb":
+                break;
+            case "spy":
+                break;
+            case "interference":
+                break;
+            case "none":
+                break;
+        }
+
         mDBHelper = DBHelper.getInstance(this);
 
         (findViewById(R.id.loading_wheel)).setVisibility(View.INVISIBLE);
@@ -68,6 +83,15 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 .addOnConnectionFailedListener(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
+    }
+
+    private void setUpWeapons(){
+        SharedPreferences prefs =
+                getSharedPreferences(MainMenuActivity.ARMED_WEAPONS_PREFS, MODE_PRIVATE);
+        String weapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
+        String weapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
+
+        
     }
 
     @Override
