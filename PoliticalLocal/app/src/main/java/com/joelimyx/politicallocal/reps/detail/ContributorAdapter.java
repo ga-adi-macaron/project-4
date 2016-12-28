@@ -10,7 +10,9 @@ import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.reps.gson.opensecret.Attributes_;
 import com.joelimyx.politicallocal.reps.gson.opensecret.Contributor;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Joe on 12/19/16.
@@ -35,12 +37,11 @@ public class ContributorAdapter extends RecyclerView.Adapter<ContributorAdapter.
     public void onBindViewHolder(ContributorViewHolder holder, int position) {
         Attributes_ current = mContributorList.get(position).getAttributes();
         holder.mContributorName.setText(current.getOrgName());
-        StringBuilder amount = new StringBuilder(current.getTotal());
-        int comma = current.getTotal().length()/3;
-        for (int i = 1; i <= comma; i++) {
-            amount.insert(current.getTotal().length()-(i*3),",");
-        }
-        holder.mContributorAmount.setText("$"+amount.toString());
+
+        //Take in total amount in string, convert it to Integer for easier formatting
+        int total = Integer.parseInt(current.getTotal());
+        String fill = NumberFormat.getNumberInstance(Locale.US).format(total);
+        holder.mContributorAmount.setText("$"+fill);
     }
 
     @Override

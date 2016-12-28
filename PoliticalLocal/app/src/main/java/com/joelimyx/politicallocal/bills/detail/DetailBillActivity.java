@@ -22,6 +22,7 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,7 +95,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                     mDetailBillTitle.setText(Html.fromHtml(mDetailBill.getTitle()));
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
-                    SpannableString content = new SpannableString("More detail");
+                    SpannableString content = new SpannableString("Full detail(PDF)");
                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                     mDetailBillPDF.setText(content);
                     mDetailBillPDF.setOnClickListener(v ->{
@@ -127,7 +128,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
 
             @Override
             public void onFailure(Call<DetailBill> call, Throwable t) {
-
+                Toast.makeText(DetailBillActivity.this, "Fail to get Detail Bill", Toast.LENGTH_SHORT).show();
             }
         });
         DetailBillPagerAdapter detailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());

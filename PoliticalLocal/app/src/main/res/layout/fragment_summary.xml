@@ -22,7 +22,8 @@
                     android:id="@+id/bill_summary_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="9"/>
+                    android:layout_weight="9"
+                    android:textColor="#000"/>
                 <ImageView
                     android:id="@+id/expand_more_or_less"
                     android:src="@drawable/ic_expand_more"
@@ -36,9 +37,10 @@
             android:id="@+id/bill_tags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#a3a3a3"
+            android:textColor="#757575"
             android:layout_below="@id/summary_block"
-            android:maxLines="3"
+            android:maxLines="4"
+            android:ellipsize="end"
             android:paddingBottom="16dp"/>
     </RelativeLayout>
 </android.support.v4.widget.NestedScrollView>

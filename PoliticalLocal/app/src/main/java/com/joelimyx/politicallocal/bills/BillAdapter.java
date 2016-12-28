@@ -22,6 +22,10 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
     private OnBillItemSelectedListener mListener;
 
     interface OnBillItemSelectedListener {
+        /**
+         * Call back from Adapter to fragment to start the DetailBillActivity
+         * @param billId bill number in the format of hr123
+         */
         void onBillItemSelected(String billId);
     }
 
@@ -51,6 +55,12 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
     @Override
     public int getItemCount() {
         return mBillList.size();
+    }
+
+    public void swapData(List<Bill> newBills){
+        mBillList.clear();
+        mBillList = newBills;
+        notifyDataSetChanged();
     }
 
     class BillViewHolder extends RecyclerView.ViewHolder{

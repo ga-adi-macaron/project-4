@@ -49,47 +49,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_toEndOf="@id/detail_reps_image"/>
-            <TextView
-                android:id="@+id/detail_contact_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/detail_reps_name_party"
-                android:layout_toEndOf="@id/detail_reps_image"
-                android:text="@string/contact_information"/>
-
-            <ImageView
-                android:id="@+id/detail_reps_phone"
-                android:src="@drawable/ic_phone"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_below="@id/detail_contact_text"
-                android:layout_toEndOf="@id/detail_reps_image"/>
-            <ImageView
-                android:id="@+id/detail_reps_email"
-                android:src="@mipmap/ic_email"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_below="@id/detail_contact_text"
-                android:layout_toEndOf="@id/detail_reps_phone"/>
-            <ImageView
-                android:id="@+id/detail_reps_website"
-                android:src="@drawable/ic_website"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_below="@id/detail_contact_text"
-                android:layout_toEndOf="@id/detail_reps_email"/>
-            <android.support.v7.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="24dp"
-                android:layout_below="@id/detail_contact_text"
-                android:layout_toEndOf="@id/detail_reps_website">
-                <ImageView
-                    android:id="@+id/detail_reps_twitter"
-                    android:src="@drawable/ic_twitter"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"/>
-            </android.support.v7.widget.CardView>
         </RelativeLayout>
 
         <android.support.v4.view.ViewPager
@@ -107,4 +66,39 @@
                 android:background="#0066ec"/>
         </android.support.v4.view.ViewPager>
     </LinearLayout>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:menu_icon="@drawable/ic_launch"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        app:elevation="6dp">
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/twitter_fab"
+            android:src="@drawable/ic_twitter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_size="mini"/>
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/link_fab"
+            android:src="@drawable/ic_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_size="mini"/>
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/email_fab"
+            android:src="@drawable/ic_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_size="mini"/>
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/phone_fab"
+            android:src="@drawable/ic_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_size="mini"/>
+
+        </com.github.clans.fab.FloatingActionMenu>
 </android.support.design.widget.CoordinatorLayout>
