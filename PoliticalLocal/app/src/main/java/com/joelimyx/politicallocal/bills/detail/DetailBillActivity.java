@@ -140,6 +140,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        // FIXME: 12/27/16 requestLayout bug?
         int scrollRange = appBarLayout.getTotalScrollRange();
         if (scrollRange==Math.abs(verticalOffset)){
             mCollapsingToolbarLayout.setTitle(mBillNumber);

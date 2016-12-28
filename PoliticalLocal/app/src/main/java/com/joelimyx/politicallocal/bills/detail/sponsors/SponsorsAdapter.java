@@ -26,7 +26,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class SponsorsAdapter extends RecyclerView.Adapter<SponsorsAdapter.SponsorViewHolder> {
     private List<Sponsor> mSponsors;
     private Context mContext;
-    private static final String TAG = "SponsorsAdapter";
 
     SponsorsAdapter(List<Sponsor> sponsors, Context context) {
         mSponsors = sponsors;
@@ -43,7 +42,6 @@ public class SponsorsAdapter extends RecyclerView.Adapter<SponsorsAdapter.Sponso
 
     @Override
     public void onBindViewHolder(SponsorViewHolder holder, int position) {
-        //TODO:Change layout for main sponsor
         Sponsor current = mSponsors.get(position);
 
         if (current.isMajor()){
