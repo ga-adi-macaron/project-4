@@ -22,6 +22,7 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -127,7 +128,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
 
             @Override
             public void onFailure(Call<DetailBill> call, Throwable t) {
-
+                Toast.makeText(DetailBillActivity.this, "Fail to get Detail Bill", Toast.LENGTH_SHORT).show();
             }
         });
         DetailBillPagerAdapter detailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());

@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
 import com.joelimyx.politicallocal.reps.MyReps;
@@ -58,29 +59,28 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
         Fabric.with(DetailRepsActivity.this, new Twitter(authConfig));
 
         RepsSQLHelper db = RepsSQLHelper.getInstance(this);
+
         /*---------------------------------------------------------------------------------
-        // Basic info
+        // Basic info and FAB menu
         ---------------------------------------------------------------------------------*/
         TextView namePartyText = (TextView) findViewById(R.id.detail_reps_name_party);
         ImageView detailRepsImage= (ImageView) findViewById(R.id.detail_reps_image);
 
-        ImageView phoneImage = (ImageView) findViewById(R.id.detail_reps_phone);
-        ImageView emailImage = (ImageView) findViewById(R.id.detail_reps_email);
-        ImageView websiteImage= (ImageView) findViewById(R.id.detail_reps_website);
-        ImageView twitterImage= (ImageView) findViewById(R.id.detail_reps_twitter);
+        FloatingActionButton phoneFab = (FloatingActionButton) findViewById(R.id.phone_fab),
+                             emailFab = (FloatingActionButton) findViewById(R.id.email_fab),
+                             linkFab = (FloatingActionButton) findViewById(R.id.link_fab),
+                             twitterFab = (FloatingActionButton) findViewById(R.id.twitter_fab);
 
-
+        phoneFab.setOnClickListener(this);
+        emailFab.setOnClickListener(this);
+        linkFab.setOnClickListener(this);
+        twitterFab.setOnClickListener(this);
 
         mMyReps = db.getMyRepByID(getIntent().getStringExtra("id"));
         Picasso.with(this)
                 .load(getFileStreamPath(mMyReps.getFileName()))
                 .fit().into(detailRepsImage);
         namePartyText.setText(mMyReps.getName());
-
-        phoneImage.setOnClickListener(this);
-        emailImage.setOnClickListener(this);
-        websiteImage.setOnClickListener(this);
-        twitterImage.setOnClickListener(this);
 
         /*---------------------------------------------------------------------------------
         // Toolbar Area
@@ -106,20 +106,20 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.detail_reps_phone:
+            case R.id.phone_fab:
                 //Show up the phone dial for user to decide whether to call
                 Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+mMyReps.getPhone()));
                 startActivity(phoneIntent);
 
                 break;
-            case R.id.detail_reps_email:
+            case R.id.email_fab:
                 //Open email app for user to send email with their desire email app
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
                 emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{mMyReps.getEmail()});
                 emailIntent.setType("plain/text");
                 startActivity(Intent.createChooser(emailIntent,"Send Email..."));
                 break;
-            case R.id.detail_reps_website:
+            case R.id.link_fab:
                 //Launch a custom chrome tab for the legislator website
                 String packageName = "com.android.chrome";
                 CustomTabsClient.bindCustomTabsService(this, packageName, new CustomTabsServiceConnection() {
@@ -144,7 +144,8 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
                     }
                 });
                 break;
-            case R.id.detail_reps_twitter:
+            case R.id.twitter_fab:
+                //Use custom call to get twitter id from the presented user name
                 mClient = new TwitterIdClient(new OkHttpClient.Builder().build());
                 Call<User> call = mClient.getIdService().getId(mMyReps.getTwitter());
                 call.enqueue(new Callback<User>() {
@@ -153,6 +154,7 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
                         long id = response.body().id;
                         Intent twitterIntent;
                         try {
+                            //Launch the official twitter app
                             getPackageManager().getPackageInfo("com.twitter.android",0);
                             Log.d(TAG, "onClick: "+ mMyReps.getTwitter());
                             twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?user_id="+id));
@@ -171,6 +173,7 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
                 break;
         }
     }
+    
     /*---------------------------------------------------------------------------------
     // Page Adapter Section
     ---------------------------------------------------------------------------------*/

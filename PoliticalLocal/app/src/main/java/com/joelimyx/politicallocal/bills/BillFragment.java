@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.detail.DetailBillActivity;
@@ -69,7 +70,7 @@ public class BillFragment extends Fragment
 
             @Override
             public void onFailure(Call<RecentBills> call, Throwable t) {
-
+                Toast.makeText(getContext(), "Failed to get Bill list", Toast.LENGTH_SHORT).show();
             }
         });
 

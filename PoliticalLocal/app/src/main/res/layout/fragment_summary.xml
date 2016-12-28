@@ -38,7 +38,6 @@
             android:layout_height="wrap_content"
             android:textColor="#a3a3a3"
             android:layout_below="@id/summary_block"
-            android:maxLines="3"
             android:paddingBottom="16dp"/>
     </RelativeLayout>
 </android.support.v4.widget.NestedScrollView>

@@ -22,6 +22,10 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
     private OnBillItemSelectedListener mListener;
 
     interface OnBillItemSelectedListener {
+        /**
+         * Call back from Adapter to fragment to start the DetailBillActivity
+         * @param billId bill number in the format of hr123
+         */
         void onBillItemSelected(String billId);
     }
 
