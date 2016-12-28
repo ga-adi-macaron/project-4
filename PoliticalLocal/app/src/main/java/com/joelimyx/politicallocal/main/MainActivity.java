@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
+import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -49,7 +51,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        AppBarLayout.OnOffsetChangedListener{
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "V2RCaymY8YS5r2hQLtKPf1A5s";
@@ -59,13 +62,12 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     public static final int LOCATION_REQUEST_CODE = 1;
 
-    private BottomNavigationView mBottomBar;
+    private FloatingSearchView mSearchView;
+
     private GoogleApiClient mGoogleApiClient;
-    private Location mCurrentLocation;
-    String mState;
+    private String mState;
 
     public static final String district_base_URL = "https://congress.api.sunlightfoundation.com/";
-    public static final String open_Url = "https://www.opensecrets.org/";
 
 
     @Override
@@ -78,10 +80,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Twitter Instantiation
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
+
         setContentView(R.layout.activity_main);
 
+        //DBAsset to grab data from database
         new AsyncTask<Void, Void, Void>(){
             @Override
             protected Void doInBackground(Void... voids) {
@@ -94,6 +100,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences preferences = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE);
         mState = preferences.getString(getString(R.string.state),null);
 
+        //Instantiate google api
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -102,15 +109,25 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
-        mBottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
-        mBottomBar.setOnNavigationItemSelectedListener(this);
+        /*---------------------------------------------------------------------------------
+        // SearchView
+        ---------------------------------------------------------------------------------*/
+        AppBarLayout appBar = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
+        appBar.addOnOffsetChangedListener(this);
+        mSearchView = (FloatingSearchView) findViewById(R.id.search_view);
+
+        /*---------------------------------------------------------------------------------
+        // Bottom Nav Bar
+        ---------------------------------------------------------------------------------*/
+        BottomNavigationView bottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
+        bottomBar.setOnNavigationItemSelectedListener(this);
 
         //todo: Default show as news fragment
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main_container, BillFragment.newInstance())
                 .commit();
-        mBottomBar.getMenu().getItem(2).setChecked(true);
+        bottomBar.getMenu().getItem(2).setChecked(true);
     }
 
     /*---------------------------------------------------------------------------------
@@ -192,9 +209,9 @@ public class MainActivity extends AppCompatActivity
      * Helper method for getting current location
      */
     private void getCurrentLocation(){
-        mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        double latitude = mCurrentLocation.getLatitude();
-        double longitude = mCurrentLocation.getLongitude();
+        Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        double latitude = currentLocation.getLatitude();
+        double longitude = currentLocation.getLongitude();
 
         SharedPreferences preference = getSharedPreferences(getString(R.string.district_file),MODE_PRIVATE);
 
@@ -253,5 +270,10 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        mSearchView.setTranslationY(verticalOffset);
     }
 }
