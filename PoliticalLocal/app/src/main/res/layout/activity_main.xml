@@ -8,11 +8,45 @@
     android:layout_height="match_parent"
     tools:context="com.joelimyx.politicallocal.main.MainActivity">
 
-    <FrameLayout
-        android:id="@+id/main_container"
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_bar"/>
+        android:layout_height="match_parent">
+        <!-- todo Make it transparent -->
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/bill_appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00eeeeee"
+        app:elevation="0dp"
+        android:fitsSystemWindows="true">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            app:layout_scrollFlags="scroll|enterAlways"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/main_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom_bar"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_marginBottom="56dp"/>
+    </android.support.design.widget.CoordinatorLayout>
+
+    <com.arlib.floatingsearchview.FloatingSearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:floatingSearch_searchBarMarginLeft="5dp"
+        app:floatingSearch_searchBarMarginTop="5dp"
+        app:floatingSearch_searchBarMarginRight="5dp"
+        app:floatingSearch_close_search_on_keyboard_dismiss="true"
+        app:floatingSearch_dismissOnOutsideTouch="true"
+        app:floatingSearch_dimBackground="true"
+        app:floatingSearch_leftActionMode="showSearch"/>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@id/bottom_bar"

@@ -4,6 +4,7 @@ package com.joelimyx.politicallocal.bills;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,6 +56,7 @@ public class BillFragment extends Fragment
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
         RecyclerView billRecyclerview = (RecyclerView) view.findViewById(R.id.bill_recyclerview);
         billRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         mAdapter = new BillAdapter(new ArrayList<>(),this);
@@ -106,4 +108,5 @@ public class BillFragment extends Fragment
             }
         });
     }
+
 }

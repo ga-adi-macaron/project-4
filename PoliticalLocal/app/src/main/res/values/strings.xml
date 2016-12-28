@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Political Local</string>
 
     <string name="action_settings">Settings</string>
     <string name="district_file">district_file</string>

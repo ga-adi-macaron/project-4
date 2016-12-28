@@ -22,7 +22,6 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,8 +59,8 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_bill);
 
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.bill_collapsing_toolbar);
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.detail_bill_collapsing_toolbar);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.detail_bill_appbar_layout);
         appBarLayout.addOnOffsetChangedListener(this);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
