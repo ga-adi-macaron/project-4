@@ -96,6 +96,7 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
             }
             lostMessage.setVisibility(View.VISIBLE);
         }
+        mTimer.cancel();
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {

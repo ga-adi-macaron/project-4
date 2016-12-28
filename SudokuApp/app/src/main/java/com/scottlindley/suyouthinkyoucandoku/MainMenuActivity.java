@@ -32,7 +32,6 @@ public class MainMenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         TransitionSet transition = new TransitionSet();
         transition.addTransition(new ChangeTransform());
@@ -40,6 +39,8 @@ public class MainMenuActivity extends AppCompatActivity {
         getWindow().setSharedElementReturnTransition(transition);
 
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().hide();
 
         DBAssetHelper dbAssetSetUp = new DBAssetHelper(MainMenuActivity.this);
         dbAssetSetUp.getReadableDatabase();

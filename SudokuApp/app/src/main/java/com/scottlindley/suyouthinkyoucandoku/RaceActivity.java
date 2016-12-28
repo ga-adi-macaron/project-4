@@ -56,7 +56,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_puzzle);
+        setContentView(R.layout.activity_race);
 
         mDBHelper = DBHelper.getInstance(this);
 
@@ -274,7 +274,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 })
                 .setTitle("No match found. Please try again!")
                 .create();
-        dialog.show();
+        mTimer.cancel();
+        if(RaceActivity.this!=null) {
+            dialog.show();
+        }
     }
 
     @Override
@@ -438,6 +441,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
             Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
         }
+        mTimer.cancel();
         super.onBackPressed();
     }
 
