@@ -4,100 +4,41 @@ package com.example.jon.eventmeets.model.game_models;
  * Created by Jon on 12/16/2016.
  */
 
-public class VideoGamingEvent extends GamingEventParent {
-    private String mTitle;
-    private String mCategory;
-    private String mSubCategory;
-    private boolean mNeedsNearby;
-    private boolean mCanBeNearby;
-    private String mLocation;
-    private String mTime;
+public class VideoGamingEvent {
+    private int id;
+    private String name;
+    private String image;
+    private String[] platforms;
 
-    /**
-     * Event constructor with only mandatory parameters
-     * @param title The unique name of the event
-     * @param category The type of event as a string, see Category for more details
-     * @param needsNearby If the event requires participants to be local (i.e. hosted in-person)
-     */
-    public VideoGamingEvent(String title, String category, boolean needsNearby) {
-        mTitle = title;
-        mCategory = category;
-        mNeedsNearby = needsNearby;
-        mTime = "TBD";
-        mSubCategory = "none";
-        //Checking for nearby selection
-        if(mNeedsNearby) {
-            mLocation = "show error";
-        }
+    public String getName() {
+        return name;
     }
 
-    /**
-     * The full constructor for an event with all fields filled out.
-     * @param title
-     * @param category
-     * @param subCategory
-     * @param needsNearby
-     * @param canBeNearby
-     * @param location
-     * @param time
-     */
-    public VideoGamingEvent(String title, String category, String subCategory, boolean needsNearby, boolean canBeNearby,
-                            String location, String time) {
-        mTitle = title;
-        mCategory = category;
-        mSubCategory = subCategory;
-        mNeedsNearby = needsNearby;
-        mCanBeNearby = canBeNearby;
-        mLocation = location;
-        mTime = time;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    /**
-     * Constructor called if the event needs nearby users
-     * @param title
-     * @param category
-     * @param needsNearby
-     * @param location
-     */
-    public VideoGamingEvent(String title, String category, boolean needsNearby, String location) {
-        mTitle = title;
-        mCategory = category;
-        mNeedsNearby = needsNearby;
-        mLocation = location;
-        mSubCategory = "none";
+    public String getImage() {
+        return image;
     }
 
-    private void nearbyLocationSelected() {
-        if(mNeedsNearby) {
-            mLocation = null; //Location becomes required
-        }
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public String getSubCategory() {
-        return mSubCategory;
+    public int getId() {
+        return id;
     }
 
-    public String getLocation() {
-        return mLocation;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getTime() {
-        return mTime;
+    public String[] getPlatforms() {
+        return platforms;
     }
 
-    public void setSubCategory(String category) {
-        mSubCategory = category;
-    }
-
-    public void setLocation(String location) {
-        mLocation = location;
-    }
-
-    public void setTime(String time) {
-        mTime = time;
-    }
-
-    public void setCanbeNearby(boolean canBeNearby) {
-        mCanBeNearby = canBeNearby;
+    public void setPlatforms(String[] platforms) {
+        this.platforms = platforms;
     }
 }

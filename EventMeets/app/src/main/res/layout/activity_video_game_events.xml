@@ -11,7 +11,8 @@
         android:id="@+id/video_game_search"
         android:hint="Enter Game's Name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"/>
 
     <Button
         android:id="@+id/search_games"
@@ -20,11 +21,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <CheckBox
-        android:id="@+id/local_only"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nearby Players Only"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/game_search_results"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/search_games"/>
 
 </RelativeLayout>

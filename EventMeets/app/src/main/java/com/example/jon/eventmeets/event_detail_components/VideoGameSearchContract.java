@@ -12,7 +12,9 @@ public interface VideoGameSearchContract {
 
     interface View {
         void displaySearchResults(List<VideoGamingEvent> games);
-    } interface Presenter {
+    }
+
+    interface Presenter {
         void onSearchRequested(String query);
     }
 }
