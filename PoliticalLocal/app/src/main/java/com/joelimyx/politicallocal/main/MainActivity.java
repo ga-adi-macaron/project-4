@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity
                         .beginTransaction()
                         .replace(R.id.main_container, BillFragment.newInstance())
                         .commit();
-                mBottomBar.setBackgroundColor(Color.parseColor("#EF6C00"));
                 break;
         }
         return true;
