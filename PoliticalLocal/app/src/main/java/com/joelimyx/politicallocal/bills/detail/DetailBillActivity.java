@@ -95,7 +95,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                     mDetailBillTitle.setText(Html.fromHtml(mDetailBill.getTitle()));
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
-                    SpannableString content = new SpannableString("More detail");
+                    SpannableString content = new SpannableString("Full detail(PDF)");
                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                     mDetailBillPDF.setText(content);
                     mDetailBillPDF.setOnClickListener(v ->{

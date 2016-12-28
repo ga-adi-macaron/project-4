@@ -57,6 +57,12 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
         return mBillList.size();
     }
 
+    public void swapData(List<Bill> newBills){
+        mBillList.clear();
+        mBillList = newBills;
+        notifyDataSetChanged();
+    }
+
     class BillViewHolder extends RecyclerView.ViewHolder{
         private TextView mBillNumber, mBillTitle;
         private LinearLayout mBillItem;

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -137,13 +138,14 @@ public class MainActivity extends AppCompatActivity
                         .beginTransaction()
                         .replace(R.id.main_container, BillFragment.newInstance())
                         .commit();
+                mBottomBar.setBackgroundColor(Color.parseColor("#EF6C00"));
                 break;
         }
         return true;
     }
 
     /*---------------------------------------------------------------------------------
-    // PERMISION REQUEST AREA
+    // PERMISSION REQUEST AREA
     ---------------------------------------------------------------------------------*/
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -222,7 +224,7 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Call<RepsList> call, Throwable t) {
-
+                    Toast.makeText(MainActivity.this, "Failed to get your representatives", Toast.LENGTH_SHORT).show();
                 }
             });
         }

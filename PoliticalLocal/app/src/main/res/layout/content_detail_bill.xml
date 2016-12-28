@@ -32,7 +32,7 @@
         android:textColor="#1d1d1d"/>
     <TextView
         android:id="@+id/detail_bill_pdf"
-        android:textColor="#3366BB"
+        android:textColor="#0D47A1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
