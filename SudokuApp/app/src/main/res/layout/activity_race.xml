@@ -49,6 +49,7 @@
                 android:backgroundTint="#4b4b4b"
                 android:layout_below="@id/score_text">
                 <ImageView
+                    android:id="@+id/weapon1_image"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_margin="2dp"
@@ -66,6 +67,7 @@
                 android:backgroundTint="#4b4b4b"
                 android:layout_below="@id/score_text">
                 <ImageView
+                    android:id="@+id/weapon2_image"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,8 +39,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.scottlindley.suyouthinkyoucandoku.R.id.weapon1;
-
 public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener {
     private static final String TAG = "RaceActivity";
@@ -55,23 +55,13 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private int mNumberOfParticipants;
     private boolean mResolvingConnectionFailure, mStillConnected;
     private GoogleApiClient mGoogleApiClient;
+    private String weapon1, weapon2;
+    private boolean weapon1Clicked, weapon2Clicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race);
-
-        setUpWeapons();
-        switch (weapon1){
-            case "bomb":
-                break;
-            case "spy":
-                break;
-            case "interference":
-                break;
-            case "none":
-                break;
-        }
 
         mDBHelper = DBHelper.getInstance(this);
 
@@ -88,10 +78,87 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private void setUpWeapons(){
         SharedPreferences prefs =
                 getSharedPreferences(MainMenuActivity.ARMED_WEAPONS_PREFS, MODE_PRIVATE);
-        String weapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
-        String weapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
+        weapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
+        weapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
 
-        
+        final ImageView weapon1Image = (ImageView)findViewById(R.id.weapon1_image);
+        final ImageView weapon2Image = (ImageView)findViewById(R.id.weapon2_image);
+
+        setWeaponImage(weapon1, weapon1Image);
+        setWeaponImage(weapon2, weapon2Image);
+
+        CardView weapon1Card = (CardView)findViewById(R.id.weapon1);
+        CardView weapon2Card = (CardView)findViewById(R.id.weapon2);
+
+        weapon1Card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                weapon1Clicked = !weapon1Clicked;
+                if (!weapon1.equals("none") && !weapon1Clicked){
+                    weapon1Image.setColorFilter(getResources().getColor(R.color.colorAccent));
+                    weapon2Clicked = false;
+                    weapon2Image.setColorFilter(Color.WHITE);
+                    adjustCardText(1);
+                } else if (!weapon1.equals("none") && weapon1Clicked){
+                    weapon1Image.setColorFilter(Color.WHITE);
+                    mTimerView.setText("Race!");
+                }
+            }
+        });
+
+        weapon2Card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                weapon2Clicked = !weapon2Clicked;
+                if (!weapon2.equals("none") && !weapon2Clicked){
+                    weapon2Image.setColorFilter(getResources().getColor(R.color.colorAccent));
+                    weapon1Clicked = false;
+                    weapon1Image.setColorFilter(Color.WHITE);
+                    adjustCardText(2);
+                } else if (!weapon2.equals("none") && weapon2Clicked){
+                    weapon2Image.setColorFilter(Color.WHITE);
+                    mTimerView.setText("Race!");
+                }
+            }
+        });
+    }
+
+    private void adjustCardText(int weaponSlot){
+        String weapon = "none";
+        if (weaponSlot == 1) {
+            weapon = weapon1;
+        } else if (weaponSlot == 2){
+            weapon = weapon2;
+        }
+        switch (weapon) {
+            case "bomb":
+                mTimerView.setText("Long press a box to drop Erase Bomb!");
+                break;
+            case "spy":
+                mTimerView.setText("Long press the board to spy!");
+                break;
+            case "interference":
+                mTimerView.setText("Long press the board to deploy interference!");
+                break;
+            case "none":
+        }
+    }
+
+    private void setWeaponImage(String weaponName, ImageView weaponImage){
+        switch (weaponName){
+            case "bomb":
+                weaponImage.setImageResource(R.drawable.explosion);
+                break;
+            case "spy":
+                weaponImage.setImageResource(R.drawable.eye);
+                break;
+            case "interference":
+                weaponImage.setImageResource(R.drawable.lightning);
+                break;
+            case "none":
+                weaponImage.setImageResource(R.drawable.none);
+                break;
+        }
     }
 
     @Override
@@ -353,6 +420,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         (findViewById(R.id.loading_wheel)).setVisibility(View.VISIBLE);
 
         setUpScoreCard();
+
+        setUpWeapons();
 
         Bundle autoMatch = RoomConfig.createAutoMatchCriteria(1, 1, 0);
         RoomConfig roomConfig = RoomConfig.builder(RaceActivity.this)
