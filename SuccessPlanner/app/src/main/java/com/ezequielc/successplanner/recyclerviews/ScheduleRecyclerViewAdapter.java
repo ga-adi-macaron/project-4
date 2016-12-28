@@ -1,12 +1,18 @@
 package com.ezequielc.successplanner.recyclerviews;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ezequielc.successplanner.DatabaseHelper;
+import com.ezequielc.successplanner.R;
 import com.ezequielc.successplanner.models.Schedule;
 
 import java.util.List;
@@ -25,20 +31,63 @@ public class ScheduleRecyclerViewAdapter extends RecyclerView.Adapter<ScheduleRe
     @Override
     public ScheduleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ScheduleViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(android.R.layout.simple_list_item_1, parent, false));
+        .inflate(R.layout.schedule_list_item_layout, parent, false));
     }
 
     @Override
     public void onBindViewHolder(final ScheduleViewHolder holder, int position) {
-        holder.mSchedule.setText(mScheduleList.get(position).getSchedule());
+        holder.mScheduleTextView.setText(mScheduleList.get(position).getSchedule());
 
-        holder.mSchedule.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.mScheduleItemLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
-                databaseHelper.deleteSchedule(mScheduleList.get(holder.getAdapterPosition()));
-                mScheduleList.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
+            public boolean onLongClick(final View view) {
+                CharSequence[] options = {"Edit", "Delete"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext())
+                        .setTitle("Schedule options")
+                        .setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0: // Edit option
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                                        LayoutInflater inflater = LayoutInflater.from(view.getContext());
+                                        View dialogView = inflater.inflate(R.layout.dialog_add_schedule, null);
+                                        builder.setView(dialogView);
+
+                                        final EditText editText = (EditText) dialogView.findViewById(R.id.schedule_edit_text);
+                                        editText.setText(mScheduleList.get(holder.getAdapterPosition()).getSchedule());
+
+                                        builder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                if (editText.getText().toString().trim().length() == 0) {
+                                                    Toast.makeText(view.getContext(), "Please fill field!", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+
+                                                String input = editText.getText().toString();
+                                                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+
+                                                mScheduleList.get(holder.getAdapterPosition()).setSchedule(input);
+                                                databaseHelper.updateSchedule(mScheduleList.get(holder.getAdapterPosition()));
+                                                notifyItemChanged(holder.getAdapterPosition());
+                                            }
+                                        })
+                                                .setNegativeButton("Cancel", null);
+                                        builder.create().show();
+                                        break;
+
+                                    case 1: // Delete option
+                                        // TODO: ADD AN "ARE YOU SURE YOU WANT TO DELETE?" DIALOG
+                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                                        databaseHelper.deleteSchedule(mScheduleList.get(holder.getAdapterPosition()));
+                                        mScheduleList.remove(holder.getAdapterPosition());
+                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        break;
+                                }
+                            }
+                        });
+                builder.create().show();
                 return false;
             }
         });
@@ -50,12 +99,14 @@ public class ScheduleRecyclerViewAdapter extends RecyclerView.Adapter<ScheduleRe
     }
 
     class ScheduleViewHolder extends RecyclerView.ViewHolder {
-        TextView mSchedule;
+        TextView mScheduleTextView;
+        LinearLayout mScheduleItemLayout;
 
         public ScheduleViewHolder(View itemView) {
             super(itemView);
 
-            mSchedule = (TextView) itemView.findViewById(android.R.id.text1);
+            mScheduleTextView = (TextView) itemView.findViewById(R.id.schedule_item);
+            mScheduleItemLayout = (LinearLayout) itemView.findViewById(R.id.schedule_item_linear_layout);
         }
     }
 }

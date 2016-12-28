@@ -1,12 +1,18 @@
 package com.ezequielc.successplanner.recyclerviews;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ezequielc.successplanner.DatabaseHelper;
+import com.ezequielc.successplanner.R;
 import com.ezequielc.successplanner.models.Affirmation;
 
 import java.util.List;
@@ -25,21 +31,64 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
     @Override
     public AffirmationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new AffirmationViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(android.R.layout.simple_list_item_1, parent, false));
+        .inflate(R.layout.affirmation_list_item_layout, parent, false));
     }
 
     @Override
     public void onBindViewHolder(final AffirmationViewHolder holder, int position) {
-        holder.mAffirmation.setText(mAffirmationList.get(position).getAffirmation());
+        holder.mAffirmationTextView.setText(mAffirmationList.get(position).getAffirmation());
 
-        holder.mAffirmation.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.mAffirmationItemLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
-                databaseHelper.deleteAffirmations(mAffirmationList.get(holder.getAdapterPosition()));
-                mAffirmationList.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
-                return true;
+            public boolean onLongClick(final View view) {
+                CharSequence[] options = {"Edit", "Delete"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext())
+                        .setTitle("Affirmation options")
+                        .setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0: // Edit option
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                                        LayoutInflater inflater = LayoutInflater.from(view.getContext());
+                                        View dialogView = inflater.inflate(R.layout.dialog_add_affirmations, null);
+                                        builder.setView(dialogView);
+
+                                        final EditText editText = (EditText) dialogView.findViewById(R.id.affirmations_edit_text);
+                                        editText.setText(mAffirmationList.get(holder.getAdapterPosition()).getAffirmation());
+
+                                        builder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                if (editText.getText().toString().trim().length() == 0) {
+                                                    Toast.makeText(view.getContext(), "Please fill field!", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+
+                                                String input = editText.getText().toString();
+                                                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+
+                                                mAffirmationList.get(holder.getAdapterPosition()).setAffirmation(input);
+                                                databaseHelper.updateAffirmation(mAffirmationList.get(holder.getAdapterPosition()));
+                                                notifyItemChanged(holder.getAdapterPosition());
+                                            }
+                                        })
+                                                .setNegativeButton("Cancel", null);
+                                        builder.create().show();
+                                        break;
+
+                                    case 1: // Delete option
+                                        // TODO: ADD AN "ARE YOU SURE YOU WANT TO DELETE?" DIALOG
+                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                                        databaseHelper.deleteAffirmations(mAffirmationList.get(holder.getAdapterPosition()));
+                                        mAffirmationList.remove(holder.getAdapterPosition());
+                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        break;
+                                }
+                            }
+                        });
+                builder.create().show();
+                return false;
             }
         });
     }
@@ -50,12 +99,14 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
     }
 
     class AffirmationViewHolder extends RecyclerView.ViewHolder {
-        TextView mAffirmation;
+        TextView mAffirmationTextView;
+        LinearLayout mAffirmationItemLayout;
 
         public AffirmationViewHolder(View itemView) {
             super(itemView);
 
-            mAffirmation = (TextView) itemView.findViewById(android.R.id.text1);
+            mAffirmationTextView = (TextView) itemView.findViewById(R.id.affirmation_item);
+            mAffirmationItemLayout = (LinearLayout) itemView.findViewById(R.id.affirmation_list_linear_layout);
         }
     }
 }
