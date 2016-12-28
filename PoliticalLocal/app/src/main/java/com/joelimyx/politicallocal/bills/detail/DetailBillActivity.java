@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
@@ -90,7 +91,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                     mCoSponsor = mDetailBill.getCosponsors();
 
                     mDetailBillNumber.setText(mBillNumber);
-                    mDetailBillTitle.setText(mDetailBill.getTitle());
+                    mDetailBillTitle.setText(Html.fromHtml(mDetailBill.getTitle()));
                     mDetailBillTitle.setEllipsize(TextUtils.TruncateAt.END);
                     mDetailBillTitle.setMarqueeRepeatLimit(3);
                     SpannableString content = new SpannableString("More detail");
@@ -139,6 +140,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        // FIXME: 12/27/16 requestLayout bug?
         int scrollRange = appBarLayout.getTotalScrollRange();
         if (scrollRange==Math.abs(verticalOffset)){
             mCollapsingToolbarLayout.setTitle(mBillNumber);
@@ -151,7 +153,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
 
     public class DetailBillPagerAdapter extends FragmentPagerAdapter {
 
-        public DetailBillPagerAdapter(FragmentManager fm) {
+        DetailBillPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

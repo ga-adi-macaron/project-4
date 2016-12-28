@@ -1,6 +1,7 @@
 package com.joelimyx.politicallocal.bills;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,13 +41,10 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
     public void onBindViewHolder(BillViewHolder holder, final int position) {
         Bill current = mBillList.get(position);
         holder.mBillNumber.setText(current.getNumber());
-        holder.mBillTitle.setText(current.getTitle());
-        holder.mBillItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String billId = mBillList.get(position).getNumber().replace(".","");
-                mListener.onBillItemSelected(billId);
-            }
+        holder.mBillTitle.setText(Html.fromHtml(current.getTitle()));
+        holder.mBillItem.setOnClickListener(view -> {
+            String billId = mBillList.get(position).getNumber().replace(".","");
+            mListener.onBillItemSelected(billId);
         });
     }
 
