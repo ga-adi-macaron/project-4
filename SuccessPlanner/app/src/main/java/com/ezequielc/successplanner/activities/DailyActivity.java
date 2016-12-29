@@ -1,5 +1,7 @@
 package com.ezequielc.successplanner.activities;
 
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,10 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.ezequielc.successplanner.DatabaseHelper;
-import com.ezequielc.successplanner.models.DailyData;
 import com.ezequielc.successplanner.models.Goal;
 import com.ezequielc.successplanner.recyclerviews.GoalRecyclerViewAdapter;
 import com.ezequielc.successplanner.R;
@@ -23,10 +25,13 @@ import com.ezequielc.successplanner.recyclerviews.ScheduleRecyclerViewAdapter;
 import com.ezequielc.successplanner.models.Affirmation;
 import com.ezequielc.successplanner.recyclerviews.AffirmationRecyclerViewAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DailyActivity extends AppCompatActivity {
+    public static final int DIALOG_ID = 0;
+    int mHour, mMinute;
+
+    TextView mTimePicker;
     TextView mCurrentDate;
     Button mAddGoals, mAddAffirmations, mAddSchedule;
     RecyclerView mGoalsRecyclerView, mAffirmationsRecyclerView, mScheduleRecyclerView;
@@ -53,6 +58,8 @@ public class DailyActivity extends AppCompatActivity {
         mGoalsRecyclerView = (RecyclerView) findViewById(R.id.goals_recycler_view);
         mAffirmationsRecyclerView = (RecyclerView) findViewById(R.id.affirmations_recycler_view);
         mScheduleRecyclerView = (RecyclerView) findViewById(R.id.schedule_recycler_view);
+
+        mTimePicker =(TextView) findViewById(R.id.time_picker_text);
 
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
@@ -83,6 +90,13 @@ public class DailyActivity extends AppCompatActivity {
         mScheduleRecyclerView.setLayoutManager(ScheduleLinearLayoutManager);
         mScheduleRecyclerView.setAdapter(mScheduleAdapter);
 
+        mTimePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialog(DIALOG_ID);
+            }
+        });
+
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,6 +117,25 @@ public class DailyActivity extends AppCompatActivity {
         mAddGoals.setOnClickListener(onClickListener);
         mAddAffirmations.setOnClickListener(onClickListener);
         mAddSchedule.setOnClickListener(onClickListener);
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+
+        TimePickerDialog.OnTimeSetListener mListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                mHour = hourOfDay;
+                mMinute = minute;
+                Toast.makeText(DailyActivity.this, mHour + ":" + mMinute, Toast.LENGTH_SHORT).show();
+                mTimePicker.setText(mHour + ":" + mMinute);
+            }
+        };
+
+        if (id == DIALOG_ID) {
+            return new TimePickerDialog(DailyActivity.this, mListener, mHour, mMinute, false);
+        }
+        return null;
     }
 
     public void alertDialog(int layout, final int id){
