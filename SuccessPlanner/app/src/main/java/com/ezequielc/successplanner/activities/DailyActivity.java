@@ -31,7 +31,8 @@ public class DailyActivity extends AppCompatActivity {
     public static final int DIALOG_ID = 0;
     int mHour, mMinute;
 
-    TextView mTimePicker;
+    TimePicker mTimePicker;
+    TimePickerDialog.OnTimeSetListener mListener;
     TextView mCurrentDate;
     Button mAddGoals, mAddAffirmations, mAddSchedule;
     RecyclerView mGoalsRecyclerView, mAffirmationsRecyclerView, mScheduleRecyclerView;
@@ -59,7 +60,7 @@ public class DailyActivity extends AppCompatActivity {
         mAffirmationsRecyclerView = (RecyclerView) findViewById(R.id.affirmations_recycler_view);
         mScheduleRecyclerView = (RecyclerView) findViewById(R.id.schedule_recycler_view);
 
-        mTimePicker =(TextView) findViewById(R.id.time_picker_text);
+        mTimePicker = new TimePicker(getApplicationContext());
 
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
@@ -90,12 +91,12 @@ public class DailyActivity extends AppCompatActivity {
         mScheduleRecyclerView.setLayoutManager(ScheduleLinearLayoutManager);
         mScheduleRecyclerView.setAdapter(mScheduleAdapter);
 
-        mTimePicker.setOnClickListener(new View.OnClickListener() {
+        mListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
-            public void onClick(View view) {
-                showDialog(DIALOG_ID);
+            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                mTimePicker = timePicker;
             }
-        });
+        };
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -109,6 +110,7 @@ public class DailyActivity extends AppCompatActivity {
                         break;
                     case R.id.add_schedule_button:
                         alertDialog(R.layout.dialog_add_schedule, R.id.schedule_edit_text);
+                        showDialog(DIALOG_ID);
                         break;
                 }
             }
@@ -121,17 +123,6 @@ public class DailyActivity extends AppCompatActivity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-
-        TimePickerDialog.OnTimeSetListener mListener = new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                mHour = hourOfDay;
-                mMinute = minute;
-                Toast.makeText(DailyActivity.this, mHour + ":" + mMinute, Toast.LENGTH_SHORT).show();
-                mTimePicker.setText(mHour + ":" + mMinute);
-            }
-        };
-
         if (id == DIALOG_ID) {
             return new TimePickerDialog(DailyActivity.this, mListener, mHour, mMinute, false);
         }
@@ -176,7 +167,8 @@ public class DailyActivity extends AppCompatActivity {
                         break;
 
                     case R.id.schedule_edit_text:
-                        Schedule schedule = new Schedule(currentDate, input);
+                        String time = getTimeFromTimePicker(mTimePicker);
+                        Schedule schedule = new Schedule(currentDate, time + " " + input);
                         databaseHelper.insertSchedule(schedule);
                         mScheduleList.add(schedule);
                         mScheduleAdapter.notifyItemInserted(mScheduleList.size() - 1);
@@ -189,5 +181,14 @@ public class DailyActivity extends AppCompatActivity {
         })
                 .setNegativeButton("Cancel", null);
         builder.create().show();
+    }
+
+    public String getTimeFromTimePicker(TimePicker timePicker){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            String hour = String.valueOf(timePicker.getHour());
+            String min = String.valueOf(timePicker.getMinute());
+            return hour + ":" + min;
+        }
+        return null;
     }
 }
