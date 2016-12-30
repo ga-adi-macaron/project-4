@@ -24,4 +24,10 @@
         app:layout_anchor="@id/map"
         android:layout_gravity="bottom|end"/>
 
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_image_test"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
 </FrameLayout>

@@ -7,8 +7,7 @@ import android.net.Uri;
  */
 
 public class User {
-    String mUserName, mId;
-    Uri mUserImage;
+    private String mUserName, mId, mUserImage;
 
     public User() {
     }
@@ -29,11 +28,11 @@ public class User {
         mId = id;
     }
 
-    public Uri getUserImage() {
+    public String getUserImage() {
         return mUserImage;
     }
 
-    public void setUserImage(Uri userImage) {
+    public void setUserImage(String userImage) {
         mUserImage = userImage;
     }
 }

@@ -1,6 +1,10 @@
 package com.korbkenny.peoplesplaylist;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +20,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
+import com.korbkenny.peoplesplaylist.objects.User;
 
 public class LoginActivity extends AppCompatActivity{
     private FirebaseAuth mAuth;
@@ -25,13 +35,25 @@ public class LoginActivity extends AppCompatActivity{
     private EditText signupEmail, signupPassword, loginEmail, loginPassword;
     private RelativeLayout layoutSignup, layoutLogin, layoutAlready;
 
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseUserReference;
+
+    private UserSingleton sUserSingleton;
+    private User ME;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Button signUpButton = (Button)findViewById(R.id.signup_button);
-        Button logInButton = (Button)findViewById(R.id.login_button);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //
+        //                     Setup
+        //
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        sUserSingleton = UserSingleton.getInstance();
+        ME = new User();
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -44,6 +66,15 @@ public class LoginActivity extends AppCompatActivity{
             }
         };
 
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseUserReference = mFirebaseDatabase.getReference("Users");
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //
+        //                     Views
+        //
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         signupEmail = (EditText)findViewById(R.id.signup_username);
         signupPassword = (EditText)findViewById(R.id.signup_password);
         loginEmail = (EditText)findViewById(R.id.login_username);
@@ -53,12 +84,23 @@ public class LoginActivity extends AppCompatActivity{
         layoutLogin = (RelativeLayout)findViewById(R.id.login_layout);
         layoutAlready = (RelativeLayout)findViewById(R.id.sign_in_layout);
 
+        Button signUpButton = (Button)findViewById(R.id.signup_button);
+        Button logInButton = (Button)findViewById(R.id.login_button);
+
+
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createAccount(signupEmail.getText().toString(),signupPassword.getText().toString());
             }
         });
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //
+        //           Change to Login Screen
+        //
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         layoutAlready.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +121,12 @@ public class LoginActivity extends AppCompatActivity{
         });
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //               Auth Listeners
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -86,15 +134,23 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //                Sign in/Sign up
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
     public void signIn(String email, String password){
-        if (!validateSignupForm()) {
+        if (!validateLoginForm()) {
             return;
         }
         mAuth.signInWithEmailAndPassword(email,password)
@@ -104,28 +160,66 @@ public class LoginActivity extends AppCompatActivity{
                         if (!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Failed to sign in", Toast.LENGTH_SHORT).show();
                         }
+                        if (task.isSuccessful()){
+                            String userId = task.getResult().getUser().getUid();
+                            mDatabaseUserReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    sUserSingleton.setUser(dataSnapshot.getValue(User.class));
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                        }
                     }
                 });
     }
 
-    public void createAccount(String email, String password){
+    public void createAccount(final String email, String password){
         if (!validateSignupForm()) {
             return;
         }
         mAuth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull final Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Failed to sign up", Toast.LENGTH_SHORT).show();
                         }
                         if(task.isSuccessful()){
-                            Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
-                            startActivity(intent);
+                            new AsyncTask<Void,Void,String>(){
+                                @Override
+                                protected String doInBackground(Void... voids) {
+                                    return task.getResult().getUser().getUid();
+                                }
+
+                                @Override
+                                protected void onPostExecute(String userId) {
+                                    ME.setId(userId);
+                                    ME.setUserName(email);
+                                    ME.setUserImage("https://firebasestorage.googleapis.com/v0/b/peoplesplaylist-9c5d9.appspot.com/o/userplaceholder.png?alt=media&token=69ff913e-2eb2-46b5-a210-390e69ddac31");
+                                    sUserSingleton.setUser(ME);
+                                    mDatabaseUserReference.child(userId).setValue(ME);
+                                    Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
+                                    startActivity(intent);
+                                }
+                            }.execute();
                         }
                     }
                 });
     }
+
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //               Validate Forms
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private boolean validateSignupForm() {
         boolean valid = true;

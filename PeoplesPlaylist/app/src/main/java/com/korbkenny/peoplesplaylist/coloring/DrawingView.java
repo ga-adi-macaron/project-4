@@ -73,6 +73,11 @@ public class DrawingView extends View {
         canvas.drawPath(drawPath, drawPaint);
     }
 
+    public void drawImage(Bitmap image) {
+        drawCanvas.drawBitmap(image, 0, 0, canvasPaint);
+        invalidate();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();

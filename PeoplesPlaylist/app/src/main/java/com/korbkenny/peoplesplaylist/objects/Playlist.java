@@ -9,9 +9,7 @@ import java.util.List;
 public class Playlist {
 
     private double mLatitude, mLongitude;
-    private String mTitle, mDescription, mId;
-    private URL mCover;
-    private List<Song> mSongList;
+    private String mTitle, mDescription, mId, mUserId, mCover;
 
     //  If you use an empty constructor and push a playlist to the database,
     //  you can get that entire playlist back with a single query.
@@ -57,21 +55,19 @@ public class Playlist {
         mDescription = description;
     }
 
-    public URL getCover() {
+    public String getCover() {
         return mCover;
     }
 
-    public void setCover(URL cover) {
+    public void setCover(String cover) {
         mCover = cover;
     }
 
-    public List<Song> getSongList() {
-        return mSongList;
+    public String getUserId() {
+        return mUserId;
     }
 
-    public void setSongList(List<Song> songList) {
-        mSongList = songList;
+    public void setUserId(String userId) {
+        mUserId = userId;
     }
-
-
 }

@@ -7,19 +7,18 @@ import android.net.Uri;
  */
 
 public class Song {
-    private User mUser;
-    private String mTitle, mSongId;
+    private String mTitle, mSongId, mUserId, mPlaylistId;
     private Uri mStreamUrl;
 
     public Song() {
     }
 
-    public User getUser() {
-        return mUser;
+    public String getUserId() {
+        return mUserId;
     }
 
-    public void setUser(User user) {
-        mUser = user;
+    public void setUserId(String userId) {
+        mUserId = userId;
     }
 
     public String getTitle() {
@@ -44,5 +43,13 @@ public class Song {
 
     public void setSongId(String songId) {
         mSongId = songId;
+    }
+
+    public String getPlaylistId() {
+        return mPlaylistId;
+    }
+
+    public void setPlaylistId(String playlistId) {
+        mPlaylistId = playlistId;
     }
 }

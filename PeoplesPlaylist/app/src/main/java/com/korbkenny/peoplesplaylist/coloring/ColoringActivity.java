@@ -1,11 +1,19 @@
 package com.korbkenny.peoplesplaylist.coloring;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -23,29 +31,52 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.User;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class ColoringActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "Coloring Activity: ";
     private DrawingView drawView;
     private ImageButton currPaint;
     private float smallBrush, mediumBrush, largeBrush;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseUserReference;
+    private StorageReference mStorageRef;
+    private UserSingleton sSingleton;
+    private User ME;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseUser fbUser;
+    private Bitmap myIcon;
+    private String mIconPath;
+    private Uri mFile;
+    private TextView drawButton, eraseButton, saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coloring);
 
+        sSingleton = UserSingleton.getInstance();
+        ME = sSingleton.getUser();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseUserReference = mFirebaseDatabase.getReference("Users");
+        mStorageRef = FirebaseStorage.getInstance().getReference("usericons/");
+
         smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
         largeBrush = getResources().getInteger(R.integer.large_size);
 
-        TextView drawButton = (TextView)findViewById(R.id.brush);
-        TextView eraseButton = (TextView)findViewById(R.id.erase);
-        TextView saveButton = (TextView)findViewById(R.id.save);
+        drawButton = (TextView)findViewById(R.id.brush);
+        eraseButton = (TextView)findViewById(R.id.erase);
+        saveButton = (TextView)findViewById(R.id.save);
 
         drawView = (DrawingView)findViewById(R.id.drawing);
 
@@ -58,6 +89,8 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         saveButton.setOnClickListener(this);
 
         drawView.setBrushSize(mediumBrush);
+
+
     }
 
     public void paintClicked(View view){
@@ -78,7 +111,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
 
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         if(view.getId()==R.id.brush){
             final Dialog brushDialog = new Dialog(this);
             brushDialog.setTitle("Brush size:");
@@ -155,41 +188,93 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         }
 
         else if(view.getId()==R.id.save){
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                Log.d(TAG, "onClick: SAVE: USER ID:"+ user.getUid());
-                drawView.setDrawingCacheEnabled(true);
+            drawView.setDrawingCacheEnabled(true);
+            myIcon = drawView.getDrawingCache();
+            new AsyncTask<Void,Void,String>(){
+                @Override
+                protected void onPreExecute() {
+                    drawButton.setEnabled(false);
+                    eraseButton.setEnabled(false);
+                    saveButton.setEnabled(false);
+                }
 
-                Bitmap bitmap = drawView.getDrawingCache();
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                bitmap.compress(Bitmap.CompressFormat.PNG,0,bos);
-//                byte[] bitmapdata = bos.toByteArray();
+                @Override
+                protected String doInBackground(Void... voids) {
+                    return saveImageToDisk(myIcon);
+                }
 
+                @Override
+                protected void onPostExecute(String iconPath) {
+                    mIconPath = iconPath;
+                    mFile = Uri.fromFile(new File(mIconPath + "/" + ME.getId() + "profileimage.png"));
 
-                Uri file = Uri.fromFile(new File("gs://peoplesplaylist-9c5d9.appspot.com/usericons/"+user.getUid()+".bmp"));
-                StorageReference ref = FirebaseStorage.getInstance().getReference().child("usericons/"+user.getUid()+".bmp");
-                ref.putFile(file)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                User myUser = new User();
-                                myUser.setId(user.getUid());
-                                myUser.setUserName(user.getDisplayName());
-                                myUser.setUserImage(downloadUrl);
+                    new AsyncTask<Void,Void,Void>(){
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            StorageReference profileRef = mStorageRef.child(ME.getId()+"profileimage.png");
+                            profileRef.putFile(mFile)
+                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            if(taskSnapshot.getDownloadUrl()!=null) {
+                                                ME.setUserImage(taskSnapshot.getDownloadUrl().toString());
+                                                sSingleton.setUser(ME);
+                                                mDatabaseUserReference.child(ME.getId()).setValue(ME);
+                                                Log.d(TAG, "onSuccess: " + ME.getId() + "   " + ME.getUserImage());
+                                            }
+                                        }
+                                    })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                            return null;
+                        }
 
-                                FirebaseDatabase db = FirebaseDatabase.getInstance();
-                                DatabaseReference dbRef = db.getReference("Users/"+user.getUid());
-                                dbRef.setValue(myUser);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(ColoringActivity.this, "Try again?", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            finish();
+                        }
+                    }.execute();
+
+                }
+            }.execute();
             }
+        }
+
+
+    private String saveImageToDisk(Bitmap bitmap){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getDir("imageDir",MODE_PRIVATE);
+        File imagePath = new File(directory,ME.getId()+"profileimage.png");
+
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(imagePath);
+            bitmap.compress(Bitmap.CompressFormat.PNG,0,fos);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, "saveImageToDisk: " + directory.getAbsolutePath());
+        return directory.getAbsolutePath();
+    }
+
+    private void loadImageFromDisk(String path){
+        try {
+            File file = new File(path, ME.getId()+"profileimage.png");
+            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
