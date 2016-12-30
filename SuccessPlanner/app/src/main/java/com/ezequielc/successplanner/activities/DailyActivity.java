@@ -25,7 +25,10 @@ import com.ezequielc.successplanner.recyclerviews.ScheduleRecyclerViewAdapter;
 import com.ezequielc.successplanner.models.Affirmation;
 import com.ezequielc.successplanner.recyclerviews.AffirmationRecyclerViewAdapter;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class DailyActivity extends AppCompatActivity {
     public static final int DIALOG_ID = 0;
@@ -110,7 +113,9 @@ public class DailyActivity extends AppCompatActivity {
                         break;
                     case R.id.add_schedule_button:
                         alertDialog(R.layout.dialog_add_schedule, R.id.schedule_edit_text);
-                        showDialog(DIALOG_ID);
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            showDialog(DIALOG_ID);
+                        }
                         break;
                 }
             }
@@ -168,7 +173,7 @@ public class DailyActivity extends AppCompatActivity {
 
                     case R.id.schedule_edit_text:
                         String time = getTimeFromTimePicker(mTimePicker);
-                        Schedule schedule = new Schedule(currentDate, time + " " + input);
+                        Schedule schedule = new Schedule(currentDate, time + input);
                         databaseHelper.insertSchedule(schedule);
                         mScheduleList.add(schedule);
                         mScheduleAdapter.notifyItemInserted(mScheduleList.size() - 1);
@@ -185,10 +190,16 @@ public class DailyActivity extends AppCompatActivity {
 
     public String getTimeFromTimePicker(TimePicker timePicker){
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            String hour = String.valueOf(timePicker.getHour());
-            String min = String.valueOf(timePicker.getMinute());
-            return hour + ":" + min;
+            Calendar time = Calendar.getInstance();
+            time.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+            time.set(Calendar.MINUTE, timePicker.getMinute());
+
+            String format = "hh:mm a";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.US);
+            String formatted_time = simpleDateFormat.format(time.getTime());
+
+            return formatted_time + " ";
         }
-        return null;
+        return "";
     }
 }
