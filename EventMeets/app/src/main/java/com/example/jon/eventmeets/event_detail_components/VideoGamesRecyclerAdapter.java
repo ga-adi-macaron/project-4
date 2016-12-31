@@ -116,4 +116,6 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     public int getItemCount() {
         return mVideogames.size();
     }
+
+
 }
