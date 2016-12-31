@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -27,6 +28,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
     public static final String URL = "https://apimk.com/motivationalquotes?get_quote=yes";
     public static final String DATE_FORMATTED = "dateFormatted";
+    public static final String DAY_OF_WEEK = "dayOfWeek";
 
     TextView mQuote;
     CalendarView mCalendarView;
@@ -50,7 +52,39 @@ public class MainActivity extends AppCompatActivity {
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int dayOfMonth) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                int calendarDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                String dayOfWeek = "";
+
+                switch (calendarDayOfWeek) {
+                    case Calendar.MONDAY:
+                        dayOfWeek = "Monday";
+                        break;
+                    case Calendar.TUESDAY:
+                        dayOfWeek = "Tuesday";
+                        break;
+                    case Calendar.WEDNESDAY:
+                        dayOfWeek = "Wednesday";
+                        break;
+                    case Calendar.THURSDAY:
+                        dayOfWeek = "Thursday";
+                        break;
+                    case Calendar.FRIDAY:
+                        dayOfWeek = "Friday";
+                        break;
+                    case Calendar.SATURDAY:
+                        dayOfWeek = "Saturday";
+                        break;
+                    case Calendar.SUNDAY:
+                        dayOfWeek = "Sunday";
+                        break;
+                    default:
+                        break;
+                }
+
                 Intent intent = new Intent(MainActivity.this, DailyActivity.class);
+                intent.putExtra(DAY_OF_WEEK, dayOfWeek);
                 intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
                 startActivity(intent);
             }
