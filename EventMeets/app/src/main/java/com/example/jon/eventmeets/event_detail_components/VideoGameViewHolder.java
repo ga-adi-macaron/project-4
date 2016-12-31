@@ -3,6 +3,7 @@ package com.example.jon.eventmeets.event_detail_components;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
@@ -15,8 +16,11 @@ public class VideoGameViewHolder extends RecyclerView.ViewHolder {
     public ImageView mNintendo, mXbox, mPlaystation, mPc;
     public TextView mGameTitle;
     public ImageView mCoverArt;
+    public RelativeLayout mGameLayout;
+
     public VideoGameViewHolder(View itemView) {
         super(itemView);
+        mGameLayout = (RelativeLayout)itemView.findViewById(R.id.game_result_layout);
 
         mNintendo = (ImageView)itemView.findViewById(R.id.nintendo_platform);
         mXbox = (ImageView)itemView.findViewById(R.id.xbox_platform);

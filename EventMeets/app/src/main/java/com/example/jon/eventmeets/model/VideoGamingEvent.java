@@ -1,4 +1,4 @@
-package com.example.jon.eventmeets.model.game_models;
+package com.example.jon.eventmeets.model;
 
 import com.example.jon.eventmeets.event_detail_components.VideoGameImages;
 import com.example.jon.eventmeets.event_detail_components.VideoGamePlatforms;

@@ -6,7 +6,6 @@
     <string name="password">Password</string>
     <string name="password_confirm">Confirm Password</string>
     <string name="Skip_login">Skip for now</string>
-    <string name="title_activity_event_browse_view">EventBrowseViewActivity</string>
     <string name="create_account">Create New Account</string>
     <string name="recommendation_header"><b>Recommended for you</b></string>
     <string name="browse">Browse all categories</string>

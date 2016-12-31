@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.jon.eventmeets.R;
-import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
+import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jon.eventmeets.R;
-import com.example.jon.eventmeets.event_category_browser.EventBrowseViewActivity;
-import com.example.jon.eventmeets.model.EventParent;
+import com.example.jon.eventmeets.event_detail_components.VideoGameEventsActivity;
+import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
     }
 
     @Override
-    public void setupRecyclerView(List<EventParent> list) {
+    public void setupRecyclerView(List<VideoGamingEvent> list) {
         if(list != null && list.size() > 0) {
             mAdapter = new MainMenuRecyclerAdapter(list);
             LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -68,13 +68,13 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
     }
 
     @Override
-    public void openEventDetail(EventParent event) {
+    public void openEventDetail(VideoGamingEvent event) {
 
     }
 
     @Override
     public void openBrowseActivity() {
-        Intent intent = new Intent(this, EventBrowseViewActivity.class);
+        Intent intent = new Intent(this, VideoGameEventsActivity.class);
         startActivity(intent);
     }
 

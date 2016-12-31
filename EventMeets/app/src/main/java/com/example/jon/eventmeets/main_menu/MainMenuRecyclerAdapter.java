@@ -5,14 +5,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
-import com.example.jon.eventmeets.model.EventParent;
+import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 
 public class MainMenuRecyclerAdapter extends RecyclerView.Adapter<MainMenuEventParentViewHolder>{
-    private List<EventParent> mEventList;
+    private List<VideoGamingEvent> mEventList;
 
-    public MainMenuRecyclerAdapter(List<EventParent> list) {
+    public MainMenuRecyclerAdapter(List<VideoGamingEvent> list) {
         mEventList = list;
     }
 
@@ -24,8 +24,6 @@ public class MainMenuRecyclerAdapter extends RecyclerView.Adapter<MainMenuEventP
 
     @Override
     public void onBindViewHolder(MainMenuEventParentViewHolder holder, int position) {
-//        EventParent event = mEventList.get(position);
-//        event.setIcon(holder.mParentIcon);
     }
 
     @Override

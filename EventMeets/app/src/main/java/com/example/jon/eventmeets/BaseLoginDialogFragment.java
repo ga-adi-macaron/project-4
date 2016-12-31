@@ -21,8 +21,8 @@ import android.widget.Toast;
 
 public class BaseLoginDialogFragment extends DialogFragment implements View.OnClickListener{
     private Button mLoginButton, mCreateAccount, mSkipLogin;
-    private EditText mAccountName, mPassword, mHiddenConfirm;
-    private TextView mHiddenConfirmPassword;
+    private EditText mAccountName, mPassword, mHiddenConfirm, mFirstName, mLastName;
+    private TextView mHiddenConfirmPassword, mFirst, mLast;
     private BaseLoginContract.Presenter mPresenter;
     private Dialog mDialog;
 
@@ -43,8 +43,12 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         mAccountName = (EditText)view.findViewById(R.id.username_edit);
         mPassword = (EditText)view.findViewById(R.id.password_edit);
 
+        mFirst = (TextView)view.findViewById(R.id.first_name_text);
+        mLast = (TextView)view.findViewById(R.id.last_name_text);
         mHiddenConfirmPassword = (TextView)view.findViewById(R.id.hidden_confirm_new_password);
         mHiddenConfirm = (EditText)view.findViewById(R.id.hidden_confirm_edit);
+        mFirstName = (EditText)view.findViewById(R.id.first_name);
+        mLastName = (EditText)view.findViewById(R.id.last_name);
 
         mLoginButton.setOnClickListener(this);
         mCreateAccount.setOnClickListener(this);
@@ -80,6 +84,10 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
             case R.id.create_account_btn:
                 mHiddenConfirmPassword.setVisibility(View.VISIBLE);
                 mHiddenConfirm.setVisibility(View.VISIBLE);
+                mFirst.setVisibility(View.VISIBLE);
+                mFirstName.setVisibility(View.VISIBLE);
+                mLast.setVisibility(View.VISIBLE);
+                mLastName.setVisibility(View.VISIBLE);
                 mLoginButton.setVisibility(View.GONE);
                 mCreateAccount.setOnClickListener(new View.OnClickListener() {
                     @Override

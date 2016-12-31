@@ -1,6 +1,6 @@
 package com.example.jon.eventmeets.event_detail_components;
 
-import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
+import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 

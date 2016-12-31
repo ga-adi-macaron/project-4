@@ -1,12 +1,13 @@
 package com.example.jon.eventmeets.event_detail_components;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
-import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
+import com.example.jon.eventmeets.model.VideoGamingEvent;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 
 public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameViewHolder> {
     private List<VideoGamingEvent> mVideogames;
+    private Intent mIntent;
 
     public VideoGamesRecyclerAdapter(List<VideoGamingEvent> list) {
         mVideogames = list;
@@ -37,6 +39,13 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
 
         if(event.getImage() != null&&event.getImage().getThumb_url() != null)
             Picasso.with(holder.mCoverArt.getContext()).load(event.getImage().getThumb_url()).into(holder.mCoverArt);
+
+        holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         ArrayList<VideoGamePlatforms> platforms = event.getPlatforms();
         boolean hasNintendo = false;
@@ -116,6 +125,4 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     public int getItemCount() {
         return mVideogames.size();
     }
-
-
 }
