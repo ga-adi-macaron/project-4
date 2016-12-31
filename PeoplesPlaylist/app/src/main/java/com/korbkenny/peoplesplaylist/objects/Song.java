@@ -7,7 +7,7 @@ import android.net.Uri;
  */
 
 public class Song {
-    private String mTitle, mSongId, mUserId, mPlaylistId;
+    private String mTitle, mSongId, mUserId, mPlaylistId, mUserImage;
     private Uri mStreamUrl;
 
     public Song() {
@@ -51,5 +51,13 @@ public class Song {
 
     public void setPlaylistId(String playlistId) {
         mPlaylistId = playlistId;
+    }
+
+    public String getUserImage() {
+        return mUserImage;
+    }
+
+    public void setUserImage(String userImage) {
+        mUserImage = userImage;
     }
 }

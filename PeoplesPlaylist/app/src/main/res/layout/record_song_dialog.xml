@@ -7,7 +7,9 @@
         android:id="@+id/record_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Title this track"/>
+        android:hint="Title this track"
+        android:maxLines="1"
+        android:maxLength="50"/>
     <Button
         android:id="@+id/record_button"
         android:layout_width="200dp"

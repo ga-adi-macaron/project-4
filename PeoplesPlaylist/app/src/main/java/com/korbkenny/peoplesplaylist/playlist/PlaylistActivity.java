@@ -95,6 +95,11 @@ public class PlaylistActivity extends AppCompatActivity {
         song.setUserId(ME.getId());
         mSongList.add(song);
 
+        simpleSetup();
+
+
+
+
         new AsyncTask<Void,Void,Void>(){
 
             @Override

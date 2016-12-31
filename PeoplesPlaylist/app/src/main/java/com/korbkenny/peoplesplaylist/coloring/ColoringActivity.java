@@ -215,12 +215,22 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
                             profileRef.putFile(mFile)
                                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                         @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
                                             if(taskSnapshot.getDownloadUrl()!=null) {
-                                                ME.setUserImage(taskSnapshot.getDownloadUrl().toString());
-                                                sSingleton.setUser(ME);
-                                                mDatabaseUserReference.child(ME.getId()).setValue(ME);
-                                                Log.d(TAG, "onSuccess: " + ME.getId() + "   " + ME.getUserImage());
+                                                new AsyncTask<Void,Void,Void>(){
+                                                    @Override
+                                                    protected Void doInBackground(Void... voids) {
+                                                        ME.setUserImage(taskSnapshot.getDownloadUrl().toString());
+                                                        return null;
+                                                    }
+                                                    @Override
+                                                    protected void onPostExecute(Void aVoid) {
+                                                        sSingleton.setUser(ME);
+                                                        mDatabaseUserReference.child(ME.getId()).setValue(ME);
+                                                        Log.d(TAG, "onSuccess: " + ME.getId() + "   " + ME.getUserImage());
+                                                        finish();
+                                                    }
+                                                }.execute();
                                             }
                                         }
                                     })
@@ -235,7 +245,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
                         @Override
                         protected void onPostExecute(Void aVoid) {
-                            finish();
+
                         }
                     }.execute();
 

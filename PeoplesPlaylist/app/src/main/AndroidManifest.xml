@@ -34,6 +34,8 @@
         </activity>
         <activity android:name=".coloring.ColoringActivity">
         </activity>
+        <activity android:name=".SplashActivity">
+        </activity>
     </application>
 
 </manifest>

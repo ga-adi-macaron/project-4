@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -55,8 +56,11 @@ import com.korbkenny.peoplesplaylist.objects.Playlist;
 import com.korbkenny.peoplesplaylist.objects.Song;
 import com.korbkenny.peoplesplaylist.objects.User;
 import com.korbkenny.peoplesplaylist.playlist.PlaylistActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -76,9 +80,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GeoQuery geoQuery;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private Intent userIntent;
+    private ImageView vUserIcon;
     private User ME;
     private UserSingleton sUserSingleton;
+    private int tries = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +103,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mUserRef = mFirebaseDatabase.getReference("Users").child(user.getUid());
                     mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            ME = dataSnapshot.getValue(User.class);
-                            sUserSingleton.setUser(ME);
+                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                            if(dataSnapshot!=null){
+                                new AsyncTask<Void,Void,Void>(){
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        ME = dataSnapshot.getValue(User.class);
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        sUserSingleton.setUser(ME);
+                                    }
+                                }.execute();
+                            }
+
                         }
 
                         @Override
@@ -143,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setUpMap();
 
         fab = (FloatingActionButton)findViewById(R.id.fab);
+        vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
 
 
 
@@ -188,6 +207,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+    }
+
+    private void requestUserImage() {
+        if(ME != null && ME.getUserImage() != null){
+            loadUserIcon();
+        } else if(tries < 30){
+            Timer timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    tries++;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            requestUserImage();
+                        }
+                    });
+                }
+            };
+            timer.schedule(timerTask,0,1000);
+        }
+    }
+
+    private void loadUserIcon() {
+
+        Picasso.with(this).load(ME.getUserImage()).into(vUserIcon);
     }
 
 
@@ -340,6 +385,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mGoogleApiClient.connect();
         }
         mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        requestUserImage();
     }
 
     @Override

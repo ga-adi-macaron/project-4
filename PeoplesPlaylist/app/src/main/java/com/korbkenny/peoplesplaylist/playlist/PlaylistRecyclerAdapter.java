@@ -1,12 +1,15 @@
 package com.korbkenny.peoplesplaylist.playlist;
 
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.korbkenny.peoplesplaylist.R;
 import com.korbkenny.peoplesplaylist.objects.Song;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -28,11 +31,20 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
 
     @Override
     public void onBindViewHolder(PlaylistViewHolder holder, int position) {
-            holder.mSongTitle.setText(mSongList.get(position).getTitle());
-            holder.mUserName.setText("UserName123");
-            if (position % 2 == 1) {
-                holder.mLayout.setBackgroundColor(Color.parseColor("#dddddd"));
-            }
+        holder.mSongTitle.setText(mSongList.get(position).getTitle());
+        holder.mSongNumber.setText("hey");
+
+        Picasso.with(holder.mUserIcon.getContext())
+                .load(mSongList.get(position).getUserImage())
+                .into(holder.mUserIcon);
+
+        if (position % 2 == 1) {
+            holder.mLayout.setBackgroundColor(Color.parseColor("#dddddd"));
+        }
+
+
+
+
     }
 
     @Override

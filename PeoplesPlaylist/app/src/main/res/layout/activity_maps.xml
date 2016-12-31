@@ -1,7 +1,8 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -11,6 +12,19 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               tools:context="com.korbkenny.peoplesplaylist.MapsActivity"/>
+
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="25dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp">
+        <ImageView
+            android:id="@+id/maps_user_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/userplaceholder"/>
+    </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,11 +37,5 @@
         android:src="@android:drawable/ic_input_add"
         app:layout_anchor="@id/map"
         android:layout_gravity="bottom|end"/>
-
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_image_test"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
 
 </FrameLayout>
