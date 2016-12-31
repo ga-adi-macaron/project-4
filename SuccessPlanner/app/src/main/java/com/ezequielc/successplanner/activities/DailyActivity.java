@@ -3,6 +3,7 @@ package com.ezequielc.successplanner.activities;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -37,7 +37,7 @@ public class DailyActivity extends AppCompatActivity {
     TimePicker mTimePicker;
     TimePickerDialog.OnTimeSetListener mListener;
     TextView mCurrentDate;
-    Button mAddGoals, mAddAffirmations, mAddSchedule;
+    FloatingActionButton mFAB;
     RecyclerView mGoalsRecyclerView, mAffirmationsRecyclerView, mScheduleRecyclerView;
 
     GoalRecyclerViewAdapter mGoalAdapter;
@@ -56,14 +56,10 @@ public class DailyActivity extends AppCompatActivity {
 
         // References to Views
         mCurrentDate = (TextView) findViewById(R.id.current_date);
-        mAddGoals = (Button) findViewById(R.id.add_goals_button);
-        mAddAffirmations = (Button) findViewById(R.id.add_affirmations_button);
-        mAddSchedule = (Button) findViewById(R.id.add_schedule_button);
         mGoalsRecyclerView = (RecyclerView) findViewById(R.id.goals_recycler_view);
         mAffirmationsRecyclerView = (RecyclerView) findViewById(R.id.affirmations_recycler_view);
         mScheduleRecyclerView = (RecyclerView) findViewById(R.id.schedule_recycler_view);
-
-        mTimePicker = new TimePicker(getApplicationContext());
+        mFAB = (FloatingActionButton) findViewById(R.id.fab);
 
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
@@ -71,7 +67,6 @@ public class DailyActivity extends AppCompatActivity {
 
         // RecyclerView for Goals
         mGoalList = databaseHelper.getGoalsForDate(currentDate);
-
         mGoalAdapter = new GoalRecyclerViewAdapter(mGoalList);
         LinearLayoutManager goalLinearLayoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -94,6 +89,7 @@ public class DailyActivity extends AppCompatActivity {
         mScheduleRecyclerView.setLayoutManager(ScheduleLinearLayoutManager);
         mScheduleRecyclerView.setAdapter(mScheduleAdapter);
 
+        mTimePicker = new TimePicker(getApplicationContext());
         mListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int i, int i1) {
@@ -101,29 +97,39 @@ public class DailyActivity extends AppCompatActivity {
             }
         };
 
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+        mFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (view.getId()) {
-                    case R.id.add_goals_button:
-                        alertDialog(R.layout.dialog_add_goals, R.id.goal_edit_text);
-                        break;
-                    case R.id.add_affirmations_button:
-                        alertDialog(R.layout.dialog_add_affirmations, R.id.affirmations_edit_text);
-                        break;
-                    case R.id.add_schedule_button:
-                        alertDialog(R.layout.dialog_add_schedule, R.id.schedule_edit_text);
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                            showDialog(DIALOG_ID);
-                        }
-                        break;
-                }
-            }
-        };
+                CharSequence[] options = {"Goal", "Affirmation", "Schedule"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext())
+                        .setTitle("Choose:")
+                        .setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0: // Goals
+                                        alertDialog(R.layout.dialog_add_goals, R.id.goal_edit_text);
+                                        break;
 
-        mAddGoals.setOnClickListener(onClickListener);
-        mAddAffirmations.setOnClickListener(onClickListener);
-        mAddSchedule.setOnClickListener(onClickListener);
+                                    case 1: // Affirmations
+                                        alertDialog(R.layout.dialog_add_affirmations, R.id.affirmations_edit_text);
+                                        break;
+
+                                    case 2: // Schedule
+                                        alertDialog(R.layout.dialog_add_schedule, R.id.schedule_edit_text);
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                            showDialog(DIALOG_ID);
+                                        }
+                                        break;
+
+                                    default:
+                                        break;
+                                }
+                            }
+                        });
+                builder.create().show();
+            }
+        });
     }
 
     @Override
@@ -174,6 +180,7 @@ public class DailyActivity extends AppCompatActivity {
                     case R.id.schedule_edit_text:
                         String time = getTimeFromTimePicker(mTimePicker);
                         Schedule schedule = new Schedule(currentDate, time + input);
+
                         databaseHelper.insertSchedule(schedule);
                         mScheduleList.add(schedule);
                         mScheduleAdapter.notifyItemInserted(mScheduleList.size() - 1);
