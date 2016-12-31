@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.ImageView;
@@ -40,7 +41,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailRepsActivity extends AppCompatActivity implements View.OnClickListener{
+public class DetailRepsActivity extends AppCompatActivity
+        implements View.OnClickListener,
+        Toolbar.OnMenuItemClickListener{
 
     private DetailRepsPagerAdapter mDetailRepsPagerAdapter;
     private ViewPager mViewPager;
@@ -99,6 +102,7 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
         TabLayout tabLayout = (TabLayout) findViewById(R.id.detail_reps_tabs);
         tabLayout.setupWithViewPager(mViewPager);
     }
+
 
     /*---------------------------------------------------------------------------------
     // On Click AREA
@@ -172,6 +176,14 @@ public class DetailRepsActivity extends AppCompatActivity implements View.OnClic
                 });
                 break;
         }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId()==android.R.id.home) {
+            finish();
+        }
+        return false;
     }
     
     /*---------------------------------------------------------------------------------

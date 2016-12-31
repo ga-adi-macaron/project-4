@@ -6,5 +6,6 @@
     <string name="district">district</string>
     <string name="contact_information">Contact / Information:</string>
     <string name="is_first">is first</string>
-
+    <string name="app_name">Political Local</string>
+    <string name="bill_fragment">bill</string>
 </resources>

@@ -14,6 +14,11 @@ import retrofit2.http.Query;
  */
 
 public interface PropublicaService {
+    /**
+     *
+     * @param offSet in multiple of 20
+     * @return list of recent bill
+     */
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
     @GET("/congress/v1/114/house/bills/passed.json")
     Call<RecentBills> getRecentBills(@Query("offset") int offSet);
