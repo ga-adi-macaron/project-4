@@ -2,6 +2,7 @@ package com.joelimyx.politicallocal.main;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -13,10 +14,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageRequest;
@@ -25,6 +29,9 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.joelimyx.politicallocal.LoginActivity;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.BillFragment;
 import com.joelimyx.politicallocal.database.DBAssetHelper;
@@ -58,23 +65,35 @@ public class MainActivity extends AppCompatActivity
     private static final String TWITTER_KEY = "V2RCaymY8YS5r2hQLtKPf1A5s";
     private static final String TWITTER_SECRET = "FX3mhvuWzZQJkBxF6Idm8SwrJdwPamBh8yL3UgYTyfYP9pwKCd";
 
-
+    //Request Code and tag
     private static final String TAG = "MainActivity";
     public static final int LOCATION_REQUEST_CODE = 1;
+    public static final int SIGNIN_REQUEST_CODE = 2;
 
+    //Main Menu View
     private FloatingSearchView mSearchView;
+    private BottomNavigationView mBottomNavigationView;
 
+    //Google and Firebase
     private GoogleApiClient mGoogleApiClient;
-    private String mState;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseUser mUser;
+
+    //Local variables
+    private boolean mIsFirst;
+    private OnBottomMenuItemSelectedListener mListener;
 
     public static final String district_base_URL = "https://congress.api.sunlightfoundation.com/";
-
 
     @Override
     protected void onStart() {
         super.onStart();
         // TODO: 12/17/16 Call this only once to get location
-        mGoogleApiClient.connect();
+        if (!mIsFirst) {
+            mGoogleApiClient.connect();
+        }
+        mAuth.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
@@ -87,6 +106,23 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
+        mIsFirst = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE).getBoolean(getString(R.string.is_first),true);
+
+        /*---------------------------------------------------------------------------------
+        // Sign In AREA
+        ---------------------------------------------------------------------------------*/
+        if (mIsFirst) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, SIGNIN_REQUEST_CODE);
+        }
+        mAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = firebaseAuth -> {
+            mUser = firebaseAuth.getCurrentUser();
+            if (mUser!=null){
+                Log.d(TAG, "onCreate: "+mUser.getDisplayName());
+            }
+        };
+
         //DBAsset to grab data from database
         new AsyncTask<Void, Void, Void>(){
             @Override
@@ -96,9 +132,6 @@ public class MainActivity extends AppCompatActivity
                 return null;
             }
         }.execute();
-
-        SharedPreferences preferences = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE);
-        mState = preferences.getString(getString(R.string.state),null);
 
         //Instantiate google api
         if (mGoogleApiClient == null) {
@@ -119,15 +152,35 @@ public class MainActivity extends AppCompatActivity
         /*---------------------------------------------------------------------------------
         // Bottom Nav Bar
         ---------------------------------------------------------------------------------*/
-        BottomNavigationView bottomBar = (BottomNavigationView) findViewById(R.id.bottom_bar);
-        bottomBar.setOnNavigationItemSelectedListener(this);
+        mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_bar);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(this);
 
         //todo: Default show as news fragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_container, BillFragment.newInstance())
+                .replace(R.id.main_container, BillFragment.newInstance(),getString(R.string.bill_fragment))
                 .commit();
-        bottomBar.getMenu().getItem(2).setChecked(true);
+        mBottomNavigationView.getMenu().getItem(2).setChecked(true);
+    }
+
+    /*---------------------------------------------------------------------------------
+    // Sign In Result AREA
+    ---------------------------------------------------------------------------------*/
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==SIGNIN_REQUEST_CODE){
+            if (resultCode==RESULT_OK){
+                if (data!=null && data.getBooleanExtra("back",true)){
+                    Log.d(TAG, "onActivityResult: back");
+                    finish();
+                }else {
+                    Log.d(TAG, "onActivityResult: connec");
+                    mGoogleApiClient.connect();
+                }
+            }
+        }
     }
 
     /*---------------------------------------------------------------------------------
@@ -135,26 +188,34 @@ public class MainActivity extends AppCompatActivity
     ---------------------------------------------------------------------------------*/
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        FragmentManager transaction = getSupportFragmentManager();
         switch (item.getItemId()) {
             case R.id.reps:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_container, RepsFragment.newInstance(mState))
-                        .commit();
+                String state = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE).getString(getString(R.string.state),null);
+                transaction
+                    .beginTransaction()
+                    .replace(R.id.main_container, RepsFragment.newInstance(state))
+                    .commit();
                 break;
 
             case R.id.news:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_container, NewsFragment.newInstance())
-                        .commit();
+                transaction
+                    .beginTransaction()
+                    .replace(R.id.main_container, NewsFragment.newInstance())
+                    .commit();
                 break;
 
             case R.id.bills:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.main_container, BillFragment.newInstance())
-                        .commit();
+                if (!(transaction.findFragmentByTag(getString(R.string.bill_fragment)) instanceof BillFragment)) {
+                    BillFragment temp = BillFragment.newInstance();
+                    transaction
+                            .beginTransaction()
+                            .replace(R.id.main_container, temp, getString(R.string.bill_fragment))
+                            .commit();
+                    mListener = temp.getListener();
+                }else {
+                    mListener.OnBottomMenuItemSelected(getString(R.string.bill_fragment));
+                }
                 break;
         }
         return true;
@@ -200,6 +261,14 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
+        mAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    //For hiding and showing the search view relative to the scroll
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        mSearchView.setTranslationY(verticalOffset);
+        mBottomNavigationView.setTranslationY(verticalOffset*-1);
     }
 
     /*---------------------------------------------------------------------------------
@@ -272,8 +341,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        mSearchView.setTranslationY(verticalOffset);
+    /*---------------------------------------------------------------------------------
+    // Interface AREA
+    ---------------------------------------------------------------------------------*/
+    public interface OnBottomMenuItemSelectedListener{
+        /**
+         * To smooth scroll to top of the list when the same bottom menu is selected
+         * @param tag fragment tags
+         */
+        void OnBottomMenuItemSelected(String tag);
     }
 }

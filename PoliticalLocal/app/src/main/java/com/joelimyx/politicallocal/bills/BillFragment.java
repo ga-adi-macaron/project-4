@@ -19,6 +19,7 @@ import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.detail.DetailBillActivity;
 import com.joelimyx.politicallocal.bills.gson.Bill;
 import com.joelimyx.politicallocal.bills.gson.RecentBills;
+import com.joelimyx.politicallocal.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +31,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BillFragment extends Fragment
-        implements BillAdapter.OnBillItemSelectedListener, SwipeRefreshLayout.OnRefreshListener{
+        implements BillAdapter.OnBillItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener, MainActivity.OnBottomMenuItemSelectedListener{
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
+
     private SwipeRefreshLayout mRefreshLayout;
     private BillAdapter mAdapter;
+    private RecyclerView mRecyclerView;
 
     private Retrofit mRetrofit;
 
@@ -57,10 +61,10 @@ public class BillFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        RecyclerView billRecyclerview = (RecyclerView) view.findViewById(R.id.bill_recyclerview);
-        billRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.bill_recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mAdapter = new BillAdapter(new ArrayList<>(),this);
-        billRecyclerview.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.bill_swiperefresh);
         mRefreshLayout.setOnRefreshListener(this);
@@ -83,6 +87,9 @@ public class BillFragment extends Fragment
         getActivity().startActivity(intent);
     }
 
+    public MainActivity.OnBottomMenuItemSelectedListener getListener(){
+        return this;
+    }
     /*---------------------------------------------------------------------------------
     // Helper Method
     ---------------------------------------------------------------------------------*/
@@ -109,4 +116,9 @@ public class BillFragment extends Fragment
         });
     }
 
+    @Override
+    public void OnBottomMenuItemSelected(String tag) {
+        if (tag.equals(getString(R.string.bill_fragment)))
+           mRecyclerView.smoothScrollToPosition(0);
+    }
 }

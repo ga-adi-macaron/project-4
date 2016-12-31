@@ -20,7 +20,7 @@ import com.joelimyx.politicallocal.reps.detail.DetailRepsActivity;
 public class RepsFragment extends Fragment
         implements RepsAdapter.OnRepsItemSelectedListener{
     private RepsAdapter mAdapter;
-    private static final String TAG = "RepsFragment";
+
     public static final String ARG_STATE = "state";
 
     public RepsFragment() {

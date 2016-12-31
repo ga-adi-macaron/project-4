@@ -1,6 +1,7 @@
 package com.joelimyx.politicallocal.bills.detail.update;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ public class UpdateAdapter extends RecyclerView.Adapter<UpdateAdapter.UpdateView
     @Override
     public void onBindViewHolder(UpdateViewHolder holder, int position) {
         Action current = mActionList.get(position);
-        holder.mUpdateAction.setText(current.getDescription());
+        holder.mUpdateAction.setText(Html.fromHtml(current.getDescription()));
         String date = current.getDatetime().substring(0,10);
         holder.mUpdateTime.setText(date);
     }
