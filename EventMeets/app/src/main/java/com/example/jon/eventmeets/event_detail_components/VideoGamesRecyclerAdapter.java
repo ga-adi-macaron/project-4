@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.game_models.VideoGamingEvent;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,34 +32,36 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     @Override
     public void onBindViewHolder(VideoGameViewHolder holder, int position) {
         VideoGamingEvent event = mVideogames.get(position);
-        String[] platforms = event.getPlatforms();
-        ArrayList<String> consolidated = new ArrayList<>(7);
+
+        holder.mGameTitle.setText(event.getName());
+
+        if(event.getImage() != null&&event.getImage().getThumb_url() != null)
+            Picasso.with(holder.mCoverArt.getContext()).load(event.getImage().getThumb_url()).into(holder.mCoverArt);
+
+        ArrayList<VideoGamePlatforms> platforms = event.getPlatforms();
         boolean hasNintendo = false;
         boolean hasXbox = false;
         boolean hasPc = false;
         boolean hasPlaystation = false;
-        for(int i=0;i<platforms.length;i++) {
-            switch(platforms[i]) {
+        for(int i=0;i<platforms.size();i++) {
+            switch(platforms.get(i).getName()) {
                 case "Game Boy":
                 case "Game Boy Advance":
                 case "Game Boy Color":
                 case "Super Nintendo Entertainment System":
                 case "Nintendo Entertainment System":
                     //Classic Nintendo
-                    consolidated.add("GB");
                     break;
                 case "Mac":
                 case "PC":
                 case "Linux":
                     //Computer
-                    consolidated.add("PC");
                     hasPc = true;
                     break;
                 case "Nintendo 3DS":
                 case "New Nintendo 3DS":
                 case "Nintendo DS":
                     //Modern Nintendo Handhelds
-                    consolidated.add("DS");
                     break;
                 case "Nintendo Switch":
                 case "Wii U":
@@ -66,14 +69,12 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                 case "Wii":
                 case "Nintendo 64":
                     //Modern Nintendo Consoles
-                    consolidated.add("NTN");
                     hasNintendo = true;
                     break;
                 case "Xbox One":
                 case "Xbox 360":
                 case "Xbox":
                     //Microsoft Consoles
-                    consolidated.add("XBX");
                     hasXbox = true;
                     break;
                 case "PlayStation 4":
@@ -81,27 +82,33 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                 case "PlayStation 2":
                 case "PlayStation":
                     //Sony Consoles
-                    consolidated.add("PS");
                     hasPlaystation = true;
                     break;
                 case "PlayStation Portable":
                 case "PlayStation Vita":
                     //Sony Handhelds
-                    consolidated.add("PSP");
                     break;
             }
         }
         if(hasNintendo) {
             holder.mNintendo.setVisibility(View.VISIBLE);
+        } else {
+            holder.mNintendo.setVisibility(View.INVISIBLE);
         }
         if(hasPc) {
             holder.mPc.setVisibility(View.VISIBLE);
+        } else {
+            holder.mPc.setVisibility(View.INVISIBLE);
         }
         if(hasXbox) {
             holder.mXbox.setVisibility(View.VISIBLE);
+        } else {
+            holder.mXbox.setVisibility(View.INVISIBLE);
         }
         if(hasPlaystation) {
             holder.mPlaystation.setVisibility(View.VISIBLE);
+        } else {
+            holder.mPlaystation.setVisibility(View.INVISIBLE);
         }
     }
 

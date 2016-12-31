@@ -61,7 +61,7 @@ class MainMenuPresenter implements MainMenuContract.Presenter {
                 randomEvent = new DrinkEventParent();
                 break;
             case 3:
-                randomEvent = new VideoGamingEvent("title", "category", false);
+                randomEvent = new DrinkEventParent();
                 break;
             case 4:
                 randomEvent = new HikingEvent("hiking", "nature", "location");

@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.event_category.CategoryWithSubsActivity;
+import com.example.jon.eventmeets.event_detail_components.VideoGameEventsActivity;
 
 public class EventBrowseViewActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mConversation, mDrink, mGame, mNature, mTaste, mTheater;
@@ -35,7 +36,7 @@ public class EventBrowseViewActivity extends AppCompatActivity implements View.O
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        String category;
+        String category = "";
         switch(id) {
             case R.id.category_conversation:
                 category = "conversation";
@@ -44,7 +45,8 @@ public class EventBrowseViewActivity extends AppCompatActivity implements View.O
                 category = "drink";
                 break;
             case R.id.category_game:
-                category = "game";
+                Intent intent = new Intent(this, VideoGameEventsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.category_nature:
                 category = "nature";
@@ -58,8 +60,8 @@ public class EventBrowseViewActivity extends AppCompatActivity implements View.O
             default:
                 category = "error";
         }
-        Intent intent = new Intent(this, CategoryWithSubsActivity.class);
-        intent.putExtra("category", category);
-        startActivity(intent);
+//        Intent intent = new Intent(this, CategoryWithSubsActivity.class);
+//        intent.putExtra("category", category);
+//        startActivity(intent);
     }
 }
