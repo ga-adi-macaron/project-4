@@ -44,11 +44,7 @@ public class SponsorsAdapter extends RecyclerView.Adapter<SponsorsAdapter.Sponso
     public void onBindViewHolder(SponsorViewHolder holder, int position) {
         Sponsor current = mSponsors.get(position);
 
-        if (current.isMajor()){
-            holder.mSponsorItem.setBackgroundColor(Color.parseColor("#EF6C00"));
-        }else{
-            holder.mSponsorItem.setBackgroundColor(Color.parseColor("#fff4d3"));
-        }
+        holder.mSponsorItem.setBackgroundColor(Color.parseColor("#fff4d3"));
 
         Picasso.with(mContext)
                 .load("https://theunitedstates.io/images/congress/original/"+current.getBioId()+".jpg")
@@ -82,13 +78,9 @@ public class SponsorsAdapter extends RecyclerView.Adapter<SponsorsAdapter.Sponso
      * @param sponsor sponsor variable to be added to list and update recyclerview
      */
     void addSponsorToList(Sponsor sponsor){
-        if (sponsor.isMajor()) {
-            mSponsors.add(0,sponsor);
-            notifyItemInserted(0);
-        }else {
             mSponsors.add(sponsor);
             notifyItemInserted(mSponsors.size() - 1);
-        }
+
     }
 
     class SponsorViewHolder extends RecyclerView.ViewHolder {
