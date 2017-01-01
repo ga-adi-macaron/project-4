@@ -95,7 +95,9 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                         String username = mAccountName.getText().toString();
                         String password = mPassword.getText().toString();
                         String confirm = mHiddenConfirm.getText().toString();
-                        mPresenter.onNewAccountRequested(username, password, confirm);
+                        String firstName = mFirstName.getText().toString();
+                        String lastName = mLastName.getText().toString();
+                        mPresenter.onNewAccountRequested(username, password, confirm,firstName ,lastName);
                     }
                 });
                 break;
@@ -118,6 +120,22 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
             revertOnClickListener(mCreateAccount);
         } else {
             mHiddenConfirm.setError(result);
+        }
+    }
+
+    void displayError(String error) {
+        switch(error) {
+            case "passwords":
+                mPassword.setError("Passwords Must Match");
+                break;
+            case "empty":
+                mAccountName.setError("All Fields Required");
+                break;
+            case "invalid":
+                mAccountName.setError("Invalid Username and/or Password");
+                break;
+            default:
+                Toast.makeText(getContext(), "Whoops", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -71,8 +71,8 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     }
 
     @Override
-    public void notifyFragmentFailure() {
-        mFragment.showAccountCreationResult("failure");
+    public void notifyFragmentFailure(String reason) {
+        mFragment.showAccountCreationResult(reason);
     }
 
     @Override
@@ -87,6 +87,11 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     public void addAccountInfoToSharedPreferences(String username, String password) {
         SharedPreferences preferences = getSharedPreferences("account", MODE_PRIVATE);
         preferences.edit().putString("username", username).putString("password", password).apply();
+    }
+
+    @Override
+    public void sendLoginErrorToFragment(String error) {
+        mFragment.displayError(error);
     }
 
     @Override

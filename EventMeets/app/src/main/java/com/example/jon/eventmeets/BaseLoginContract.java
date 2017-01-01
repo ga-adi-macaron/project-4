@@ -15,11 +15,13 @@ public interface BaseLoginContract {
 
         void notifyFragmentSuccess();
 
-        void notifyFragmentFailure();
+        void notifyFragmentFailure(String reason);
 
         void checkSharedPreferences();
 
         void addAccountInfoToSharedPreferences(String username, String password);
+
+        void sendLoginErrorToFragment(String error);
     }
 
     interface Presenter {
@@ -33,7 +35,7 @@ public interface BaseLoginContract {
 
         void onUserReturn(String username, String password);
 
-        void onNewAccountRequested(String username, String password, String confirmPassword);
+        void onNewAccountRequested(String username, String password, String confirmPassword, String firstName, String lastName);
 
         void addFirebaseListener();
 

@@ -30,6 +30,13 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
+            <ImageView
+                app:layout_collapseMode="parallax"
+                android:id="@+id/screen_image"
+                android:layout_gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="124dp"/>
+
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 

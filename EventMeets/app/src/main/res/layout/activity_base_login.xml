@@ -4,15 +4,18 @@
     android:id="@+id/activity_base_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+                android:background="#bdbdbd"
     tools:context="com.example.jon.eventmeets.BaseLoginActivity">
 
     <Button
+        android:background="@drawable/button_shape"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:id="@+id/login_main_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:elevation="6dp"
         android:text="@string/login"/>
 
     <Button

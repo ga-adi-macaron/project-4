@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.example.jon.eventmeets.model.BaseUser;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +40,6 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     @Override
     public void notifyLoginSuccess(boolean wasSuccessful) {
         if (wasSuccessful) {
-            Toast.makeText((BaseLoginActivity)mView, "Logged In Successfully", Toast.LENGTH_SHORT).show();
             mView.startMainMenuActivity();
         } else {
             Toast.makeText((BaseLoginActivity)mView, "Invalid Credentials", Toast.LENGTH_SHORT).show();
@@ -53,16 +53,22 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
 
     @Override
     public void checkLoginDetails(final String username, final String password) {
-        mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(
-                new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()) {
-                            mView.addAccountInfoToSharedPreferences(username, password);
-                            notifyLoginSuccess(true);
+        if(username != null&&username.length() > 0&&password != null&&password.length() > 0) {
+            mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(
+                    new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (!task.isSuccessful()) {
+                                mView.sendLoginErrorToFragment("invalid");
+                            } else {
+                                mView.addAccountInfoToSharedPreferences(username,password);
+                                notifyLoginSuccess(true);
+                            }
                         }
-                    }
-                });
+                    });
+        } else {
+            mView.sendLoginErrorToFragment("empty");
+        }
     }
 
     @Override
@@ -74,22 +80,16 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     }
 
     @Override
-    public void onNewAccountRequested(String username, String password, String confirmPassword) {
+    public void onNewAccountRequested(String username, String password, String confirmPassword, String firstName, String lastName) {
 
-        if(password.equals(confirmPassword)) {
-            mAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(
-                    new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (!task.isSuccessful()) {
-                                mView.notifyFragmentFailure();
-                            } else {
-                                mView.notifyFragmentSuccess();
-                                String userKey = mAuth.getCurrentUser().getUid();
-                                addUserToDatabase(userKey);
-                            }
-                        }
-                    });
+        if(username.length() > 0&&password.length() > 0&&firstName.length() > 0&&lastName.length() > 0) {
+            if (password.equals(confirmPassword)) {
+                requestAccount(username, password, firstName, lastName);
+            } else {
+                mView.sendLoginErrorToFragment("passwords");
+            }
+        } else {
+            mView.sendLoginErrorToFragment("empty");
         }
     }
 
@@ -103,10 +103,26 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
         mAuth.removeAuthStateListener(mAuthListener);
     }
 
-    private void addUserToDatabase(String userKey) {
+    private void addUserToDatabase(String userKey, String first, String last) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("users");
-        BaseUser user = new BaseUser(userKey, "Jon");
+        BaseUser user = new BaseUser(userKey, first, last);
         ref.child(userKey).setValue(user);
+    }
+
+    private void requestAccount(String username, String password, final String first, final String last) {
+        mAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(
+                new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            mView.notifyFragmentFailure(task.getResult().toString());
+                        } else {
+                            mView.notifyFragmentSuccess();
+                            String userKey = mAuth.getCurrentUser().getUid();
+                            addUserToDatabase(userKey, first, last);
+                        }
+                    }
+                });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jon.eventmeets.event_detail_components;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,9 +18,12 @@ public class VideoGameViewHolder extends RecyclerView.ViewHolder {
     public TextView mGameTitle;
     public ImageView mCoverArt;
     public RelativeLayout mGameLayout;
+    public Context mContext;
 
     public VideoGameViewHolder(View itemView) {
         super(itemView);
+        mContext = itemView.getContext();
+
         mGameLayout = (RelativeLayout)itemView.findViewById(R.id.game_result_layout);
 
         mNintendo = (ImageView)itemView.findViewById(R.id.nintendo_platform);

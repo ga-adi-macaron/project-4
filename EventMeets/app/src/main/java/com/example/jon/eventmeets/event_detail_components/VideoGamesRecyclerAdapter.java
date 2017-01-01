@@ -1,6 +1,7 @@
 package com.example.jon.eventmeets.event_detail_components;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import java.util.List;
 public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameViewHolder> {
     private List<VideoGamingEvent> mVideogames;
     private Intent mIntent;
+    private boolean mNintendo, mXbox, mPc, mPlaystation;
 
     public VideoGamesRecyclerAdapter(List<VideoGamingEvent> list) {
         mVideogames = list;
@@ -32,26 +34,20 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     }
 
     @Override
-    public void onBindViewHolder(VideoGameViewHolder holder, int position) {
-        VideoGamingEvent event = mVideogames.get(position);
+    public void onBindViewHolder(final VideoGameViewHolder holder, int position) {
+        final VideoGamingEvent event = mVideogames.get(position);
 
         holder.mGameTitle.setText(event.getName());
 
         if(event.getImage() != null&&event.getImage().getThumb_url() != null)
-            Picasso.with(holder.mCoverArt.getContext()).load(event.getImage().getThumb_url()).into(holder.mCoverArt);
+            Picasso.with(holder.mContext).load(event.getImage().getThumb_url()).into(holder.mCoverArt);
 
-        holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         ArrayList<VideoGamePlatforms> platforms = event.getPlatforms();
-        boolean hasNintendo = false;
-        boolean hasXbox = false;
-        boolean hasPc = false;
-        boolean hasPlaystation = false;
+        mNintendo = false;
+        mXbox = false;
+        mPc = false;
+        mPlaystation = false;
         for(int i=0;i<platforms.size();i++) {
             switch(platforms.get(i).getName()) {
                 case "Game Boy":
@@ -65,7 +61,7 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                 case "PC":
                 case "Linux":
                     //Computer
-                    hasPc = true;
+                    mPc = true;
                     break;
                 case "Nintendo 3DS":
                 case "New Nintendo 3DS":
@@ -78,20 +74,20 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                 case "Wii":
                 case "Nintendo 64":
                     //Modern Nintendo Consoles
-                    hasNintendo = true;
+                    mNintendo = true;
                     break;
                 case "Xbox One":
                 case "Xbox 360":
                 case "Xbox":
                     //Microsoft Consoles
-                    hasXbox = true;
+                    mXbox = true;
                     break;
                 case "PlayStation 4":
                 case "PlayStation 3":
                 case "PlayStation 2":
                 case "PlayStation":
                     //Sony Consoles
-                    hasPlaystation = true;
+                    mPlaystation = true;
                     break;
                 case "PlayStation Portable":
                 case "PlayStation Vita":
@@ -99,26 +95,43 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                     break;
             }
         }
-        if(hasNintendo) {
+        if(mNintendo) {
             holder.mNintendo.setVisibility(View.VISIBLE);
         } else {
             holder.mNintendo.setVisibility(View.INVISIBLE);
         }
-        if(hasPc) {
+        if(mPc) {
             holder.mPc.setVisibility(View.VISIBLE);
         } else {
             holder.mPc.setVisibility(View.INVISIBLE);
         }
-        if(hasXbox) {
+        if(mXbox) {
             holder.mXbox.setVisibility(View.VISIBLE);
         } else {
             holder.mXbox.setVisibility(View.INVISIBLE);
         }
-        if(hasPlaystation) {
+        if(mPlaystation) {
             holder.mPlaystation.setVisibility(View.VISIBLE);
         } else {
             holder.mPlaystation.setVisibility(View.INVISIBLE);
         }
+
+        holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIntent = new Intent(holder.mContext, EventDetailActivity.class);
+
+                mIntent.putExtra("id'", event.getId());
+                mIntent.putExtra("name", event.getName());
+                mIntent.putExtra("image", event.getImage().getScreen_url());
+                mIntent.putExtra("nintendo", mNintendo);
+                mIntent.putExtra("pc", mPc);
+                mIntent.putExtra("xbox", mXbox);
+                mIntent.putExtra("playstation", mPlaystation);
+
+                holder.mContext.startActivity(mIntent);
+            }
+        });
     }
 
     @Override
