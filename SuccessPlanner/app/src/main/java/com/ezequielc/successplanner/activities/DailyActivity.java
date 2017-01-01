@@ -64,7 +64,7 @@ public class DailyActivity extends AppCompatActivity {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         String dayOfWeek = getIntent().getStringExtra(MainActivity.DAY_OF_WEEK);
         String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
-        mCurrentDate.setText(dayOfWeek + ", " + currentDate);
+        mCurrentDate.setText(dayOfWeek);
 
         // RecyclerView for Goals
         mGoalList = databaseHelper.getGoalsForDate(currentDate);

@@ -54,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, month, dayOfMonth);
-                int calendarDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                String dayOfWeek = "";
 
-                switch (calendarDayOfWeek) {
+                String dayOfWeek = "";
+                String monthString = "";
+
+                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
                     case Calendar.MONDAY:
                         dayOfWeek = "Monday";
                         break;
@@ -83,8 +84,49 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
+                switch (calendar.get(Calendar.MONTH)) {
+                    case Calendar.JANUARY:
+                        monthString = "January";
+                        break;
+                    case Calendar.FEBRUARY:
+                        monthString = "February";
+                        break;
+                    case Calendar.MARCH:
+                        monthString = "March";
+                        break;
+                    case Calendar.APRIL:
+                        monthString = "April";
+                        break;
+                    case Calendar.MAY:
+                        monthString = "May";
+                        break;
+                    case Calendar.JUNE:
+                        monthString = "June";
+                        break;
+                    case Calendar.JULY:
+                        monthString = "July";
+                        break;
+                    case Calendar.AUGUST:
+                        monthString = "August";
+                        break;
+                    case Calendar.SEPTEMBER:
+                        monthString = "September";
+                        break;
+                    case Calendar.OCTOBER:
+                        monthString = "October";
+                        break;
+                    case Calendar.NOVEMBER:
+                        monthString = "November";
+                        break;
+                    case Calendar.DECEMBER:
+                        monthString = "December";
+                        break;
+                    default:
+                        break;
+                }
+
                 Intent intent = new Intent(MainActivity.this, DailyActivity.class);
-                intent.putExtra(DAY_OF_WEEK, dayOfWeek);
+                intent.putExtra(DAY_OF_WEEK, dayOfWeek + ":  " + monthString + " " + dayOfMonth + ", " + year);
                 intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
                 startActivity(intent);
             }
