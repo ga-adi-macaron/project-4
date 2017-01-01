@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
-    List<Bill> mBillList;
+    private List<Bill> mBillList;
     private OnBillItemSelectedListener mListener;
 
     interface OnBillItemSelectedListener {
@@ -57,17 +57,23 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder
         return mBillList.size();
     }
 
-    public void swapData(List<Bill> newBills){
+    void swapData(List<Bill> newBills){
         mBillList.clear();
         mBillList = newBills;
         notifyDataSetChanged();
+    }
+
+    void addData(List<Bill> newBills){
+        int temp = mBillList.size();
+        mBillList.addAll(newBills);
+        notifyItemRangeInserted(temp,newBills.size());
     }
 
     class BillViewHolder extends RecyclerView.ViewHolder{
         private TextView mBillNumber, mBillTitle;
         private LinearLayout mBillItem;
 
-        public BillViewHolder(View itemView) {
+        BillViewHolder(View itemView) {
             super(itemView);
             mBillNumber = (TextView) itemView.findViewById(R.id.list_bill_number);
             mBillTitle= (TextView) itemView.findViewById(R.id.list_bill_title);

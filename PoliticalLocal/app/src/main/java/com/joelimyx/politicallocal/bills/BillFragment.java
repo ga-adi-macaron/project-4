@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.joelimyx.politicallocal.EndlessRecyclerViewScrollListener;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.detail.DetailBillActivity;
 import com.joelimyx.politicallocal.bills.gson.Bill;
@@ -35,6 +36,7 @@ public class BillFragment extends Fragment
         SwipeRefreshLayout.OnRefreshListener, MainActivity.OnBottomMenuItemSelectedListener{
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
+    private static final String TAG = "BillFragment";
 
     private SwipeRefreshLayout mRefreshLayout;
     private BillAdapter mAdapter;
@@ -62,7 +64,8 @@ public class BillFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.bill_recyclerview);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(manager);
         mAdapter = new BillAdapter(new ArrayList<>(),this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -72,39 +75,44 @@ public class BillFragment extends Fragment
                 .baseUrl(propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        makeCall();
+        makeCall(0);
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener((LinearLayoutManager) manager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d(TAG, "onLoadMore: "+page);
+                makeCall(page);
+            }
+        });
     }
 
     @Override
     public void onRefresh() {
-        makeCall();
-    }
-
-    @Override
-    public void onBillItemSelected(String billId) {
-        Intent intent = new Intent(getContext(), DetailBillActivity.class);
-        intent.putExtra("id",billId.toLowerCase());
-        getActivity().startActivity(intent);
+        makeCall(0);
     }
 
     public MainActivity.OnBottomMenuItemSelectedListener getListener(){
         return this;
     }
+
     /*---------------------------------------------------------------------------------
-    // Helper Method
+    // Helper Method AREA
     ---------------------------------------------------------------------------------*/
     /**
      * Enqueue call from Propublica Service
      */
-    private void makeCall(){
+    private void makeCall(int page){
         mRefreshLayout.setRefreshing(true);
 
-        Call<RecentBills> call = mRetrofit.create(PropublicaService.class).getRecentBills(0);
+        Call<RecentBills> call = mRetrofit.create(PropublicaService.class).getRecentBills(page*20);
         call.enqueue(new Callback<RecentBills>() {
             @Override
             public void onResponse(Call<RecentBills> call, Response<RecentBills> response) {
                 List<Bill> bills = response.body().getResults().get(0).getBills();
-                mAdapter.swapData(bills);
+                if (page>0){
+                    mAdapter.addData(bills);
+                }else {
+                    mAdapter.swapData(bills);
+                }
                 mRefreshLayout.setRefreshing(false);
             }
 
@@ -116,9 +124,19 @@ public class BillFragment extends Fragment
         });
     }
 
+    /*---------------------------------------------------------------------------------
+    // Interface AREA
+    ---------------------------------------------------------------------------------*/
+    @Override
+    public void onBillItemSelected(String billId) {
+        Intent intent = new Intent(getContext(), DetailBillActivity.class);
+        intent.putExtra("id",billId.toLowerCase());
+        getActivity().startActivity(intent);
+    }
+
     @Override
     public void OnBottomMenuItemSelected(String tag) {
-        if (tag.equals(getString(R.string.bill_fragment)))
+        if (tag.equals(getString(R.string.bill_fragment)) )
            mRecyclerView.smoothScrollToPosition(0);
     }
 }
