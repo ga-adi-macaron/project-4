@@ -7,16 +7,14 @@ package com.joelimyx.politicallocal.bills.detail.sponsors.detail;
 public class Sponsor {
     private String mBioId, mName, mState, mParty, mChamber;
     private int mDistrictRank;
-    private boolean mIsMajor;
 
-    public Sponsor(String bioId, String name, String state, String party, String chamber, int districtRank, boolean isMajor) {
+    public Sponsor(String bioId, String name, String state, String party, String chamber, int districtRank) {
         mBioId = bioId;
         mName = name;
         mState = state;
         mParty = party;
         mDistrictRank = districtRank;
         mChamber = chamber;
-        mIsMajor = isMajor;
     }
 
     public String getBioId() {
@@ -47,7 +45,4 @@ public class Sponsor {
         return mDistrictRank;
     }
 
-    public boolean isMajor() {
-        return mIsMajor;
-    }
 }
