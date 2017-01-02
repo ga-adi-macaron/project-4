@@ -1,12 +1,14 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -50,6 +52,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     public static final String OPPONENT_QUIT_MESSAGE = "opponent quit";
     public static final String TOO_MANY_GUESSES_MESSAGE = "too many guesses";
     public static final String OPPONENT_FINISHED_MESSAGE = "opponent finished";
+    public static final String INTERFERENCE_MESSAGE = "interference";
+    public static final String BOMB_MESSAGE = "Bomb";
     private boolean mOpponentQuit, mOpponentDisconnected, mOpponentTooManyGuesses, mOpponentFinished;
     private boolean mUserDisconnected;
     private String mRoomID;
@@ -113,12 +117,12 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             @Override
             public void onClick(View view) {
                 mWeapon2Clicked = !mWeapon2Clicked;
-                if (!mWeapon2.equals("none") && !mWeapon2Clicked){
+                if (!mWeapon2.equals("none") && mWeapon2Clicked == true){
                     weapon2Image.setColorFilter(getResources().getColor(R.color.colorAccent));
                     mWeapon1Clicked = false;
                     weapon1Image.setColorFilter(Color.WHITE);
                     adjustCardText(2);
-                } else if (!mWeapon2.equals("none") && mWeapon2Clicked){
+                } else if (!mWeapon2.equals("none") && mWeapon2Clicked == false){
                     weapon2Image.setColorFilter(Color.WHITE);
                     mWeaponSelected = "none";
                     mTimerView.setText("Race!");
@@ -139,10 +143,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 mTimerView.setText("Long press a box to drop Erase Bomb!");
                 break;
             case "spy":
-                mTimerView.setText("Long press the board to spy!");
+                mTimerView.setText("Long press below to spy!");
                 break;
             case "interference":
-                mTimerView.setText("Long press the board to deploy interference!");
+                mTimerView.setText("Long press blow to deploy interference!");
                 break;
             case "none":
                 mTimerView.setText("Race!");
@@ -254,7 +258,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 })
                 .setView(dialogView)
                 .create();
-        if(!RaceActivity.this.isFinishing()) {
+        if(!RaceActivity.this.isFinishing() && !RaceActivity.this.isDestroyed()) {
             dialog.show();
         }
 
@@ -389,21 +393,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             }
         }
         //Send a message to the opponent containing the box number whose contents will be erased
-        String message = "BOMB: "+boxNumber;
+        String message = BOMB_MESSAGE+boxNumber;
         byte[] data = message.getBytes();
         Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data,mRoomID);
         //Adjust the weapon image that was just used as well as the top card text
-        if (mWeapon1Clicked){
-            mWeapon1 = "none";
-            adjustCardText(1);
-            setWeaponImage(mWeapon1, (ImageView) findViewById(R.id.weapon1_image));
-            ((ImageView) findViewById(R.id.weapon1_image)).setColorFilter(Color.WHITE);
-        } else if (mWeapon2Clicked){
-            mWeapon2 = "none";
-            adjustCardText(2);
-            setWeaponImage(mWeapon2, (ImageView)findViewById(R.id.weapon2));
-            ((ImageView) findViewById(R.id.weapon2)).setColorFilter(Color.WHITE);
-        }
+        removeWeaponFromWeaponSlot();
         removeWeaponFromInventory("bomb");
     }
 
@@ -433,11 +427,15 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             }
         };
         spyTimer.start();
+        removeWeaponFromWeaponSlot();
         removeWeaponFromInventory("spy");
     }
 
     private void deployInterference(){
-
+        byte[] data = INTERFERENCE_MESSAGE.getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+        removeWeaponFromWeaponSlot();
+        removeWeaponFromInventory("interference");
     }
 
     /**
@@ -470,17 +468,33 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    /**
+     * Clears the weapon icon from the weapon slot at the top so it cannot be used twice.
+     */
+    private void removeWeaponFromWeaponSlot(){
+        if (mWeapon1Clicked){
+            mWeapon1 = "none";
+            adjustCardText(1);
+            setWeaponImage(mWeapon1, (ImageView) findViewById(R.id.weapon1_image));
+            ((ImageView) findViewById(R.id.weapon1_image)).setColorFilter(Color.WHITE);
+        } else if (mWeapon2Clicked){
+            mWeapon2 = "none";
+            adjustCardText(2);
+            setWeaponImage(mWeapon2, (ImageView)findViewById(R.id.weapon2_image));
+            ((ImageView) findViewById(R.id.weapon2_image)).setColorFilter(Color.WHITE);
+        }
+    }
+
     private void receiveBomb(int boxNumber){
+
         int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
         for (int i=0; i<boxCellIds.length; i++){
-            Log.d(TAG, "onRealTimeMessageReceived: VALUE IN KEY"+mKey[boxCellIds[i]]);
             if (mKey[boxCellIds[i]] == 0) {
-                Log.d(TAG, "onRealTimeMessageReceived: cell id = "+boxCellIds[i]);
                 mUserAnswers[boxCellIds[i]] = 0;
                 mCellViews.get(boxCellIds[i]).setText("");
             }
-            Log.d(TAG, "onRealTimeMessageReceived: "+mKey[boxCellIds[i]]);
         }
+        ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(2000);
         Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
         //Reset the choice tiles because one or more hidden tiles may need to be made visible again.
         for (int i=0; i<mChoiceTiles.size(); i++){
@@ -498,6 +512,50 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 }
             }
         }
+    }
+
+    private void receiveInterference(){
+        Toast.makeText(this, "Opponent used Interference!", Toast.LENGTH_SHORT).show();
+        CountDownTimer timer = new CountDownTimer(10000, 1000) {
+            @Override
+            public void onTick(long l) {
+                Log.d(TAG, "onTick: " + l);
+                boolean skip = false;
+                if (l < 1000 || l < 3000) {
+                    skip = false;
+                }
+                if (l <= 6000 && l >= 300) {
+                    skip = true;
+                }
+
+                for (int i = 0; i < mKey.length; i++) {
+                    if (mKey[i] != 0) {
+                        if (!skip) {
+                            mCellViews.get(i).setBackgroundColor(Color.rgb(75,75,75));
+                            mCellViews.get(i).setTextColor(Color.rgb(75,75,75));
+                        } else {
+                            mCellViews.get(i).setBackgroundColor(Color.TRANSPARENT);
+                            mCellViews.get(i).setTextColor(Color.BLACK);
+                        }
+                        skip = !skip;
+                    }
+                }
+            }
+
+
+            @Override
+            public void onFinish() {
+                for (int i=0; i<mCellViews.size(); i++){
+                    if (mOpponentCellsFilled[i] == 1){
+                        mCellViews.get(i).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
+                    } else {
+                        mCellViews.get(i).setBackgroundColor(Color.TRANSPARENT);
+                        mCellViews.get(i).setTextColor(Color.BLACK);
+                    }
+                }
+            }
+        };
+        timer.start();
     }
 
     private void launchNoMatchFoundDialog(){
@@ -673,7 +731,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             endGame(false);
         } else if(data.equals(STILL_CONNECTED_MESSAGE)){
             mStillConnected = true;
-        } else if (data.contains("BOMB: ")){
+        } else if(data.equals(INTERFERENCE_MESSAGE)){
+            receiveInterference();
+        } else if(data.contains(BOMB_MESSAGE)){
             int boxNumber = Character.getNumericValue(data.charAt(data.length()-1));
             receiveBomb(boxNumber);
         } else {
