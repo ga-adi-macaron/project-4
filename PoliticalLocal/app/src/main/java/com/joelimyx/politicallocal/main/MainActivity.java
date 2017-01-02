@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity
                     .beginTransaction()
                     .replace(R.id.main_container, RepsFragment.newInstance(state))
                     .commit();
+                mBottomNavigationView.setBackgroundColor(R.color.colorPrimary);
                 break;
 
             case R.id.news:
@@ -210,6 +212,7 @@ public class MainActivity extends AppCompatActivity
                             .replace(R.id.main_container, temp, getString(R.string.bill_fragment))
                             .commit();
                     mListener = temp.getListener();
+                    mBottomNavigationView.setBackgroundColor(Color.parseColor("#FB8C00"));
                 }else {
                     mListener.OnBottomMenuItemSelected(getString(R.string.bill_fragment));
                 }

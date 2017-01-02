@@ -20,8 +20,8 @@ public interface PropublicaService {
      * @return list of recent bill
      */
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
-    @GET("/congress/v1/114/house/bills/passed.json")
-    Call<RecentBills> getRecentBills(@Query("offset") int offSet);
+    @GET("/congress/v1/114/{chamber}/bills/{filter}.json")
+    Call<RecentBills> getRecentBills(@Path("chamber") String chamber, @Path("filter") String filter, @Query("offset") int offSet);
 
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
     @GET("/congress/v1/114/bills/{bill-id}.json")

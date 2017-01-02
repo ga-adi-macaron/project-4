@@ -4,8 +4,9 @@ package com.joelimyx.politicallocal.bills;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +34,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class BillFragment extends Fragment
         implements BillAdapter.OnBillItemSelectedListener,
-        SwipeRefreshLayout.OnRefreshListener, MainActivity.OnBottomMenuItemSelectedListener{
+        SwipeRefreshLayout.OnRefreshListener,
+        MainActivity.OnBottomMenuItemSelectedListener,
+        FilterDialogFragment.OnDialogPositiveClickedListener{
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
     private static final String TAG = "BillFragment";
@@ -75,19 +78,24 @@ public class BillFragment extends Fragment
                 .baseUrl(propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        makeCall(0);
+        // TODO: 1/1/17 Change this to dynamic
+        makeCall("senate", "passed", 0);
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener((LinearLayoutManager) manager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Log.d(TAG, "onLoadMore: "+page);
-                makeCall(page);
+                // TODO: 1/1/17 Change this to dynamic
+                makeCall("senate", "passed", page);
             }
         });
+
+        FloatingActionButton filterButton = (FloatingActionButton) view.findViewById(R.id.bill_filter_fab);
+        filterButton.setOnClickListener(v -> showDialog());
     }
 
     @Override
     public void onRefresh() {
-        makeCall(0);
+        // TODO: 1/1/17 Change this to dynamic
+        makeCall("senate", "passed", 0);
     }
 
     public MainActivity.OnBottomMenuItemSelectedListener getListener(){
@@ -100,10 +108,11 @@ public class BillFragment extends Fragment
     /**
      * Enqueue call from Propublica Service
      */
-    private void makeCall(int page){
+    private void makeCall(String chamber, String filter, int page){
         mRefreshLayout.setRefreshing(true);
 
-        Call<RecentBills> call = mRetrofit.create(PropublicaService.class).getRecentBills(page*20);
+        Log.d(TAG, "makeCall() called with: chamber = [" + chamber + "], filter = [" + filter + "], page = [" + page + "]");
+        Call<RecentBills> call = mRetrofit.create(PropublicaService.class).getRecentBills(chamber, filter, page*20);
         call.enqueue(new Callback<RecentBills>() {
             @Override
             public void onResponse(Call<RecentBills> call, Response<RecentBills> response) {
@@ -124,6 +133,13 @@ public class BillFragment extends Fragment
         });
     }
 
+    private void showDialog(){
+        FragmentManager manager = getFragmentManager();
+        FilterDialogFragment fragment = FilterDialogFragment.newInstance("Senate","passed");
+        fragment.setListener(this);
+        fragment.show(manager,"Filter fragment");
+    }
+
     /*---------------------------------------------------------------------------------
     // Interface AREA
     ---------------------------------------------------------------------------------*/
@@ -138,5 +154,11 @@ public class BillFragment extends Fragment
     public void OnBottomMenuItemSelected(String tag) {
         if (tag.equals(getString(R.string.bill_fragment)) )
            mRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void OnDialogPositiveClicked(String chamber, String filter) {
+        makeCall(chamber, filter, 0);
+        mRecyclerView.smoothScrollToPosition(0);
     }
 }
