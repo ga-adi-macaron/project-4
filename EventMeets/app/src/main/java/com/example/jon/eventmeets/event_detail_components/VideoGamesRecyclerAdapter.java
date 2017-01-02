@@ -41,20 +41,49 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     public void onBindViewHolder(final VideoGameViewHolder holder, int position) {
         final GameResultObject game = mVideogames.get(position);
 
-//        double dHeight = (double)game.getCover().getHeight();
-//        double dWidth = (double)game.getCover().getWidth();
-//        double ratio = dWidth/dHeight;
-//        dWidth = 150*ratio;
-//
-//        Log.d("tag", "onBindViewHolder: "+dHeight+", "+dWidth);
-//
-//        holder.mCoverArt.getLayoutParams().height = 150;
-//        holder.mCoverArt.getLayoutParams().width = (int)dWidth;
-//        holder.mCoverArt.requestLayout();
+        mNintendo = false;
+        mXbox = false;
+        mPc = false;
+        mPlaystation = false;
 
-        if(game.getCover() != null&&game.getCover().getUrl().length() > 0)
-            Picasso.with(holder.mContext).load("https:"+game.getCover().getUrl()).into(holder.mCoverArt);
+        for(int i=0;i<game.getRelease_dates().size();i++) {
+            int platform = game.getRelease_dates().get(i).getPlatform();
+            switch(platform) {
+                case 4:
+                case 5:
+                case 18:
+                case 19:
+                case 21:
+                case 41:
+                case 130:
+                    mNintendo = true;
+                    break;
+                case 3:
+                case 6:
+                case 14:
+                    mPc = true;
+                    break;
+                case 7:
+                case 8:
+                case 9:
+                case 38:
+                case 46:
+                case 48:
+                    mPlaystation = true;
+                    break;
+                case 11:
+                case 12:
+                case 49:
+                    mXbox = true;
+                    break;
+            }
+        }
 
+        if(game.getCover() != null&&game.getCover().getUrl().length() > 0) {
+            String cover = "https://images.igdb.com/igdb/image/upload/t_cover_small/"
+                    +game.getCover().getCloudinary_id()+".jpg";
+            Picasso.with(holder.mContext).load(cover).into(holder.mCoverArt);
+        }
         holder.mGameTitle.setText(game.getName());
 
         holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +92,7 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
                 mIntent= new Intent(holder.mContext, EventDetailActivity.class);
                 String image = game.getScreenshots().get(0).getCloudinary_id();
 
+                consoleAssignments(mIntent);
                 mIntent.putExtra("summary", game.getSummary());
                 mIntent.putExtra("name", game.getName());
                 mIntent.putExtra("id", game.getId());
@@ -75,5 +105,28 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     @Override
     public int getItemCount() {
         return mVideogames.size();
+    }
+
+    private void consoleAssignments(Intent intent) {
+        int count = 0;
+        ArrayList<String> consoles = new ArrayList<>();
+        if(mXbox) {
+            consoles.add("XBox");
+            count++;
+        }
+        if(mNintendo) {
+            consoles.add("Nintendo");
+            count++;
+        }
+        if(mPlaystation) {
+            consoles.add("PlayStation");
+            count++;
+        }
+        if(mPc) {
+            consoles.add("PC");
+            count++;
+        }
+        intent.putExtra("platforms", consoles);
+        intent.putExtra("numPlatforms", count);
     }
 }

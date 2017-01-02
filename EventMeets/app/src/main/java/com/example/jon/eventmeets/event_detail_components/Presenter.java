@@ -29,7 +29,7 @@ class Presenter implements VideoGameSearchContract.Presenter {
 
     private static final String BASE_URL = "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?";
     private static final String KEY = "E9pRHWwFlJmshdOJGsvVPo718hyXp1qzb0djsntnV1Kaal2dcL";
-    private static final String PARAMS = "fields=id,name,release_dates,screenshots,cover,summary&search=";
+    private static final String PARAMS = "limit=20&fields=id,name,release_dates,screenshots,cover,summary&search=";
     private static final String KEY_HEADER = "X-Mashape-Key";
     private static final String TYPE_HEADER = "Accept";
     private static final String TYPE = "application/json";
@@ -70,7 +70,8 @@ class Presenter implements VideoGameSearchContract.Presenter {
                 for(int i=0;i<root.length();i++) {
                     Gson gson = new Gson();
                     GameResultObject game = gson.fromJson(root.getJSONObject(i).toString(), GameResultObject.class);
-                    mGameList.add(game);
+                    if(game.hasSufficientData())
+                        mGameList.add(game);
                 }
             } catch(IOException | JSONException e) {
                 e.printStackTrace();

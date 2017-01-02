@@ -16,6 +16,10 @@ public class GameResultObject {
 
     public GameResultObject() {}
 
+    public boolean hasSufficientData() {
+        return release_dates!=null&&screenshots!=null;
+    }
+
     public String getSummary() {
         return summary;
     }

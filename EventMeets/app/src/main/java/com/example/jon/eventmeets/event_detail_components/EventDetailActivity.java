@@ -15,10 +15,11 @@ import android.widget.TextView;
 import com.example.jon.eventmeets.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 public class EventDetailActivity extends AppCompatActivity implements View.OnClickListener{
     private String mName, mImage;
     private int mId;
-    private boolean mXbox, mPc, mNintendo, mPlaystation;
     private TextView mPlatform1, mPlatform2, mPlatform3, mPlatform4, mGameSummary;
     private FloatingActionButton mFab;
 
@@ -42,17 +43,16 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         Intent intent = getIntent();
 
         String summary = intent.getStringExtra("summary");
-        mGameSummary.setText(summary);
+        if(summary.length() > 0) {
+            mGameSummary.setText(summary);
+        } else {
+            mGameSummary.setText("No Details Found");
+        }
 
         mName = intent.getStringExtra("name");
         setTitle(mName);
 
         mId = intent.getIntExtra("id", -1);
-
-//        mXbox = intent.getBooleanExtra("xbox", false);
-//        mPc = intent.getBooleanExtra("pc", false);
-//        mNintendo = intent.getBooleanExtra("nintendo", false);
-//        mPlaystation = intent.getBooleanExtra("playstation", false);
 
         mImage = intent.getStringExtra("image");
         if(mImage.length() > 0) {
@@ -60,31 +60,23 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
             Picasso.with(this).load(mImage).fit().into((ImageView)findViewById(R.id.screen_image));
         }
 
-//        if(hasMultiplePlatforms()) {
-//            if(mXbox) {
-//                mPlatform1.setVisibility(View.VISIBLE);
-//                mPlatform1.setText("xbox");
-//            }
-//            if(mPc) {
-//                mPlatform2.setVisibility(View.VISIBLE);
-//                mPlatform2.setText("pc");
-//            }
-//            if(mNintendo) {
-//                mPlatform3.setVisibility(View.VISIBLE);
-//                mPlatform3.setText("nintendo");
-//            }
-//            if(mPlaystation) {
-//                mPlatform4.setVisibility(View.VISIBLE);
-//                mPlatform4.setText("playstation");
-//            }
-//        }
-//
-//        mFab.setOnClickListener(this);
-    }
-
-    private boolean hasMultiplePlatforms() {
-        return mXbox&&mPc || mXbox&&mNintendo || mXbox&&mPlaystation
-                || mPc&&mNintendo || mPc&&mPlaystation || mPlaystation&&mNintendo;
+        ArrayList<String> platforms = intent.getStringArrayListExtra("platforms");
+        if(platforms.contains("XBox")) {
+            mPlatform1.setVisibility(View.VISIBLE);
+            mPlatform1.setText("XBox");
+        }
+        if(platforms.contains("PC")) {
+            mPlatform2.setVisibility(View.VISIBLE);
+            mPlatform2.setText("PC");
+        }
+        if(platforms.contains("PlayStation")) {
+            mPlatform3.setVisibility(View.VISIBLE);
+            mPlatform3.setText("PlayStation");
+        }
+        if(platforms.contains("Nintendo")) {
+            mPlatform4.setVisibility(View.VISIBLE);
+            mPlatform4.setText("Nintendo");
+        }
     }
 
     @Override
@@ -94,12 +86,5 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
             case R.id.fab:
 
         }
-    }
-
-    private void consoleSelection() {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Select Console")
-                .setView(R.layout.console_selection_dialog)
-                .create();
     }
 }
