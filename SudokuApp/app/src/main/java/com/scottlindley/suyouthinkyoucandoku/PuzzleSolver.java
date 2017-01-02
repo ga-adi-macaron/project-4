@@ -1,8 +1,11 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import static com.google.android.gms.wearable.DataMap.TAG;
 
 /**
  * Created by Scott Lindley on 12/11/2016.
@@ -152,6 +155,26 @@ public class PuzzleSolver {
             solution[i] = mSolution.get(i);
         }
         return solution;
+    }
+
+    public int getBoxNumber(int cellIdex){
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (mBoxCells[i][j] == cellIdex) {
+                    Log.d(TAG, "getBoxNumber: "+i);
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int[][] getBoxCells(){
+        return mBoxCells;
+    }
+
+    public int[] getKey(){
+        return mKey;
     }
 
     public interface OnSolveFinishedListener{

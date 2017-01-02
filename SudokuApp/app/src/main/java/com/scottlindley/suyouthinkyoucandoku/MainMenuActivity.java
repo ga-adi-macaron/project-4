@@ -55,6 +55,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         setUpCardViews();
 
+        //TODO: REPLACE CURRENT PUZZLES WITH NEW ONES
 //        addPuzzle();
 
         checkForNewPuzzles();
@@ -116,6 +117,10 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
+    /*
+    When Wifi connection is established, download new puzzles from the remote
+    database and store them locally.
+    */
     private void checkForNewPuzzles(){
         NetworkConnectivityChecker networkChecker = new NetworkConnectivityChecker(MainMenuActivity.this);
         if (networkChecker.isConnected()) {
@@ -129,6 +134,9 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
+    /*
+    Allows to user to arm up to two weapons in their inventory and bring them into the race arena.
+     */
     private void launchWeaponArmingDialog(){
         final View dialogView = getLayoutInflater().inflate(R.layout.arm_weapons_dialog, null);
 

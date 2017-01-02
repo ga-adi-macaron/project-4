@@ -10,6 +10,7 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
@@ -145,7 +146,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * This is done by performing the Choice Tile's onClick.
      * @param cell
      */
-    private void setCellClickListener(final TextView cell){
+    public void setCellClickListener(final TextView cell){
         cell.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,13 +171,16 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * @param cell
      */
     public void checkCellInput(TextView cell){
+        Log.d("BASE PUZZLE", "checkCellInput: "+cell.getId());
+        Log.d("BASE PUZZLE", "checkCellInput: "+mKey[cell.getId()]);
         if (mSelectedNum != 0) {
             if (mSolution[cell.getId()] == mSelectedNum) {
+
                 //Choice was right
                 cell.setText(String.valueOf(mSelectedNum));
                 cell.setTextColor(getResources().getColor(R.color.colorAccent));
                 mUserAnswers[cell.getId()] = Integer.parseInt(cell.getText().toString());
-
+                Log.d("BASE PUZZLE", "checkCellInput: "+ mKey[cell.getId()]);
                 /*
                 If the user has found all instances of this number in the puzzle,
                 remove that number down in the choice tiles.
@@ -223,7 +227,10 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * Sets up the input selection tiles at the bottom of the screen
      */
     public void setUpChoiceTiles() {
-        mUserAnswers = mKey;
+        mUserAnswers = new int[81];
+        for (int i=0; i<mKey.length; i++){
+            mUserAnswers[i] = mKey[i];
+        }
 
         mChoiceTiles = new ArrayList<>();
         mChoiceTiles.add((TextView) findViewById(R.id.tile1));

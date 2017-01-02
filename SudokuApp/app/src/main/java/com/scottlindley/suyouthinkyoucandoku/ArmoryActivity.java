@@ -31,7 +31,7 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
 
     private void setUpViews(){
         SharedPreferences prefs = getSharedPreferences(ARMORY_SHARED_PREFS, MODE_PRIVATE);
-        mCoinCount = prefs.getInt(COIN_COUNT_KEY, 0);
+        mCoinCount = prefs.getInt(COIN_COUNT_KEY, 100);
         mCoinCountText = (TextView)findViewById(R.id.coins_text);
         mCoinCountText.setText("Coins: " + mCoinCount);
 
@@ -42,6 +42,14 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
         mBombInventoryCount = (TextView) findViewById(R.id.bomb_inventory_count);
         mSpyInventoryCount = (TextView) findViewById(R.id.spy_inventory_count);
         mInterferenceInventoryCount = (TextView) findViewById(R.id.interference_inventory_count);
+
+        int bombCount = prefs.getInt(BOMB_COUNT_KEY, 0);
+        int spyCount = prefs.getInt(SPY_COUNT_KEY, 0);
+        int interfCount = prefs.getInt(INTERFERENCE_COUNT_KEY, 0);
+
+        mBombInventoryCount.setText(String.valueOf(bombCount));
+        mSpyInventoryCount.setText(String.valueOf(spyCount));
+        mInterferenceInventoryCount.setText(String.valueOf(interfCount));
 
         mBuyBombBtn.setOnClickListener(this);
         mBuySpyBtn.setOnClickListener(this);

@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -55,8 +56,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private int mNumberOfParticipants;
     private boolean mResolvingConnectionFailure, mStillConnected;
     private GoogleApiClient mGoogleApiClient;
-    private String weapon1, weapon2;
-    private boolean weapon1Clicked, weapon2Clicked;
+    private String mWeapon1, mWeapon2, mWeaponSelected = "none";
+    private boolean mWeapon1Clicked, mWeapon2Clicked;
+    private int[] mOpponentCellsFilled = new int[81];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,14 +80,14 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private void setUpWeapons(){
         SharedPreferences prefs =
                 getSharedPreferences(MainMenuActivity.ARMED_WEAPONS_PREFS, MODE_PRIVATE);
-        weapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
-        weapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
+        mWeapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
+        mWeapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
 
         final ImageView weapon1Image = (ImageView)findViewById(R.id.weapon1_image);
         final ImageView weapon2Image = (ImageView)findViewById(R.id.weapon2_image);
 
-        setWeaponImage(weapon1, weapon1Image);
-        setWeaponImage(weapon2, weapon2Image);
+        setWeaponImage(mWeapon1, weapon1Image);
+        setWeaponImage(mWeapon2, weapon2Image);
 
         CardView weapon1Card = (CardView)findViewById(R.id.weapon1);
         CardView weapon2Card = (CardView)findViewById(R.id.weapon2);
@@ -93,14 +95,15 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         weapon1Card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                weapon1Clicked = !weapon1Clicked;
-                if (!weapon1.equals("none") && !weapon1Clicked){
+                mWeapon1Clicked = !mWeapon1Clicked;
+                if (!mWeapon1.equals("none") && mWeapon1Clicked == true){
                     weapon1Image.setColorFilter(getResources().getColor(R.color.colorAccent));
-                    weapon2Clicked = false;
+                    mWeapon2Clicked = false;
                     weapon2Image.setColorFilter(Color.WHITE);
                     adjustCardText(1);
-                } else if (!weapon1.equals("none") && weapon1Clicked){
+                } else if (!mWeapon1.equals("none") && mWeapon1Clicked == false){
                     weapon1Image.setColorFilter(Color.WHITE);
+                    mWeaponSelected = "none";
                     mTimerView.setText("Race!");
                 }
             }
@@ -109,14 +112,15 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         weapon2Card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                weapon2Clicked = !weapon2Clicked;
-                if (!weapon2.equals("none") && !weapon2Clicked){
+                mWeapon2Clicked = !mWeapon2Clicked;
+                if (!mWeapon2.equals("none") && !mWeapon2Clicked){
                     weapon2Image.setColorFilter(getResources().getColor(R.color.colorAccent));
-                    weapon1Clicked = false;
+                    mWeapon1Clicked = false;
                     weapon1Image.setColorFilter(Color.WHITE);
                     adjustCardText(2);
-                } else if (!weapon2.equals("none") && weapon2Clicked){
+                } else if (!mWeapon2.equals("none") && mWeapon2Clicked){
                     weapon2Image.setColorFilter(Color.WHITE);
+                    mWeaponSelected = "none";
                     mTimerView.setText("Race!");
                 }
             }
@@ -126,9 +130,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private void adjustCardText(int weaponSlot){
         String weapon = "none";
         if (weaponSlot == 1) {
-            weapon = weapon1;
+            weapon = mWeapon1;
         } else if (weaponSlot == 2){
-            weapon = weapon2;
+            weapon = mWeapon2;
         }
         switch (weapon) {
             case "bomb":
@@ -141,7 +145,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 mTimerView.setText("Long press the board to deploy interference!");
                 break;
             case "none":
+                mTimerView.setText("Race!");
         }
+        mWeaponSelected = weapon;
     }
 
     private void setWeaponImage(String weaponName, ImageView weaponImage){
@@ -248,7 +254,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 })
                 .setView(dialogView)
                 .create();
-        dialog.show();
+        if(!RaceActivity.this.isFinishing()) {
+            dialog.show();
+        }
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
@@ -272,7 +280,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     private void tintCell(int cellLocation){
-        Log.d(TAG, "tintCell: "+cellLocation);
         mCellViews.get(cellLocation).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
     }
 
@@ -347,6 +354,88 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 RaceActivity.this.finish();
             }
         }.start();
+    }
+
+    @Override
+    public void setCellClickListener(TextView cell) {
+        super.setCellClickListener(cell);
+        cell.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                switch (mWeaponSelected){
+                    case "bomb":
+                        deployBomb(view.getId());
+                        return true;
+                    case "spy":
+                        deploySpy();
+                        return true;
+                    case "interference":
+                        deployInterference();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+    }
+
+    private void deployBomb(int cellIndex){
+        int boxNumber = mPuzzleSolver.getBoxNumber(cellIndex);
+        Log.d(TAG, "deployBomb: Box num = "+boxNumber);
+        String message = "BOMB: "+boxNumber;
+        byte[] data = message.getBytes();
+        int[] boxCells = mPuzzleSolver.getBoxCells()[boxNumber];
+        for (int i=0; i<boxCells.length; i++){
+            if (mOpponentCellsFilled[boxCells[i]] == 1){
+                mCellViews.get(boxCells[i]).setBackgroundColor(Color.TRANSPARENT);
+            }
+        }
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data,mRoomID);
+        if (mWeapon1Clicked){
+            mWeapon1 = "none";
+            adjustCardText(1);
+            setWeaponImage(mWeapon1, (ImageView) findViewById(R.id.weapon1_image));
+            ((ImageView) findViewById(R.id.weapon1_image)).setColorFilter(Color.WHITE);
+        } else if (mWeapon2Clicked){
+            mWeapon2 = "none";
+            adjustCardText(2);
+            setWeaponImage(mWeapon2, (ImageView)findViewById(R.id.weapon2));
+            ((ImageView) findViewById(R.id.weapon2)).setColorFilter(Color.WHITE);
+        }
+        removeWeaponFromInventory("bomb");
+    }
+
+    private void deploySpy(){
+
+    }
+
+    private void deployInterference(){
+
+    }
+
+    private void removeWeaponFromInventory(String weapon){
+        SharedPreferences prefs =
+                getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
+        switch (weapon){
+            case "bomb":
+                int bombCount = prefs.getInt(ArmoryActivity.BOMB_COUNT_KEY, 0);
+                if (bombCount!=0) {
+                    prefs.edit().putInt(ArmoryActivity.BOMB_COUNT_KEY, bombCount - 1).commit();
+                }
+                break;
+            case "spy":
+                int spyCount = prefs.getInt(ArmoryActivity.SPY_COUNT_KEY, 0);
+                if (spyCount!=0) {
+                    prefs.edit().putInt(ArmoryActivity.SPY_COUNT_KEY, spyCount - 1).commit();
+                }
+                break;
+            case "interference":
+                int interfCount = prefs.getInt(ArmoryActivity.INTERFERENCE_COUNT_KEY, 0);
+                if (interfCount!=0) {
+                    prefs.edit().putInt(ArmoryActivity.INTERFERENCE_COUNT_KEY, interfCount - 1).commit();
+                }
+                break;
+        }
     }
 
     private void launchNoMatchFoundDialog(){
@@ -522,9 +611,23 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             endGame(false);
         } else if(data.equals(STILL_CONNECTED_MESSAGE)){
             mStillConnected = true;
+        } else if (data.contains("BOMB: ")){
+            int boxNumber = Character.getNumericValue(data.charAt(data.length()-1));
+            int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
+            for (int i=0; i<boxCellIds.length; i++){
+                Log.d(TAG, "onRealTimeMessageReceived: VALUE IN KEY"+mKey[boxCellIds[i]]);
+                if (mKey[boxCellIds[i]] == 0) {
+                    Log.d(TAG, "onRealTimeMessageReceived: cell id = "+boxCellIds[i]);
+                    mUserAnswers[boxCellIds[i]] = 0;
+                    mCellViews.get(boxCellIds[i]).setText("");
+                }
+                Log.d(TAG, "onRealTimeMessageReceived: "+mKey[boxCellIds[i]]);
+            }
+            Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
         } else {
             int cellLocation = Integer.parseInt(data);
             tintCell(cellLocation);
+            mOpponentCellsFilled[cellLocation] = 1;
         }
     }
 
