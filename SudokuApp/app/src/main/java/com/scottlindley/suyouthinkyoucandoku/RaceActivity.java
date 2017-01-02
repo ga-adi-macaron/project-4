@@ -380,17 +380,19 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     private void deployBomb(int cellIndex){
+        //Clear the tinted boxes on the attacker's screen
         int boxNumber = mPuzzleSolver.getBoxNumber(cellIndex);
-        Log.d(TAG, "deployBomb: Box num = "+boxNumber);
-        String message = "BOMB: "+boxNumber;
-        byte[] data = message.getBytes();
         int[] boxCells = mPuzzleSolver.getBoxCells()[boxNumber];
         for (int i=0; i<boxCells.length; i++){
             if (mOpponentCellsFilled[boxCells[i]] == 1){
                 mCellViews.get(boxCells[i]).setBackgroundColor(Color.TRANSPARENT);
             }
         }
+        //Send a message to the opponent containing the box number whose contents will be erased
+        String message = "BOMB: "+boxNumber;
+        byte[] data = message.getBytes();
         Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data,mRoomID);
+        //Adjust the weapon image that was just used as well as the top card text
         if (mWeapon1Clicked){
             mWeapon1 = "none";
             adjustCardText(1);
@@ -406,13 +408,43 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     private void deploySpy(){
+        for (int i=0; i<mOpponentCellsFilled.length; i++){
+            if (mOpponentCellsFilled[i] == 1){
+                mCellViews.get(i).setBackgroundColor(Color.rgb(75,75,75));
+                mCellViews.get(i).setText(mSolution[i]+"");
+                mCellViews.get(i).setTextColor(getResources().getColor(R.color.colorAccent));
+            }
+        }
+        CountDownTimer spyTimer = new CountDownTimer(3000, 1000) {
+            @Override
+            public void onTick(long l) {
 
+            }
+
+            @Override
+            public void onFinish() {
+                for (int i=0; i<mOpponentCellsFilled.length; i++){
+                    if (mOpponentCellsFilled[i] == 1){
+                        mCellViews.get(i).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
+                        mCellViews.get(i).setText("");
+                        mCellViews.get(i).setTextColor(getResources().getColor(R.color.colorAccent));
+                    }
+                }
+            }
+        };
+        spyTimer.start();
+        removeWeaponFromInventory("spy");
     }
 
     private void deployInterference(){
 
     }
 
+    /**
+     * Removes on weapon of a specific type from the user's inventory. Called when the player uses
+     * on of his or her weapons.
+     * @param weapon is the weapon name.
+     */
     private void removeWeaponFromInventory(String weapon){
         SharedPreferences prefs =
                 getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
