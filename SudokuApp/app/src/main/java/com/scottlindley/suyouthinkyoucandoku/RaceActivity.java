@@ -470,6 +470,36 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    private void receiveBomb(int boxNumber){
+        int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
+        for (int i=0; i<boxCellIds.length; i++){
+            Log.d(TAG, "onRealTimeMessageReceived: VALUE IN KEY"+mKey[boxCellIds[i]]);
+            if (mKey[boxCellIds[i]] == 0) {
+                Log.d(TAG, "onRealTimeMessageReceived: cell id = "+boxCellIds[i]);
+                mUserAnswers[boxCellIds[i]] = 0;
+                mCellViews.get(boxCellIds[i]).setText("");
+            }
+            Log.d(TAG, "onRealTimeMessageReceived: "+mKey[boxCellIds[i]]);
+        }
+        Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
+        //Reset the choice tiles because one or more hidden tiles may need to be made visible again.
+        for (int i=0; i<mChoiceTiles.size(); i++){
+            ((CardView) mChoiceTiles.get(i).getParent())
+                    .setVisibility(View.VISIBLE);
+            int numberCounter = 0;
+            for (int j=0; j<mUserAnswers.length; j++){
+                if (Integer.parseInt(mChoiceTiles.get(i).getText().toString()) == mUserAnswers[i]){
+                    numberCounter++;
+                }
+                if (numberCounter == 9) {
+                    ((CardView) mChoiceTiles.get(i).getParent())
+                            .setVisibility(View.INVISIBLE);
+                    break;
+                }
+            }
+        }
+    }
+
     private void launchNoMatchFoundDialog(){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {
@@ -645,17 +675,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             mStillConnected = true;
         } else if (data.contains("BOMB: ")){
             int boxNumber = Character.getNumericValue(data.charAt(data.length()-1));
-            int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
-            for (int i=0; i<boxCellIds.length; i++){
-                Log.d(TAG, "onRealTimeMessageReceived: VALUE IN KEY"+mKey[boxCellIds[i]]);
-                if (mKey[boxCellIds[i]] == 0) {
-                    Log.d(TAG, "onRealTimeMessageReceived: cell id = "+boxCellIds[i]);
-                    mUserAnswers[boxCellIds[i]] = 0;
-                    mCellViews.get(boxCellIds[i]).setText("");
-                }
-                Log.d(TAG, "onRealTimeMessageReceived: "+mKey[boxCellIds[i]]);
-            }
-            Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
+            receiveBomb(boxNumber);
         } else {
             int cellLocation = Integer.parseInt(data);
             tintCell(cellLocation);
