@@ -14,7 +14,7 @@ import com.example.jon.eventmeets.R;
  */
 
 public class VideoGameViewHolder extends RecyclerView.ViewHolder {
-    public ImageView mNintendo, mXbox, mPlaystation, mPc;
+//    public ImageView mNintendo, mXbox, mPlaystation, mPc;
     public TextView mGameTitle;
     public ImageView mCoverArt;
     public RelativeLayout mGameLayout;
@@ -26,10 +26,10 @@ public class VideoGameViewHolder extends RecyclerView.ViewHolder {
 
         mGameLayout = (RelativeLayout)itemView.findViewById(R.id.game_result_layout);
 
-        mNintendo = (ImageView)itemView.findViewById(R.id.nintendo_platform);
-        mXbox = (ImageView)itemView.findViewById(R.id.xbox_platform);
-        mPlaystation = (ImageView)itemView.findViewById(R.id.playstation_platform);
-        mPc = (ImageView)itemView.findViewById(R.id.pc_platform);
+//        mNintendo = (ImageView)itemView.findViewById(R.id.nintendo_platform);
+//        mXbox = (ImageView)itemView.findViewById(R.id.xbox_platform);
+//        mPlaystation = (ImageView)itemView.findViewById(R.id.playstation_platform);
+//        mPc = (ImageView)itemView.findViewById(R.id.pc_platform);
 
         mGameTitle = (TextView)itemView.findViewById(R.id.game_title);
 

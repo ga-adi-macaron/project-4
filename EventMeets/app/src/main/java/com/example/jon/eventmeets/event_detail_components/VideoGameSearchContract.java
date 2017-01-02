@@ -1,5 +1,6 @@
 package com.example.jon.eventmeets.event_detail_components;
 
+import com.example.jon.eventmeets.model.GameResultObject;
 import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface VideoGameSearchContract {
 
     interface View {
-        void displaySearchResults(List<VideoGamingEvent> games);
+        void displaySearchResults(List<GameResultObject> games);
     }
 
     interface Presenter {

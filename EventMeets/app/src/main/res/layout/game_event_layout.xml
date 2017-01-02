@@ -1,58 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/game_result_layout"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="145dp">
+                android:layout_height="150dp">
 
     <TextView
         android:id="@+id/game_title"
         android:text="Game Title"
         android:layout_marginStart="8dp"
         android:layout_toEndOf="@+id/cover_art"
+        android:layout_centerVertical="true"
+        android:textSize="24sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <ImageView
         android:id="@+id/cover_art"
         android:src="#80e7"
-        android:layout_width="100dp"
+        android:layout_width="105dp"
         android:layout_height="match_parent"/>
-
-    <ImageView
-        android:id="@+id/xbox_platform"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:src="@drawable/common_google_signin_btn_icon_dark"/>
-
-    <ImageView
-        android:id="@+id/playstation_platform"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@id/xbox_platform"
-        android:src="@drawable/common_google_signin_btn_icon_dark_disabled"/>
-
-    <ImageView
-        android:id="@+id/nintendo_platform"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@id/playstation_platform"
-        android:src="@mipmap/ic_launcher"/>
-
-    <ImageView
-        android:id="@+id/pc_platform"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:padding="2dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@id/nintendo_platform"
-        android:src="#030fd8"/>
-
 </RelativeLayout>

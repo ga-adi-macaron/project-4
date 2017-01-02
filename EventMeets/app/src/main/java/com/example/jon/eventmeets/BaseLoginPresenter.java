@@ -110,7 +110,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
         ref.child(userKey).setValue(user);
     }
 
-    private void requestAccount(String username, String password, final String first, final String last) {
+    private void requestAccount(final String username, final String password, final String first, final String last) {
         mAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(
                 new OnCompleteListener<AuthResult>() {
                     @Override
@@ -121,6 +121,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
                             mView.notifyFragmentSuccess();
                             String userKey = mAuth.getCurrentUser().getUid();
                             addUserToDatabase(userKey, first, last);
+                            mView.addAccountInfoToSharedPreferences(username, password);
                         }
                     }
                 });

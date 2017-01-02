@@ -3,9 +3,11 @@ package com.example.jon.eventmeets.event_detail_components;
 
 import android.os.AsyncTask;
 
+import com.example.jon.eventmeets.model.GameResultObject;
 import com.example.jon.eventmeets.model.VideoGamingEvent;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,11 +25,18 @@ import okhttp3.Response;
 
 class Presenter implements VideoGameSearchContract.Presenter {
     private VideoGameSearchContract.View mView;
-    private List<VideoGamingEvent> mGameList;
+    private List<GameResultObject> mGameList;
 
-    private static final String BASE_URL = "http://www.giantbomb.com/api/search?";
-    private static final String KEY = "&api_key=76850e49a2af9255d3cbb9caec66d702dfac1521";
-    private static final String PARAMS = "&resources=game&field_list=name,id,platforms,image&format=json&query=";
+    private static final String BASE_URL = "https://igdbcom-internet-game-database-v1.p.mashape.com/games/?";
+    private static final String KEY = "E9pRHWwFlJmshdOJGsvVPo718hyXp1qzb0djsntnV1Kaal2dcL";
+    private static final String PARAMS = "fields=id,name,release_dates,screenshots,cover,summary&search=";
+    private static final String KEY_HEADER = "X-Mashape-Key";
+    private static final String TYPE_HEADER = "Accept";
+    private static final String TYPE = "application/json";
+
+//    private static final String BASE_URL = "http://www.giantbomb.com/api/search?";
+//    private static final String KEY = "&api_key=76850e49a2af9255d3cbb9caec66d702dfac1521";
+//    private static final String PARAMS = "&resources=game&field_list=name,id,platforms,image&format=json&query=";
 
     Presenter(VideoGameSearchContract.View view) {
         mView = view;
@@ -36,30 +45,33 @@ class Presenter implements VideoGameSearchContract.Presenter {
 
     @Override
     public void onSearchRequested(String query) {
-        String fullRequest = BASE_URL+KEY+PARAMS+query;
+        String fullRequest = BASE_URL+PARAMS+query;
         new GameSearchTask().execute(fullRequest);
     }
 
-    private class GameSearchTask extends AsyncTask<String, Void, GiantBombRootObject> {
+    private class GameSearchTask extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected GiantBombRootObject doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder()
                     .url(params[0])
+                    .addHeader(KEY_HEADER, KEY)
+                    .addHeader(TYPE_HEADER, TYPE)
                     .build();
 
-            GiantBombRootObject result;
 
             try {
                 Response response = client.newCall(request).execute();
 
-                JSONObject json = new JSONObject(response.body().string());
+                JSONArray root = new JSONArray(response.body().string());
 
-                Gson gson = new Gson();
-                result = gson.fromJson(json.toString(), GiantBombRootObject.class);
-                return result;
+                for(int i=0;i<root.length();i++) {
+                    Gson gson = new Gson();
+                    GameResultObject game = gson.fromJson(root.getJSONObject(i).toString(), GameResultObject.class);
+                    mGameList.add(game);
+                }
             } catch(IOException | JSONException e) {
                 e.printStackTrace();
             }
@@ -68,8 +80,7 @@ class Presenter implements VideoGameSearchContract.Presenter {
         }
 
         @Override
-        protected void onPostExecute(GiantBombRootObject s) {
-            mGameList = s.getResults();
+        protected void onPostExecute(Void v) {
             mView.displaySearchResults(mGameList);
         }
     }

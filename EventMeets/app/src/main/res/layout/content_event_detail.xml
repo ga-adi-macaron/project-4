@@ -38,5 +38,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <TextView
+            android:id="@+id/game_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

@@ -9,13 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.jon.eventmeets.R;
+import com.example.jon.eventmeets.model.GameResultObject;
 import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 
 public class VideoGameEventsActivity extends AppCompatActivity implements VideoGameSearchContract.View {
     private Presenter mPresenter;
-    private List<VideoGamingEvent> mGameList;
+    private List<GameResultObject> mGameList;
     private VideoGamesRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private Button mGameSearch;
@@ -46,7 +47,7 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
     }
 
     @Override
-    public void displaySearchResults(List<VideoGamingEvent> games) {
+    public void displaySearchResults(List<GameResultObject> games) {
         mGameList = games;
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mAdapter = new VideoGamesRecyclerAdapter(mGameList);

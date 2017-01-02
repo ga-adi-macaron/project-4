@@ -3,11 +3,14 @@ package com.example.jon.eventmeets.event_detail_components;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.example.jon.eventmeets.R;
+import com.example.jon.eventmeets.model.GameResultObject;
 import com.example.jon.eventmeets.model.VideoGamingEvent;
 import com.squareup.picasso.Picasso;
 
@@ -19,13 +22,14 @@ import java.util.List;
  */
 
 public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameViewHolder> {
-    private List<VideoGamingEvent> mVideogames;
+    private List<GameResultObject> mVideogames;
     private Intent mIntent;
     private boolean mNintendo, mXbox, mPc, mPlaystation;
 
-    public VideoGamesRecyclerAdapter(List<VideoGamingEvent> list) {
+    public VideoGamesRecyclerAdapter(List<GameResultObject> list) {
         mVideogames = list;
     }
+
 
     @Override
     public VideoGameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,100 +39,34 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
 
     @Override
     public void onBindViewHolder(final VideoGameViewHolder holder, int position) {
-        final VideoGamingEvent event = mVideogames.get(position);
+        final GameResultObject game = mVideogames.get(position);
 
-        holder.mGameTitle.setText(event.getName());
+//        double dHeight = (double)game.getCover().getHeight();
+//        double dWidth = (double)game.getCover().getWidth();
+//        double ratio = dWidth/dHeight;
+//        dWidth = 150*ratio;
+//
+//        Log.d("tag", "onBindViewHolder: "+dHeight+", "+dWidth);
+//
+//        holder.mCoverArt.getLayoutParams().height = 150;
+//        holder.mCoverArt.getLayoutParams().width = (int)dWidth;
+//        holder.mCoverArt.requestLayout();
 
-        if(event.getImage() != null&&event.getImage().getThumb_url() != null)
-            Picasso.with(holder.mContext).load(event.getImage().getThumb_url()).into(holder.mCoverArt);
+        if(game.getCover() != null&&game.getCover().getUrl().length() > 0)
+            Picasso.with(holder.mContext).load("https:"+game.getCover().getUrl()).into(holder.mCoverArt);
 
-
-        ArrayList<VideoGamePlatforms> platforms = event.getPlatforms();
-        mNintendo = false;
-        mXbox = false;
-        mPc = false;
-        mPlaystation = false;
-        for(int i=0;i<platforms.size();i++) {
-            switch(platforms.get(i).getName()) {
-                case "Game Boy":
-                case "Game Boy Advance":
-                case "Game Boy Color":
-                case "Super Nintendo Entertainment System":
-                case "Nintendo Entertainment System":
-                    //Classic Nintendo
-                    break;
-                case "Mac":
-                case "PC":
-                case "Linux":
-                    //Computer
-                    mPc = true;
-                    break;
-                case "Nintendo 3DS":
-                case "New Nintendo 3DS":
-                case "Nintendo DS":
-                    //Modern Nintendo Handhelds
-                    break;
-                case "Nintendo Switch":
-                case "Wii U":
-                case "GameCube":
-                case "Wii":
-                case "Nintendo 64":
-                    //Modern Nintendo Consoles
-                    mNintendo = true;
-                    break;
-                case "Xbox One":
-                case "Xbox 360":
-                case "Xbox":
-                    //Microsoft Consoles
-                    mXbox = true;
-                    break;
-                case "PlayStation 4":
-                case "PlayStation 3":
-                case "PlayStation 2":
-                case "PlayStation":
-                    //Sony Consoles
-                    mPlaystation = true;
-                    break;
-                case "PlayStation Portable":
-                case "PlayStation Vita":
-                    //Sony Handhelds
-                    break;
-            }
-        }
-        if(mNintendo) {
-            holder.mNintendo.setVisibility(View.VISIBLE);
-        } else {
-            holder.mNintendo.setVisibility(View.INVISIBLE);
-        }
-        if(mPc) {
-            holder.mPc.setVisibility(View.VISIBLE);
-        } else {
-            holder.mPc.setVisibility(View.INVISIBLE);
-        }
-        if(mXbox) {
-            holder.mXbox.setVisibility(View.VISIBLE);
-        } else {
-            holder.mXbox.setVisibility(View.INVISIBLE);
-        }
-        if(mPlaystation) {
-            holder.mPlaystation.setVisibility(View.VISIBLE);
-        } else {
-            holder.mPlaystation.setVisibility(View.INVISIBLE);
-        }
+        holder.mGameTitle.setText(game.getName());
 
         holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIntent = new Intent(holder.mContext, EventDetailActivity.class);
+                mIntent= new Intent(holder.mContext, EventDetailActivity.class);
+                String image = game.getScreenshots().get(0).getCloudinary_id();
 
-                mIntent.putExtra("id'", event.getId());
-                mIntent.putExtra("name", event.getName());
-                mIntent.putExtra("image", event.getImage().getScreen_url());
-                mIntent.putExtra("nintendo", mNintendo);
-                mIntent.putExtra("pc", mPc);
-                mIntent.putExtra("xbox", mXbox);
-                mIntent.putExtra("playstation", mPlaystation);
-
+                mIntent.putExtra("summary", game.getSummary());
+                mIntent.putExtra("name", game.getName());
+                mIntent.putExtra("id", game.getId());
+                mIntent.putExtra("image", image);
                 holder.mContext.startActivity(mIntent);
             }
         });
