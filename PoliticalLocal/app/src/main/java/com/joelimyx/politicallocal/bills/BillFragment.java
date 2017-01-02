@@ -1,7 +1,9 @@
 package com.joelimyx.politicallocal.bills;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -36,7 +38,8 @@ public class BillFragment extends Fragment
         implements BillAdapter.OnBillItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener,
         MainActivity.OnBottomMenuItemSelectedListener,
-        FilterDialogFragment.OnDialogPositiveClickedListener{
+        FilterDialogFragment.OnDialogPositiveClickedListener,
+        MainActivity.OnBillFabClickedListener{
 
     public static final String propublica_baseURL = "https://api.propublica.org/";
     private static final String TAG = "BillFragment";
@@ -78,27 +81,31 @@ public class BillFragment extends Fragment
                 .baseUrl(propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        // TODO: 1/1/17 Change this to dynamic
-        makeCall("senate", "passed", 0);
+
+        String[] myPref = getFilterPref();
+        makeCall(myPref[0],myPref[1], 0);
+
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener((LinearLayoutManager) manager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                // TODO: 1/1/17 Change this to dynamic
-                makeCall("senate", "passed", page);
+
+                String[] temp = getFilterPref();
+                makeCall(temp[0],temp[1], page);
             }
         });
 
-        FloatingActionButton filterButton = (FloatingActionButton) view.findViewById(R.id.bill_filter_fab);
-        filterButton.setOnClickListener(v -> showDialog());
     }
 
     @Override
     public void onRefresh() {
-        // TODO: 1/1/17 Change this to dynamic
-        makeCall("senate", "passed", 0);
+        String[] temp = getFilterPref();
+        makeCall(temp[0],temp[1], 0);
     }
 
     public MainActivity.OnBottomMenuItemSelectedListener getListener(){
+        return this;
+    }
+    public MainActivity.OnBillFabClickedListener getFabListener(){
         return this;
     }
 
@@ -111,7 +118,6 @@ public class BillFragment extends Fragment
     private void makeCall(String chamber, String filter, int page){
         mRefreshLayout.setRefreshing(true);
 
-        Log.d(TAG, "makeCall() called with: chamber = [" + chamber + "], filter = [" + filter + "], page = [" + page + "]");
         Call<RecentBills> call = mRetrofit.create(PropublicaService.class).getRecentBills(chamber, filter, page*20);
         call.enqueue(new Callback<RecentBills>() {
             @Override
@@ -133,11 +139,28 @@ public class BillFragment extends Fragment
         });
     }
 
+    /**
+     * Create dialog fragment
+     */
     private void showDialog(){
+        String[] temp = getFilterPref();
+
         FragmentManager manager = getFragmentManager();
-        FilterDialogFragment fragment = FilterDialogFragment.newInstance("Senate","passed");
+        FilterDialogFragment fragment = FilterDialogFragment.newInstance(temp[0], temp[1]);
         fragment.setListener(this);
         fragment.show(manager,"Filter fragment");
+    }
+
+    /**
+     * Get the chamber and filter from the shared preference
+     * @return String array with chamber and filter
+     */
+    private String[] getFilterPref(){
+        String[] myPref = new String[2];
+        SharedPreferences preferences = getActivity().getSharedPreferences(getString(R.string.bill_filter), Context.MODE_PRIVATE);
+        myPref[0] = preferences.getString(getString(R.string.chamber),getString(R.string.chamber_default));
+        myPref[1] = preferences.getString(getString(R.string.filter),getString(R.string.filter_default));
+        return myPref;
     }
 
     /*---------------------------------------------------------------------------------
@@ -160,5 +183,10 @@ public class BillFragment extends Fragment
     public void OnDialogPositiveClicked(String chamber, String filter) {
         makeCall(chamber, filter, 0);
         mRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void OnBillFabClicked() {
+        showDialog();
     }
 }

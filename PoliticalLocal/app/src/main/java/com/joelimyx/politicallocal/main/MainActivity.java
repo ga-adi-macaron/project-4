@@ -13,12 +13,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageRequest;
@@ -79,10 +81,16 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser mUser;
 
     //Local variables
-    private boolean mIsFirst;
+    private FloatingActionButton mButton;
+    private boolean mIsFirst, mIsBillFragment = false;
     private OnBottomMenuItemSelectedListener mListener;
+    private OnBillFabClickedListener mBillFabClickedListener;
 
     public static final String district_base_URL = "https://congress.api.sunlightfoundation.com/";
+
+    public interface OnBillFabClickedListener{
+        void OnBillFabClicked();
+    }
 
     @Override
     protected void onStart() {
@@ -159,6 +167,9 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.main_container, BillFragment.newInstance(),getString(R.string.bill_fragment))
                 .commit();
         mBottomNavigationView.getMenu().getItem(2).setChecked(true);
+
+        mButton = (FloatingActionButton) findViewById(R.id.bill_filter_fab);
+        mButton.setOnClickListener(v -> mBillFabClickedListener.OnBillFabClicked());
     }
 
     /*---------------------------------------------------------------------------------
@@ -171,10 +182,8 @@ public class MainActivity extends AppCompatActivity
         if (requestCode==SIGNIN_REQUEST_CODE){
             if (resultCode==RESULT_OK){
                 if (data!=null && data.getBooleanExtra("back",true)){
-                    Log.d(TAG, "onActivityResult: back");
                     finish();
                 }else {
-                    Log.d(TAG, "onActivityResult: connec");
                     mGoogleApiClient.connect();
                 }
             }
@@ -189,6 +198,7 @@ public class MainActivity extends AppCompatActivity
         FragmentManager transaction = getSupportFragmentManager();
         switch (item.getItemId()) {
             case R.id.reps:
+                mIsBillFragment = false;
                 String state = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE).getString(getString(R.string.state),null);
                 transaction
                     .beginTransaction()
@@ -198,6 +208,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.news:
+                mIsBillFragment = false;
                 transaction
                     .beginTransaction()
                     .replace(R.id.main_container, NewsFragment.newInstance())
@@ -206,12 +217,17 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.bills:
                 if (!(transaction.findFragmentByTag(getString(R.string.bill_fragment)) instanceof BillFragment)) {
+                    mIsBillFragment = true;
                     BillFragment temp = BillFragment.newInstance();
                     transaction
                             .beginTransaction()
                             .replace(R.id.main_container, temp, getString(R.string.bill_fragment))
                             .commit();
+
                     mListener = temp.getListener();
+                    mBillFabClickedListener = temp.getFabListener();
+
+                    mButton.setVisibility(View.VISIBLE);
                     mBottomNavigationView.setBackgroundColor(Color.parseColor("#FB8C00"));
                 }else {
                     mListener.OnBottomMenuItemSelected(getString(R.string.bill_fragment));
@@ -269,6 +285,10 @@ public class MainActivity extends AppCompatActivity
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         mSearchView.setTranslationY(verticalOffset);
         mBottomNavigationView.setTranslationY(verticalOffset*-1);
+        if (verticalOffset == 0 && mIsBillFragment) {
+            mButton.setVisibility(View.VISIBLE);
+        }else
+            mButton.setVisibility(View.GONE);
     }
 
     /*---------------------------------------------------------------------------------

@@ -36,7 +36,6 @@ public class SponsorsAdapter extends RecyclerView.Adapter<SponsorsAdapter.Sponso
     public SponsorViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new SponsorViewHolder(
                 LayoutInflater.from(parent.getContext())
-                        // TODO: 12/26/16 Create and Use new layout
                         .inflate(R.layout.list_item_reps,parent,false));
     }
 

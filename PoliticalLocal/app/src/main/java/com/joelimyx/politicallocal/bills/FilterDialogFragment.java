@@ -2,16 +2,13 @@ package com.joelimyx.politicallocal.bills;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.joelimyx.politicallocal.R;
@@ -86,7 +83,15 @@ public class FilterDialogFragment extends DialogFragment {
                 .setTitle("Filter")
                 .setView(view)
                 .setPositiveButton("Filter", (dialog, which) -> {
-                    mListener.OnDialogPositiveClicked(String.valueOf(chamberSpinner.getText()).toLowerCase(), String.valueOf(filterSpinner.getText()).toLowerCase());
+                    String chamber = String.valueOf(chamberSpinner.getText()).toLowerCase(),
+                            filter = String.valueOf(filterSpinner.getText()).toLowerCase();
+
+                    SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.bill_filter), Context.MODE_PRIVATE).edit();
+                    editor.putString(getString(R.string.chamber),chamber);
+                    editor.putString(getString(R.string.filter),filter);
+                    editor.commit();
+
+                    mListener.OnDialogPositiveClicked(chamber, filter);
                     dismiss();
                 })
                 .setNegativeButton("Cancel", null)
