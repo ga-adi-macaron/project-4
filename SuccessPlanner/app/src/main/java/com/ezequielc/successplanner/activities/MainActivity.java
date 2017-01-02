@@ -44,9 +44,10 @@ public class MainActivity extends AppCompatActivity {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-//            getQuote();
+            getQuote();
         } else {
             Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_SHORT).show();
+            mQuote.setText("Unable to Receive Quotes...");
         }
 
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Intent intent = new Intent(MainActivity.this, DailyActivity.class);
-                intent.putExtra(DAY_OF_WEEK, dayOfWeek + ":  " + monthString + " " + dayOfMonth + ", " + year);
+                intent.putExtra(DAY_OF_WEEK, dayOfWeek + ": " + monthString + " " + dayOfMonth + ", " + year);
                 intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
                 startActivity(intent);
             }
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject object = array.getJSONObject(0);
                     String quote = object.getString("quote");
                     String author = object.getString("author_name");
-                    qod.append(quote + "\n- " + author);
+                    qod.append("\"" + quote + "\"" + "\n- " + author);
 
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override

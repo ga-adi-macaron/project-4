@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -36,7 +35,6 @@ public class DailyActivity extends AppCompatActivity {
 
     TimePicker mTimePicker;
     TimePickerDialog.OnTimeSetListener mListener;
-    TextView mCurrentDate;
     FloatingActionButton mFAB;
     RecyclerView mGoalsRecyclerView, mAffirmationsRecyclerView, mScheduleRecyclerView;
 
@@ -55,7 +53,6 @@ public class DailyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_daily);
 
         // References to Views
-        mCurrentDate = (TextView) findViewById(R.id.current_date);
         mGoalsRecyclerView = (RecyclerView) findViewById(R.id.goals_recycler_view);
         mAffirmationsRecyclerView = (RecyclerView) findViewById(R.id.affirmations_recycler_view);
         mScheduleRecyclerView = (RecyclerView) findViewById(R.id.schedule_recycler_view);
@@ -64,7 +61,8 @@ public class DailyActivity extends AppCompatActivity {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getApplicationContext());
         String dayOfWeek = getIntent().getStringExtra(MainActivity.DAY_OF_WEEK);
         String currentDate = getIntent().getStringExtra(MainActivity.DATE_FORMATTED);
-        mCurrentDate.setText(dayOfWeek);
+
+        getSupportActionBar().setTitle(dayOfWeek);
 
         // RecyclerView for Goals
         mGoalList = databaseHelper.getGoalsForDate(currentDate);
