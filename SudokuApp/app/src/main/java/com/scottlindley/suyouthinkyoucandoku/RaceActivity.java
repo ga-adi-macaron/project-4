@@ -140,13 +140,13 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
         switch (weapon) {
             case "bomb":
-                mTimerView.setText("Long press a box to drop Erase Bomb!");
+                mTimerView.setText("Long press a box!");
                 break;
             case "spy":
-                mTimerView.setText("Long press below to spy!");
+                mTimerView.setText("Long press the board!");
                 break;
             case "interference":
-                mTimerView.setText("Long press blow to deploy interference!");
+                mTimerView.setText("Long press the board!");
                 break;
             case "none":
                 mTimerView.setText("Race!");
@@ -747,6 +747,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    //User has quit out of the game if he/she presses the back button
     @Override
     public void onBackPressed() {
         if(mRoomID!=null) {

@@ -1,6 +1,7 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -25,6 +26,10 @@ import java.util.concurrent.TimeUnit;
  */
 
 public abstract class BasePuzzleActivity extends AppCompatActivity implements PuzzleSolver.OnSolveFinishedListener{
+    public static final String TIMER_PREFS_KEY = "Timer";
+    public static final String INTERVAL_PREFS_KEY = "score interval";
+    public static final String SCORE_PREFS_KEY = "score";
+    public static final String TIME_PREFS_KEY = "time";
     public DBHelper mDBHelper;
     private SudokuGridLayout mBoardView;
     public TextView mTimerView;
@@ -77,6 +82,12 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
                 scoreDropInterval = 0;
                 mScore = 0;
         }
+        //Save this interval into shared preferences
+        SharedPreferences.Editor prefsEditor =
+                getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE).edit();
+        prefsEditor.putInt(INTERVAL_PREFS_KEY, scoreDropInterval);
+        prefsEditor.commit();
+
         mStrikes = 0;
         mTimerView = (TextView)findViewById(R.id.score_text);
         mTime = 0;

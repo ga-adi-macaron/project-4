@@ -2,7 +2,9 @@ package com.scottlindley.suyouthinkyoucandoku;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.text.format.DateUtils;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.concurrent.TimeUnit;
 
 public class SoloPuzzleActivity extends BasePuzzleActivity {
     private static final String TAG = "SoloPuzzleActivity";
@@ -120,5 +124,59 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
             cell.setVisibility(View.VISIBLE);
         }
         setUpScoreCard();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor prefsEditor =
+                getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE).edit();
+        prefsEditor.putLong(TIME_PREFS_KEY, mTime);
+        prefsEditor.putInt(SCORE_PREFS_KEY, mScore);
+        prefsEditor.commit();
+        mTimer.cancel();
+    }
+
+    @Override
+    protected void onResume() {
+        SharedPreferences prefs = getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE);
+        int score = prefs.getInt(SCORE_PREFS_KEY, -1);
+        long time = prefs.getLong(TIME_PREFS_KEY, -1);
+        final int scoreDropInterval = prefs.getInt(INTERVAL_PREFS_KEY, -1);
+
+        //Check to verify these have been saved in onPause once before
+        if (score != -1 && time != -1) {
+            mScore = score;
+            mTime = time;
+            mTimer = new CountDownTimer(TimeUnit.MINUTES.toMillis(1000), 1000) {
+                @Override
+                public void onTick(long l) {
+                    mScore = mScore - scoreDropInterval;
+                    mTime++;
+                    if (mScore <= 0) {
+                        onFinish();
+                    }
+                     mTimerView.setText(DateUtils.formatElapsedTime(mTime));
+                }
+
+                @Override
+                public void onFinish() {
+                    mScore = 0;
+                    endGame(false);
+                }
+            }.start();
+        }
+        super.onResume();
+    }
+
+    //Reset timer and score in preferences so they are not stored from one solo game to another
+    @Override
+    protected void onDestroy() {
+        SharedPreferences.Editor prefsEdit =
+                getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE).edit();
+        prefsEdit.putLong(TIME_PREFS_KEY, -1);
+        prefsEdit.putInt(SCORE_PREFS_KEY, -1);
+        prefsEdit.commit();
+        super.onDestroy();
     }
 }
