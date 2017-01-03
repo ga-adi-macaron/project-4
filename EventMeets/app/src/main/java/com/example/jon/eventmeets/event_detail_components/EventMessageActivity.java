@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
@@ -34,6 +36,8 @@ public class EventMessageActivity extends AppCompatActivity {
         mPlatform = intent.getStringExtra("console");
         mCover = intent.getStringExtra("cover");
         mScreenshot = intent.getStringExtra("screencap");
+
+        setTitle(mName);
 
         mGameObject = new DatabaseGameObject(mId, mName, mScreenshot, mCover, mPlatform);
 
