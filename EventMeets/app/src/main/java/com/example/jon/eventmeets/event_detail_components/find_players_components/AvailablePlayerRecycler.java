@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.AvailablePlayer;
+import com.example.jon.eventmeets.model.BaseUser;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -69,6 +71,12 @@ public class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlaye
             @Override
             public void onClick(View v) {
                 AvailablePlayer player = mPlayers.get(holder.getAdapterPosition());
+                String chatName = FirebaseAuth.getInstance().getCurrentUser().getUid().substring(0, 6)
+                        +player.getUserKey().substring(0, 6);
+                DatabaseReference temp = mDatabase.getReference("chats").child(chatName);
+                temp.child("users").child(player.getUserKey()).setValue(player.getFirstName());
+                temp.child("users").child(BaseUser.getInstance().getUsername()).setValue(BaseUser.getInstance().getFirstName());
+                temp.child("messages").push().child("type").setValue("starter");
             }
         });
     }

@@ -71,6 +71,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
 
         mDialog.getWindow().setAttributes(lp);
+        mDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         return mDialog;
     }
 

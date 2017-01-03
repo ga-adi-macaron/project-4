@@ -4,8 +4,11 @@
     android:id="@+id/activity_base_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-                android:background="#bdbdbd"
-    tools:context="com.example.jon.eventmeets.BaseLoginActivity">
+    android:background="#bdbdbd"
+    tools:context="com.example.jon.eventmeets.BaseLoginActivity"
+    android:nestedScrollingEnabled="true"
+    android:isScrollContainer="true"
+    android:scrollbars="vertical">
 
     <Button
         android:background="@drawable/button_shape"
