@@ -497,19 +497,21 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(2000);
         Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
         //Reset the choice tiles because one or more hidden tiles may need to be made visible again.
-        for (int i=0; i<mChoiceTiles.size(); i++){
-            ((CardView) mChoiceTiles.get(i).getParent())
-                    .setVisibility(View.VISIBLE);
-            int numberCounter = 0;
-            for (int j=0; j<mUserAnswers.length; j++){
-                if (Integer.parseInt(mChoiceTiles.get(i).getText().toString()) == mUserAnswers[i]){
-                    numberCounter++;
-                }
-                if (numberCounter == 9) {
-                    ((CardView) mChoiceTiles.get(i).getParent())
-                            .setVisibility(View.INVISIBLE);
-                    break;
-                }
+        int[] numberCounters = new int[9];
+        for (int i=0; i<mUserAnswers.length; i++){
+            if (mUserAnswers[i] != 0){
+                int value = mUserAnswers[i];
+                numberCounters[value-1]++;
+            }
+        }
+
+        for (int i=0; i<numberCounters.length; i++) {
+            if (!(numberCounters[i] < 9)) {
+                ((CardView) mChoiceTiles.get(i).getParent())
+                        .setVisibility(View.INVISIBLE);
+            } else {
+                ((CardView) mChoiceTiles.get(i).getParent())
+                        .setVisibility(View.VISIBLE);
             }
         }
     }
