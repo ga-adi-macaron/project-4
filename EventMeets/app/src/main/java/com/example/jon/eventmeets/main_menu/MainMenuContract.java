@@ -1,21 +1,21 @@
 package com.example.jon.eventmeets.main_menu;
 
-import com.example.jon.eventmeets.model.VideoGamingEvent;
+import com.example.jon.eventmeets.model.GameResultObject;
 
 import java.util.List;
 
 interface MainMenuContract {
     interface Presenter {
         void onNewEventsNeeded();
-        void onNewEventsReady(List<VideoGamingEvent> newEvents);
-        void onEventPressed(VideoGamingEvent gameEvent);
+        void onNewEventsReady(List<GameResultObject> newEvents);
+        void onEventPressed(GameResultObject gameEvent);
         void onBrowsePressed();
     }
 
     interface View {
-        void setupRecyclerView(List<VideoGamingEvent> list);
+        void setupRecyclerView(List<GameResultObject> list);
         void hideLoginButton();
-        void openEventDetail(VideoGamingEvent event);
+        void openEventDetail(GameResultObject event);
         void openBrowseActivity();
         void displayLoginButton();
         void openSettingsActivity();

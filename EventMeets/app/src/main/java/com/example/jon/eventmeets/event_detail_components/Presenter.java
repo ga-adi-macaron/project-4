@@ -4,12 +4,10 @@ package com.example.jon.eventmeets.event_detail_components;
 import android.os.AsyncTask;
 
 import com.example.jon.eventmeets.model.GameResultObject;
-import com.example.jon.eventmeets.model.VideoGamingEvent;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;

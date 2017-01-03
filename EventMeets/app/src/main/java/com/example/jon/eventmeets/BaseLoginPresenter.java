@@ -9,6 +9,8 @@ import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -20,6 +22,8 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private BaseLoginContract.View mView;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private String mFirst, mLast, mToken;
+    private FirebaseUser mUser;
 
     public BaseLoginPresenter(BaseLoginContract.View view) {
         mView = view;
@@ -27,7 +31,13 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
+                mUser = firebaseAuth.getCurrentUser();
+                if(mUser != null) {
+                    UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(mFirst+" "+mLast)
+                            .build();
+                    mUser.updateProfile(request);
+                }
             }
         };
     }
@@ -106,11 +116,15 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private void addUserToDatabase(String userKey, String first, String last) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("users");
-        BaseUser user = new BaseUser(userKey, first, last);
-        ref.child(userKey).setValue(user);
+        BaseUser.getInstance().setFirstName(first);
+        BaseUser.getInstance().setLastName(last);
+        BaseUser.getInstance().setUsername(userKey);
+        ref.child(userKey).setValue(BaseUser.getInstance());
     }
 
-    private void requestAccount(final String username, final String password, final String first, final String last) {
+    private void requestAccount(final String username, final String password, String first, String last) {
+        mFirst = first;
+        mLast = last;
         mAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(
                 new OnCompleteListener<AuthResult>() {
                     @Override
@@ -120,7 +134,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
                         } else {
                             mView.notifyFragmentSuccess();
                             String userKey = mAuth.getCurrentUser().getUid();
-                            addUserToDatabase(userKey, first, last);
+                            addUserToDatabase(userKey, mFirst, mLast);
                             mView.addAccountInfoToSharedPreferences(username, password);
                         }
                     }

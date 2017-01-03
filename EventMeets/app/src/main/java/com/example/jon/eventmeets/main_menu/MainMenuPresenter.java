@@ -1,6 +1,6 @@
 package com.example.jon.eventmeets.main_menu;
 
-import com.example.jon.eventmeets.model.VideoGamingEvent;
+import com.example.jon.eventmeets.model.GameResultObject;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 class MainMenuPresenter implements MainMenuContract.Presenter {
     private MainMenuView mView;
-    private List<VideoGamingEvent> mEventList;
+    private List<GameResultObject> mEventList;
     private DatabaseReference mReference;
 
     MainMenuPresenter(MainMenuView view) {
@@ -28,12 +28,12 @@ class MainMenuPresenter implements MainMenuContract.Presenter {
     }
 
     @Override
-    public void onNewEventsReady(List<VideoGamingEvent> newEvents) {
+    public void onNewEventsReady(List<GameResultObject> newEvents) {
         mView.setupRecyclerView(newEvents);
     }
 
     @Override
-    public void onEventPressed(VideoGamingEvent gameEvent) {
+    public void onEventPressed(GameResultObject gameEvent) {
 
     }
 

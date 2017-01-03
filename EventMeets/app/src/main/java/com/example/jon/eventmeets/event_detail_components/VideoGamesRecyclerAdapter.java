@@ -1,17 +1,15 @@
 package com.example.jon.eventmeets.event_detail_components;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.GameResultObject;
-import com.example.jon.eventmeets.model.VideoGamingEvent;
+import com.example.jon.eventmeets.model.ReleaseDateObject;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -41,13 +39,46 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
     public void onBindViewHolder(final VideoGameViewHolder holder, int position) {
         final GameResultObject game = mVideogames.get(position);
 
+        if(game.getCover() != null&&game.getCover().getUrl().length() > 0) {
+            String cover = "https://images.igdb.com/igdb/image/upload/t_cover_small/"
+                    +game.getCover().getCloudinary_id()+".jpg";
+            Picasso.with(holder.mContext).load(cover).into(holder.mCoverArt);
+        }
+        holder.mGameTitle.setText(game.getName());
+
+        holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIntent= new Intent(holder.mContext, EventDetailActivity.class);
+                String image = game.getScreenshots().get(0).getCloudinary_id();
+
+                consoleAssignments(mIntent, holder.getAdapterPosition());
+                mIntent.putExtra("summary", game.getSummary());
+                mIntent.putExtra("name", game.getName());
+                mIntent.putExtra("id", game.getId());
+                mIntent.putExtra("image", image);
+                mIntent.putExtra("cover", game.getCover().getCloudinary_id());
+                holder.mContext.startActivity(mIntent);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return mVideogames.size();
+    }
+
+    private void consoleAssignments(Intent intent, int position) {
+
         mNintendo = false;
         mXbox = false;
         mPc = false;
         mPlaystation = false;
 
-        for(int i=0;i<game.getRelease_dates().size();i++) {
-            int platform = game.getRelease_dates().get(i).getPlatform();
+        List<ReleaseDateObject> dates = mVideogames.get(position).getRelease_dates();
+
+        for(int i=0;i<dates.size();i++) {
+            int platform = dates.get(i).getPlatform();
             switch(platform) {
                 case 4:
                 case 5:
@@ -79,54 +110,19 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
             }
         }
 
-        if(game.getCover() != null&&game.getCover().getUrl().length() > 0) {
-            String cover = "https://images.igdb.com/igdb/image/upload/t_cover_small/"
-                    +game.getCover().getCloudinary_id()+".jpg";
-            Picasso.with(holder.mContext).load(cover).into(holder.mCoverArt);
-        }
-        holder.mGameTitle.setText(game.getName());
-
-        holder.mGameLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mIntent= new Intent(holder.mContext, EventDetailActivity.class);
-                String image = game.getScreenshots().get(0).getCloudinary_id();
-
-                consoleAssignments(mIntent);
-                mIntent.putExtra("summary", game.getSummary());
-                mIntent.putExtra("name", game.getName());
-                mIntent.putExtra("id", game.getId());
-                mIntent.putExtra("image", image);
-                holder.mContext.startActivity(mIntent);
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mVideogames.size();
-    }
-
-    private void consoleAssignments(Intent intent) {
-        int count = 0;
         ArrayList<String> consoles = new ArrayList<>();
         if(mXbox) {
             consoles.add("XBox");
-            count++;
         }
         if(mNintendo) {
             consoles.add("Nintendo");
-            count++;
         }
         if(mPlaystation) {
             consoles.add("PlayStation");
-            count++;
         }
         if(mPc) {
             consoles.add("PC");
-            count++;
         }
         intent.putExtra("platforms", consoles);
-        intent.putExtra("numPlatforms", count);
     }
 }

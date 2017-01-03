@@ -5,14 +5,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
-import com.example.jon.eventmeets.model.VideoGamingEvent;
+import com.example.jon.eventmeets.model.GameResultObject;
 
 import java.util.List;
 
 public class MainMenuRecyclerAdapter extends RecyclerView.Adapter<MainMenuEventParentViewHolder>{
-    private List<VideoGamingEvent> mEventList;
+    private List<GameResultObject> mEventList;
 
-    public MainMenuRecyclerAdapter(List<VideoGamingEvent> list) {
+    public MainMenuRecyclerAdapter(List<GameResultObject> list) {
         mEventList = list;
     }
 

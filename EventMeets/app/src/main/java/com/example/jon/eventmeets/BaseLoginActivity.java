@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.jon.eventmeets.main_menu.MainMenuView;
+import com.example.jon.eventmeets.model.BaseUser;
 
 public class BaseLoginActivity extends AppCompatActivity implements BaseLoginContract.View, View.OnClickListener{
     private BaseLoginContract.Presenter mPresenter;

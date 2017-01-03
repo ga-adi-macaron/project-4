@@ -10,7 +10,6 @@ import android.widget.EditText;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.GameResultObject;
-import com.example.jon.eventmeets.model.VideoGamingEvent;
 
 import java.util.List;
 
