@@ -420,8 +420,12 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 for (int i=0; i<mOpponentCellsFilled.length; i++){
                     if (mOpponentCellsFilled[i] == 1){
                         mCellViews.get(i).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
-                        mCellViews.get(i).setText("");
-                        mCellViews.get(i).setTextColor(getResources().getColor(R.color.colorAccent));
+                        mCellViews.get(i).setTextColor(Color.BLACK);
+                        if (mUserAnswers[i] == 0){
+                            mCellViews.get(i).setText("");
+                        } else {
+                            mCellViews.get(i).setText(mUserAnswers[i]+"");
+                        }
                     }
                 }
             }
@@ -552,11 +556,12 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                         mCellViews.get(i).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
                     } else {
                         mCellViews.get(i).setBackgroundColor(Color.TRANSPARENT);
-                        if(mKey[i] != 0){
-                            mCellViews.get(i).setText(mKey[i]+"");
-                        } else {
-                            mCellViews.get(i).setText("");
-                        }
+
+                    }
+                    if (mUserAnswers[i] == 0){
+                        mCellViews.get(i).setText("");
+                    } else {
+                        mCellViews.get(i).setText(mUserAnswers[i]+"");
                     }
                 }
             }

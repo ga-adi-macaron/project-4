@@ -238,22 +238,26 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ImageView weaponImage;
-                String weaponSlot;
+                String weaponSlot, weaponCurrentlyInSlot;
+                //Determine which weapon slot was clicked
                 switch (view.getId()){
                     case R.id.weapon1:
                         weaponImage = (ImageView)dialogView.findViewById(R.id.weapon1_image);
                         weaponSlot = "slot 1";
+                        weaponCurrentlyInSlot = dialog.mWeaponSlot1;
                         break;
                     case R.id.weapon2:
                         weaponImage = (ImageView)dialogView.findViewById(R.id.weapon2_image);
                         weaponSlot = "slot 2";
+                        weaponCurrentlyInSlot = dialog.mWeaponSlot2;
                         break;
                     default:
                         return;
                 }
 
                 String selectedWeapon = dialog.mSelectedWeapon;
-                if(!selectedWeapon.equals("")) {
+
+                if(!selectedWeapon.equals("") && !weaponCurrentlyInSlot.equals(selectedWeapon)) {
                     if (selectedWeapon.equals("bomb")){
                         weaponImage.setImageResource(R.drawable.explosion);
                         int bombCount = Integer.parseInt(bombInventoryText.getText().toString());
@@ -267,28 +271,51 @@ public class MainMenuActivity extends AppCompatActivity {
                         int interfCount = Integer.parseInt(interfInventoryText.getText().toString());
                         interfInventoryText.setText(String.valueOf(interfCount-1));
                     }
+
+                    //Set the weapon into the slot and save what weapon if any was there before
+                    String weaponToAddBack = "";
                     if (weaponSlot.equals("slot 1")){
-                        dialog.mWeaponSlot1 = selectedWeapon;
+                        weaponToAddBack = dialog.mWeaponSlot1;
+                        if (!selectedWeapon.equals(dialog.mWeaponSlot1)) {
+                            dialog.mWeaponSlot1 = selectedWeapon;
+                        }
                     } else if (weaponSlot.equals("slot 2")){
+                        weaponToAddBack = dialog.mWeaponSlot2;
+                        if (!selectedWeapon.equals(dialog.mWeaponSlot2)) {
+                            dialog.mWeaponSlot2 = selectedWeapon;
+                        }
                         dialog.mWeaponSlot2 = selectedWeapon;
+                    }
+
+                    //Add the old weapon back into the inventory count
+                    if (!selectedWeapon.equals(weaponToAddBack)) {
+                        switch (weaponToAddBack) {
+                            case "bomb":
+                                bombInventoryText.setText(String.valueOf(
+                                        Integer.parseInt(bombInventoryText.getText().toString()) + 1));
+                                break;
+                            case "spy":
+                                spyInventoryText.setText(String.valueOf(
+                                        Integer.parseInt(spyInventoryText.getText().toString())+ 1));
+                                break;
+                            case "interference":
+                                interfInventoryText.setText(String.valueOf(
+                                        Integer.parseInt(interfInventoryText.getText().toString())+ 1));
+                                break;
+                        }
                     }
                     dialog.mSelectedWeapon = "";
                     bombIcon.setColorFilter(Color.WHITE);
                     spyIcon.setColorFilter(Color.WHITE);
                     interfIcon.setColorFilter(Color.WHITE);
                 }
-
-
             }
         };
 
         View.OnLongClickListener weaponSlotLongListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                SharedPreferences.Editor prefsEditor =
-                        getSharedPreferences(ARMED_WEAPONS_PREFS, MODE_PRIVATE).edit();
-
-                ImageView weaponImage;
+               ImageView weaponImage;
                 String weaponSlot;
                 switch (view.getId()){
                     case R.id.weapon1:
@@ -303,9 +330,9 @@ public class MainMenuActivity extends AppCompatActivity {
                         return false;
                 }
                 if (weaponSlot.equals("slot 1")){
-                    prefsEditor.putString(WEAPON_SLOT1_KEY, "none");
+                    dialog.mWeaponSlot1 = "none";
                 } else if (weaponSlot.equals("slot 2")){
-                    prefsEditor.putString(WEAPON_SLOT2_KEY, "none");
+                    dialog.mWeaponSlot2 = "none";
                 }
                 dialog.mSelectedWeapon = "";
                 weaponImage.setImageResource(R.drawable.none);
