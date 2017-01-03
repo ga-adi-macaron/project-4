@@ -14,6 +14,7 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ChangeTransform;
+import android.transition.Explode;
 import android.transition.TransitionSet;
 import android.util.Pair;
 import android.view.View;
@@ -41,6 +42,8 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        getWindow().setExitTransition(new Explode());
+
         TransitionSet transition = new TransitionSet();
         transition.addTransition(new ChangeTransform());
         getWindow().setSharedElementEnterTransition(transition);
@@ -79,9 +82,11 @@ public class MainMenuActivity extends AppCompatActivity {
                         Pair.create(findViewById(R.id.armory_card), getString(R.string.transition3));
                 Pair<View, String> pair4 =
                         Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+                Pair<View, String> backgroundPair =
+                        Pair.create(findViewById(R.id.main_menu_acivity), getString(R.string.background_transition));
                 ActivityOptions options =
                         ActivityOptions.makeSceneTransitionAnimation(
-                                MainMenuActivity.this, pair1, pair2, pair3, pair4);
+                                MainMenuActivity.this, pair1, pair2, pair3, pair4, backgroundPair);
                 startActivity(new Intent(MainMenuActivity.this, SoloActivity.class), options.toBundle());
             }
         });
@@ -103,8 +108,11 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Pair<View, String> pair =
                         Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+                Pair<View, String> backgroundPair =
+                        Pair.create(findViewById(R.id.main_menu_acivity), getString(R.string.background_transition));
+
                 ActivityOptions options =
-                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair);
+                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair, backgroundPair);
                 startActivity(new Intent(MainMenuActivity.this, StatsActivity.class), options.toBundle());
             }
         });
