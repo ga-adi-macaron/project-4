@@ -491,13 +491,43 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
 
     private void receiveBomb(int boxNumber){
 
-        int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
+        final int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
         for (int i=0; i<boxCellIds.length; i++){
             if (mKey[boxCellIds[i]] == 0) {
                 mUserAnswers[boxCellIds[i]] = 0;
                 mCellViews.get(boxCellIds[i]).setText("");
             }
         }
+
+        CountDownTimer timer = new CountDownTimer(2000, 250) {
+            boolean swap = false;
+            @Override
+            public void onTick(long l) {
+                for (int i=0; i<boxCellIds.length; i++){
+                    if (swap) {
+                        mCellViews.get(boxCellIds[i])
+                                .setBackgroundColor(getResources().getColor(R.color.bombFlashColor));
+                    } else {
+                        mCellViews.get(boxCellIds[i]).setBackgroundColor(Color.TRANSPARENT);
+                    }
+                }
+                swap = !swap;
+            }
+
+            @Override
+            public void onFinish() {
+                for (int i=0; i<boxCellIds.length; i++) {
+                    if (mOpponentCellsFilled[boxCellIds[i]] == 1){
+                        mCellViews.get(boxCellIds[i])
+                                .setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
+                    } else {
+                        mCellViews.get(boxCellIds[i]).setBackgroundColor(Color.TRANSPARENT);
+                    }
+                }
+            }
+        };
+        timer.start();
+
         ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(2000);
         Toast.makeText(this, "YOU'VE BEEN ERASE BOMBED!", Toast.LENGTH_SHORT).show();
         //Reset the choice tiles because one or more hidden tiles may need to be made visible again.

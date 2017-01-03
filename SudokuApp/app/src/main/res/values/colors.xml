@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#28745c</color>
     <color name="colorAccent">#fe6faa</color>
     <color name="oppenentCellColor">#8a318b6e</color>
+    <color name="bombFlashColor">#8aff9100</color>
 </resources>
