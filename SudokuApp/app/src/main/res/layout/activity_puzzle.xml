@@ -37,11 +37,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/score_card"
         android:orientation="horizontal"
-        android:padding="2dp"
+        android:layout_margin="1dp"
         android:layout_centerHorizontal="true"
+        android:foregroundGravity="center"
         android:rowCount="9"
         android:columnCount="9"
-        android:background="@drawable/grid">
+        android:background="@drawable/grid4">
     </com.scottlindley.suyouthinkyoucandoku.SudokuGridLayout>
 
     <ProgressBar
