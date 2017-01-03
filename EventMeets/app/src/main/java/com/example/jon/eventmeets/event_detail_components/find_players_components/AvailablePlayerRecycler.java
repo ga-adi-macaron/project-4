@@ -1,6 +1,7 @@
 package com.example.jon.eventmeets.event_detail_components.find_players_components;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +24,12 @@ import java.util.List;
 
 public class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHolder> {
     private List<String> mPlayerKeys;
-    private DatabaseReference mReference;
+    private FirebaseDatabase mDatabase;
     private List<AvailablePlayer> mPlayers;
 
     public AvailablePlayerRecycler(List<String> list) {
         mPlayerKeys = list;
-        mReference = FirebaseDatabase.getInstance().getReference("users");
+        mDatabase = FirebaseDatabase.getInstance();
         mPlayers = new ArrayList<>();
     }
 
@@ -42,7 +43,7 @@ public class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlaye
     public void onBindViewHolder(final AvailablePlayerViewHolder holder, int position) {
         String key = mPlayerKeys.get(position);
 
-        mReference.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String firstName = (String)dataSnapshot.child("firstName").getValue();
@@ -60,7 +61,7 @@ public class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlaye
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.d("HERE", "onCancelled: "+databaseError);
             }
         });
 

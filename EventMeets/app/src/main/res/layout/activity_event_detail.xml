@@ -33,8 +33,9 @@
             <ImageView
                 android:id="@+id/screen_image"
                 app:layout_collapseMode="none"
+                android:layout_gravity="top"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"/>
+                android:layout_height="match_parent"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>

@@ -50,9 +50,14 @@ public class EventMessageActivity extends AppCompatActivity {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         mReference = db.getReference("games");
 
+        mAdapter = new AvailablePlayerRecycler(mPlayerIDs);
+        mPlayerRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mPlayerRecycler.setAdapter(mAdapter);
+
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                final String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 if(!dataSnapshot.hasChild(mId)) {
                     mReference.child(mId).child(mPlatform).setValue(mGameObject);
                 } else {
@@ -63,8 +68,13 @@ public class EventMessageActivity extends AppCompatActivity {
                         }
                     }
                 }
-                String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                mReference.child(mId).child(mPlatform).child(user).setValue("looking");
+                mReference.child(mId).child(mPlatform).child(user).setValue("looking", new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        mPlayerIDs.add(user);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
             }
 
             @Override
@@ -73,8 +83,5 @@ public class EventMessageActivity extends AppCompatActivity {
             }
         });
 
-        mAdapter = new AvailablePlayerRecycler(mPlayerIDs);
-        mPlayerRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mPlayerRecycler.setAdapter(mAdapter);
     }
 }
