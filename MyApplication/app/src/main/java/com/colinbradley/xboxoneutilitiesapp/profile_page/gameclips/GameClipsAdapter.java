@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 
 import com.colinbradley.xboxoneutilitiesapp.R;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -25,8 +27,9 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
         mContext = context;
     }
 
-    public interface OnItemSelectedListener{
-        void onItemSelected(String clipURL, String imgURL, String title);
+    interface OnItemSelectedListener{
+        void onItemSelectedToPlay(String clipURL, String imgURL, String title);
+        void onItemSelectedToDownload(String url) throws MalformedURLException, URISyntaxException;
     }
 
     @Override
@@ -36,17 +39,32 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(GameClipsViewHolder holder, final int position) {
+    public void onBindViewHolder(final GameClipsViewHolder holder, final int position) {
         final GameClip currentClip = mGameClipsList.get(position);
         holder.mGame.setText(mGameClipsList.get(position).getGameName());
         holder.mDescription.setText(mGameClipsList.get(position).getClipDescription());
         holder.mTitle.setText(mGameClipsList.get(position).getClipName());
         holder.bindImage(mGameClipsList.get(position).getImgURL(), mContext);
 
-        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+
+        holder.mDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.onItemSelected(currentClip.getClipURL(), currentClip.getImgURL(), currentClip.getClipName());
+                try {
+                    mOnItemSelectedListener.onItemSelectedToDownload(currentClip.getClipURL());
+                } catch (MalformedURLException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
+        holder.mPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemSelectedListener.onItemSelectedToPlay(currentClip.getClipURL(), currentClip.getImgURL(), currentClip.getClipName());
+
             }
         });
 

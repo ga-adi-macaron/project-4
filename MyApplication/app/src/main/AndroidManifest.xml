@@ -4,7 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +21,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".profile_page.ProfileActivity" />
-        <activity android:name=".VideoPlayerActivity"></activity>
+        <activity android:name=".VideoPlayerActivity" />
+        <activity android:name=".store_page.StoreActivity" />
+        <activity android:name=".store_page.games_with_gold.GameWithGoldDetails" />
+        <activity android:name=".store_page.xbox_marketplace.XBMarketplaceGameDetails"></activity>
+        <activity android:name=".store_page.deals_with_gold.DealWithGoldDetails"/>
     </application>
 
 </manifest>

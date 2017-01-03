@@ -9,7 +9,7 @@ import java.util.Comparator;
 public class Friend implements Comparable<Friend>{
     private String gamertag;
     private String picURL;
-    private int xuid;
+    private long xuid;
 
     public static final Comparator<Friend> gamertagComparator = new Comparator<Friend>() {
         @Override
@@ -18,7 +18,7 @@ public class Friend implements Comparable<Friend>{
         }
     };
 
-    public Friend(String gamertag, String picURL, int xuid) {
+    public Friend(String gamertag, String picURL, long xuid) {
         this.gamertag = gamertag;
         this.picURL = picURL;
         this.xuid = xuid;
@@ -40,19 +40,14 @@ public class Friend implements Comparable<Friend>{
         this.picURL = picURL;
     }
 
-    public int getXuid() {
+    public long getXuid() {
         return xuid;
     }
 
-    public void setXuid(int xuid) {
+    public void setXuid(long xuid) {
         this.xuid = xuid;
     }
 
-
-    @Override
-    public int compareTo(Friend friend) {
-        return this.xuid - friend.xuid;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -75,8 +70,12 @@ public class Friend implements Comparable<Friend>{
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 47 * hash + this.xuid;
         hash = 47 * hash + (this.gamertag != null ? this.gamertag.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public int compareTo(Friend friend) {
+        return 0;
     }
 }

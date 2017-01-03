@@ -1,5 +1,8 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page.gameclips;
 
+import android.app.DownloadManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.colinbradley.xboxoneutilitiesapp.VideoPlayerActivity;
 import com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity;
 
 import org.json.JSONArray;
@@ -20,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +48,16 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
     String mGCdescription;
     String mGCurl;
     String mGCimgUrl;
+    DownloadManager mDLmanager;
+
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mClipsList = new ArrayList<>();
+
+
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -113,7 +124,31 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
 
 
     @Override
-    public void onItemSelected(String clipURL, String imgURL, String title) {
-
+    public void onItemSelectedToPlay(String clipURL, String imgURL, String title) {
+        Intent intent = new Intent(this.getContext(), VideoPlayerActivity.class);
+        intent.putExtra("title", title);
+        intent.putExtra("url", clipURL);
+        intent.putExtra("thumb", imgURL);
+        startActivity(intent);
     }
+
+    @Override
+    public void onItemSelectedToDownload(String url) throws MalformedURLException, URISyntaxException {
+
+
+        Uri uri = Uri.parse(url);
+
+
+        Log.d(TAG, "onItemSelectedToDownload: URL --- " + url);
+        Log.d(TAG, "onItemSelectedToDownload: URI --- " + uri);
+
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        mDLmanager.enqueue(request);
+
+
+        Log.d(TAG, "onItemSelectedToDownload: Downloading?");
+    }
+
+
 }

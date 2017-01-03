@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity;
+import com.colinbradley.xboxoneutilitiesapp.store_page.StoreActivity;
 
 import java.io.IOException;
 
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mTestingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),VideoPlayerActivity.class);
+                Intent intent = new Intent(getApplicationContext(), StoreActivity.class);
                 startActivity(intent);
             }
         });
@@ -104,12 +105,10 @@ public class MainActivity extends AppCompatActivity {
                                         mIsCanceled = true;
                                     }
 
-
                                     if (mIsCanceled){
                                         Log.d(TAG, "doInBackground: CANCELED");
                                         mTask.cancel(true);
                                     }
-
 
                                     mXUID = mResponse;
                                     Log.d(TAG, "doInBackground: XUID ---- " + mXUID);
@@ -152,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     @Override

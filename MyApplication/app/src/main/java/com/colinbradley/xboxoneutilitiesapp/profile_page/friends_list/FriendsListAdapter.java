@@ -2,6 +2,7 @@ package com.colinbradley.xboxoneutilitiesapp.profile_page.friends_list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListViewHolder>{
+    public static final String TAG = "FriendsListAdapter";
 
     private List<Friend> mFriendsList;
     private OnItemSelectedListener mOnItemSelectedListener;
@@ -26,8 +28,8 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListViewHold
         mOnItemSelectedListener = listener;
     }
 
-    public interface OnItemSelectedListener{
-        void onItemSelected(int id);
+    interface OnItemSelectedListener{
+        void onItemSelected(long id);
     }
 
     @Override
@@ -38,16 +40,17 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListViewHold
     }
 
     @Override
-    public void onBindViewHolder(FriendsListViewHolder holder, int position) {
+    public void onBindViewHolder(final FriendsListViewHolder holder, final int position) {
         final Friend currentFriend = mFriendsList.get(position);
 
         holder.mGamertag.setText(mFriendsList.get(position).getGamertag());
         holder.bindImage(mFriendsList.get(position).getPicURL(), mContext);
 
-        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+        holder.mGoToProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.onItemSelected(currentFriend.getXuid());
+                mOnItemSelectedListener.onItemSelected(mFriendsList.get(position).getXuid());
+                Log.d(TAG, "onClick: " + mFriendsList.get(position).getXuid());
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page.friends_list;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -61,8 +62,9 @@ public class ProfileFriendsFragment extends Fragment implements FriendsListAdapt
                     for (int i = 0; i < friendsArray.length(); i++){
                         String gamertag = friendsArray.getJSONObject(i).getString("Gamertag");
                         String picURL = friendsArray.getJSONObject(i).getString("GameDisplayPicRaw");
-                        int xuid = friendsArray.getJSONObject(i).getInt("id");
+                        long xuid = friendsArray.getJSONObject(i).getLong("id");
                         mFriendsList.add(new Friend(gamertag,picURL,xuid));
+                        Log.d(TAG, "doInBackground: friend added GT -- " + gamertag + " XUID -- " + xuid);
                         Collections.sort(mFriendsList, Friend.gamertagComparator);
                     }
                 } catch (IOException | JSONException e) {
@@ -89,7 +91,16 @@ public class ProfileFriendsFragment extends Fragment implements FriendsListAdapt
     }
 
     @Override
-    public void onItemSelected(int id) {
+    public void onItemSelected(long id) {
+        Log.d(TAG, "onItemSelected: --------");
 
+        String idAsString = String.valueOf(id);
+
+        Log.d(TAG, "onItemSelected: id before parsing == " + id);
+        Log.d(TAG, "onItemSelected: id being passed -- " + idAsString);
+
+        Intent intent = new Intent(this.getContext(), ProfileActivity.class);
+        intent.putExtra("xuid", idAsString);
+        startActivity(intent);
     }
 }

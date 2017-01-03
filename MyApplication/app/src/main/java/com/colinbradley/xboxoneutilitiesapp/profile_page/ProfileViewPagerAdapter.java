@@ -12,8 +12,8 @@ import com.colinbradley.xboxoneutilitiesapp.profile_page.screenshots.ProfileScre
  * Created by colinbradley on 12/19/16.
  */
 
-public class ViewPagerAdapter extends FragmentPagerAdapter {
-    public ViewPagerAdapter(FragmentManager fm) {
+public class ProfileViewPagerAdapter extends FragmentPagerAdapter {
+    public ProfileViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

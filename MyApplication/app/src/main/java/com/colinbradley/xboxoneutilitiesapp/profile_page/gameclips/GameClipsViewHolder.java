@@ -3,6 +3,7 @@ package com.colinbradley.xboxoneutilitiesapp.profile_page.gameclips;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ public class GameClipsViewHolder extends RecyclerView.ViewHolder {
     TextView mTitle, mDescription, mGame;
     ImageView mImage;
     View mRootView;
+    ImageButton mPlay, mDownload;
 
     public GameClipsViewHolder(View itemView) {
         super(itemView);
@@ -24,6 +26,8 @@ public class GameClipsViewHolder extends RecyclerView.ViewHolder {
         mDescription = (TextView)itemView.findViewById(R.id.gameclips_item_description);
         mGame = (TextView)itemView.findViewById(R.id.gameclips_item_game);
         mImage = (ImageView)itemView.findViewById(R.id.gameclips_item_img);
+        mPlay = (ImageButton)itemView.findViewById(R.id.play_gc_button);
+        mDownload = (ImageButton)itemView.findViewById(R.id.download_gc_button);
         mRootView = itemView;
     }
 

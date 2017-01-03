@@ -1,6 +1,8 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     Toolbar mToolbar;
     ViewPager mViewPager;
     TabLayout mTablayout;
-    ViewPagerAdapter mVPadapter;
+    ProfileViewPagerAdapter mVPadapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +64,7 @@ public class ProfileActivity extends AppCompatActivity {
         mToolbar = (Toolbar)findViewById(R.id.profile_toolbar);
 
         mViewPager = (ViewPager)findViewById(R.id.profile_viewpager);
-        mVPadapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mVPadapter = new ProfileViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mVPadapter);
 
         mTablayout = (TabLayout)findViewById(R.id.profile_tablayout);
@@ -83,7 +85,21 @@ public class ProfileActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mXUID = intent.getStringExtra("xuid");
-        fillProfile();
+
+        if (mGamertag == null || mGamerscore == null || mAccountTier == null || mXUID == null || mURLforProfilePic == null || mURLforPreferedColor == null) {
+            fillProfile();
+
+            SharedPreferences sharedPreferences = getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("gt", mGamertag);
+            editor.putString("gs", mGamerscore);
+            editor.putString("status", mAccountTier);
+            editor.putString("xuid", mXUID);
+            editor.putString("img", mURLforProfilePic);
+            editor.apply();
+        }else {
+            setViews();
+        }
     }
 
     public void fillProfile(){
@@ -115,9 +131,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d(TAG, "doInBackground: PROFILE API -- URL for Fav Color -- " + mURLforPreferedColor);
                     Log.d(TAG, "doInBackground: PROFILE API -- Gamertag -- " + mGamertag);
                     Log.d(TAG, "doInBackground: PROFILE API -- URL for Pic -- " + mURLforProfilePic);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
 
@@ -131,15 +145,9 @@ public class ProfileActivity extends AppCompatActivity {
                     JSONObject colorJSONobject = new JSONObject(colorResponse.body().string());
 
                     mFavColor = colorJSONobject.getString("primaryColor");
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
-
-
 
 
                 return null;
@@ -149,32 +157,37 @@ public class ProfileActivity extends AppCompatActivity {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
-                mGTview.setText(mGamertag);
-                mGSview.setText(mGamerscore);
-                mAccountStatus.setText(mAccountTier);
-                mXUIDview.setText(mXUID);
-                Picasso.with(getApplicationContext()).load(mURLforProfilePic).into(mProfilePic);
+                setViews();
 
-                mGTview.setVisibility(View.VISIBLE);
-                mGSview.setVisibility(View.VISIBLE);
-                mAccountStatus.setVisibility(View.VISIBLE);
-                mXUIDview.setVisibility(View.VISIBLE);
-                mProfilePic.setVisibility(View.VISIBLE);
-
-                mAcctStatus.setVisibility(View.VISIBLE);
-                mXUIDtitle.setVisibility(View.VISIBLE);
-                mGamerscoreLogo.setVisibility(View.VISIBLE);
-
-                mToolbar.setVisibility(View.VISIBLE);
-
-                mProgressBar.setVisibility(View.GONE);
-
-
-                mToolbar.setBackgroundColor(Color.parseColor("#" + mFavColor));
-                mLayout.setBackgroundColor(Color.parseColor("#" + mFavColor));
 
 
             }
         }.execute();
+    }
+
+    public void setViews(){
+        mGTview.setText(mGamertag);
+        mGSview.setText(mGamerscore);
+        mAccountStatus.setText(mAccountTier);
+        mXUIDview.setText(mXUID);
+        Picasso.with(getApplicationContext()).load(mURLforProfilePic).into(mProfilePic);
+
+        mGTview.setVisibility(View.VISIBLE);
+        mGSview.setVisibility(View.VISIBLE);
+        mAccountStatus.setVisibility(View.VISIBLE);
+        mXUIDview.setVisibility(View.VISIBLE);
+        mProfilePic.setVisibility(View.VISIBLE);
+
+        mAcctStatus.setVisibility(View.VISIBLE);
+        mXUIDtitle.setVisibility(View.VISIBLE);
+        mGamerscoreLogo.setVisibility(View.VISIBLE);
+
+        mToolbar.setVisibility(View.VISIBLE);
+
+        mProgressBar.setVisibility(View.GONE);
+
+
+        mToolbar.setBackgroundColor(Color.parseColor("#" + mFavColor));
+        mLayout.setBackgroundColor(Color.parseColor("#" + mFavColor));
     }
 }
