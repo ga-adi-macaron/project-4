@@ -5,43 +5,41 @@ package com.example.jon.eventmeets.event_detail_components.message_components;
  */
 
 public class MessageObject extends SelfMessageObject {
-    private String mContent;
-    private String mSenderName;
-    private String mPhotoURL;
+    private String content;
+    private String sender;
+    private String type;
 
     public MessageObject(String content){
         super(content);
     }
 
-    public MessageObject(String content, String senderName, String photoURL) {
-        mContent = content;
-        mSenderName = senderName;
-        mPhotoURL = photoURL;
+    public MessageObject(String content, String sender) {
+        this.content = content;
+        this.sender = sender;
+        this.type = "message";
     }
 
     @Override
     public String getContent() {
-        return mContent;
+        return content;
     }
 
     @Override
     public void setContent(String content) {
-        mContent = content;
+        this.content = content;
     }
 
-    public String getSenderName() {
-        return mSenderName;
+    @Override
+    public String getSender() {
+        return sender;
     }
 
-    public void setSenderName(String senderName) {
-        mSenderName = senderName;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
-    public String getPhotoURL() {
-        return mPhotoURL;
-    }
-
-    public void setPhotoURL(String photoURL) {
-        mPhotoURL = photoURL;
+    @Override
+    public String getType() {
+        return type;
     }
 }

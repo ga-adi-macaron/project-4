@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_chat_group"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.jon.eventmeets.event_detail_components.message_components.ChatGroupActivity">
+
+    <RelativeLayout
+        android:id="@+id/chat_function_bar"
+        android:background="#e0e0e0"
+        android:elevation="6dp"
+        android:padding="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/send_message"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/ic_send_black_36dp"
+            android:backgroundTint="#644caf50"
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
+
+        <EditText
+            android:id="@+id/message_edit"
+            android:textSize="24sp"
+            android:inputType="textCapSentences"
+            android:background="#f0f0f0"
+            android:layout_toStartOf="@id/send_message"
+            android:layout_centerVertical="true"
+            android:hint="Enter message here..."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_message_recycler"
+        android:layout_above="@id/chat_function_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

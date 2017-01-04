@@ -4,7 +4,12 @@
       tools:context="com.example.jon.eventmeets.event_detail_components.EventDetailActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="0"
         android:title="@string/action_settings"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_signout"
+        android:orderInCategory="1"
+        android:title="Sign Out"
         app:showAsAction="never"/>
 </menu>

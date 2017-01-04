@@ -29,9 +29,11 @@
             android:label="@string/title_activity_event_detail"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".event_detail_components.EventMessageActivity">
+        <activity android:name=".event_detail_components.find_players_components.EventMessageActivity">
         </activity>
         <activity android:name=".event_detail_components.VideoGameEventsActivity">
+        </activity>
+        <activity android:name=".event_detail_components.message_components.ChatGroupActivity">
         </activity>
     </application>
 

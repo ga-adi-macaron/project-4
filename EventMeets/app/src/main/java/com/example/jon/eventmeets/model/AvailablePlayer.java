@@ -5,37 +5,27 @@ package com.example.jon.eventmeets.model;
  */
 
 public class AvailablePlayer {
-    private String mUserKey;
-    private String mFirstName;
-    private String mPhotoURL;
+    private String user;
+    private String display;
 
-    public AvailablePlayer(String userKey, String firstName, String photoURL) {
-        mUserKey = userKey;
-        mFirstName = firstName;
-        mPhotoURL = photoURL;
+    public AvailablePlayer(String user, String display) {
+        this.user = user;
+        this.display = display;
     }
 
-    public String getUserKey() {
-        return mUserKey;
+    public String getUser() {
+        return user;
     }
 
-    public void setUserKey(String userKey) {
-        mUserKey = userKey;
+    public void setUser(String user) {
+        this.user = user;
     }
 
-    public String getFirstName() {
-        return mFirstName;
+    public String getDisplay() {
+        return display;
     }
 
-    public void setFirstName(String firstName) {
-        mFirstName = firstName;
-    }
-
-    public String getPhotoURL() {
-        return mPhotoURL;
-    }
-
-    public void setPhotoURL(String photoURL) {
-        mPhotoURL = photoURL;
+    public void setDisplay(String display) {
+        this.display = display;
     }
 }

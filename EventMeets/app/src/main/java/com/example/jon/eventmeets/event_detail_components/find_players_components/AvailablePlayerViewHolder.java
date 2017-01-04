@@ -13,13 +13,13 @@ import com.example.jon.eventmeets.R;
  * Created by Jon on 1/3/2017.
  */
 
-public class AvailablePlayerViewHolder extends RecyclerView.ViewHolder {
-    public ImageView mThumbnail;
-    public TextView mDisplayName;
-    public Context mContext;
-    public RelativeLayout mLayout;
+class AvailablePlayerViewHolder extends RecyclerView.ViewHolder {
+    ImageView mThumbnail;
+    TextView mDisplayName;
+    Context mContext;
+    RelativeLayout mLayout;
 
-    public AvailablePlayerViewHolder(View itemView) {
+    AvailablePlayerViewHolder(View itemView) {
         super(itemView);
         mContext = itemView.getContext();
 

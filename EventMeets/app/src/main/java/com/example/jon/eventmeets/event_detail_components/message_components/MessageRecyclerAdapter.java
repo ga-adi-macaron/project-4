@@ -26,6 +26,8 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             case 0:
                 return new MessageViewHolder(inflater.inflate(R.layout.message_layout, parent, false));
             case 1:
+                return new SystemMessageViewHolder(inflater.inflate(R.layout.system_message_layout, parent, false));
+            case 2:
                 return new SelfMessageViewHolder(inflater.inflate(R.layout.self_message_layout, parent, false));
         }
         return null;
@@ -41,7 +43,9 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             case 1:
 
                 break;
-            default:
+            case 2:
+
+                break;
         }
     }
 
@@ -54,8 +58,10 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public int getItemViewType(int position) {
         if(mMessages.get(position) instanceof MessageObject) {
             return 0;
-        } else {
+        } else if(mMessages.get(position) instanceof SystemMessageObject){
             return 1;
+        } else {
+            return 2;
         }
     }
 }

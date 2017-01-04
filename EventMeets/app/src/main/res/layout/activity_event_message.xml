@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#e0e0e0"
-    tools:context="com.example.jon.eventmeets.event_detail_components.EventMessageActivity">
+    tools:context="com.example.jon.eventmeets.event_detail_components.find_players_components.EventMessageActivity">
 
     <LinearLayout
         android:id="@+id/top_layout"
