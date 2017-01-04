@@ -263,6 +263,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         racesWon.setText("Races Won: "+ stats.getRacesWon());
         racesLost.setText("Races Lost: "+ stats.getRacesLost());
 
+        checkForAcheivementUnlock(stats);
+
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {
                     @Override
@@ -283,6 +285,33 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    /**
+     * Checks to see if the user has unlocked an achievment.
+     * @param stats are the user's updates stats that contain the number of races won.
+     */
+    private void checkForAcheivementUnlock(Stats stats){
+        if (stats.getRacesWon() == 1){
+            Games.Achievements.unlock(
+                    mGoogleApiClient, getResources().getString(R.string.achievement1));
+        }
+        if (stats.getRacesWon() == 10){
+            Games.Achievements.unlock(
+                    mGoogleApiClient, getResources().getString(R.string.achievement2));
+        }
+        if (stats.getRacesWon() == 50){
+            Games.Achievements.unlock(
+                    mGoogleApiClient, getResources().getString(R.string.achievement3));
+        }
+        if (stats.getRacesWon() == 100){
+            Games.Achievements.unlock(
+                    mGoogleApiClient, getResources().getString(R.string.achievement4));
+        }
+        if (stats.getRacesWon() == 200){
+            Games.Achievements.unlock(
+                    mGoogleApiClient, getResources().getString(R.string.achievement5));
+        }
     }
 
     /**
@@ -335,7 +364,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
         super.onResume();
     }
-
+    
     @Override
     public void setUpScoreCard() {
         mStrikes = 0;
@@ -384,6 +413,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }.start();
     }
 
+    /**
+     * Adds long click listeners to all the cells to use a selected weapon.
+     * @param cell is the cell that is clicked (short or long).
+     */
     @Override
     public void setCellClickListener(TextView cell) {
         super.setCellClickListener(cell);
@@ -407,6 +440,13 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         });
     }
 
+    /**
+     * First gets the box number using the puzzle solver's logic. Then clears the color tint
+     * of any cells in the selected box. Finally, sends a message to the opponent notifying him/her
+     * that a bomb has been used and in which box.
+     * number
+     * @param cellIndex is the cell that was long pressed.
+     */
     private void deployBomb(int cellIndex){
         //Clear the tinted boxes on the attacker's screen
         int boxNumber = mPuzzleSolver.getBoxNumber(cellIndex);
@@ -425,6 +465,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         removeWeaponFromInventory("bomb");
     }
 
+    /**
+     * Sets all cells that the opponent has filled to show the value in the solution.
+     * A timer is started for three seconds. When the Countdown timer is done, the board is reverted
+     * back to it's state beofre the spy weapon was deployed.
+     */
     private void deploySpy(){
         for (int i=0; i<mOpponentCellsFilled.length; i++){
             if (mOpponentCellsFilled[i] == 1){
@@ -459,6 +504,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         removeWeaponFromInventory("spy");
     }
 
+    /**
+     * Sends a message to the user's opponent to receive interference weapon.
+     */
     private void deployInterference(){
         byte[] data = INTERFERENCE_MESSAGE.getBytes();
         Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
@@ -513,6 +561,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    /**
+     * Removes the users input found within the specified box number. The box then flashes orange/white
+     * for three seconds to draw the user's eye and show where the bombing has taken place.
+     * @param boxNumber is the box number that was bombed.
+     */
     private void receiveBomb(int boxNumber){
 
         final int[] boxCellIds = mPuzzleSolver.getBoxCells()[boxNumber];
@@ -574,12 +627,14 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    /**
+     * Causes half the user's key to become obscured. Then the other half.
+     */
     private void receiveInterference(){
         Toast.makeText(this, "Opponent used Interference!", Toast.LENGTH_SHORT).show();
         CountDownTimer timer = new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long l) {
-                Log.d(TAG, "onTick: " + l);
                 boolean skip = false;
                 if (l < 1000 || l < 3000) {
                     skip = false;
@@ -602,7 +657,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 }
             }
 
-
+            //Reset the board to it's original state before the interference occurred.
             @Override
             public void onFinish() {
                 for (int i=0; i<mCellViews.size(); i++){
@@ -623,6 +678,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         timer.start();
     }
 
+    /**
+     * Launches an alert dialog to notify the user that no match was found.
+     */
     private void launchNoMatchFoundDialog(){
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setPositiveButton("okay", new DialogInterface.OnClickListener() {

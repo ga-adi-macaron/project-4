@@ -7,4 +7,9 @@
     <string name="transition4">Transition 4</string>
     <string name="background_transition">Background Transition</string>
     <string name="signin_failure">Error Signing In</string>
+    <string name="achievement1">CgkIsYH52agXEAIQAQ</string>
+    <string name="achievement2">CgkIsYH52agXEAIQAg</string>
+    <string name="achievement3">CgkIsYH52agXEAIQAw</string>
+    <string name="achievement4">CgkIsYH52agXEAIQBA</string>
+    <string name="achievement5">CgkIsYH52agXEAIQBQ</string>
 </resources>
