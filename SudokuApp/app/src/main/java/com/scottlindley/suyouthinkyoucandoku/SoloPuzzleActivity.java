@@ -129,12 +129,15 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        SharedPreferences.Editor prefsEditor =
-                getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE).edit();
-        prefsEditor.putLong(TIME_PREFS_KEY, mTime);
-        prefsEditor.putInt(SCORE_PREFS_KEY, mScore);
-        prefsEditor.commit();
-        mTimer.cancel();
+        //If the score card has been set up, save the time and current score.
+        if (mTimer!=null) {
+            SharedPreferences.Editor prefsEditor =
+                    getSharedPreferences(TIMER_PREFS_KEY, MODE_PRIVATE).edit();
+            prefsEditor.putLong(TIME_PREFS_KEY, mTime);
+            prefsEditor.putInt(SCORE_PREFS_KEY, mScore);
+            prefsEditor.commit();
+            mTimer.cancel();
+        }
     }
 
     @Override
