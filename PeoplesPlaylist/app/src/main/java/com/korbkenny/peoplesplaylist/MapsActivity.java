@@ -49,6 +49,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -100,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean loggedIn;
     private Button mSignInButton;
     private CardView cardView;
+    private LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,26 +175,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        try {
-            boolean success = mMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            this, R.raw.style_json));
-
-            if (!success) {
-                Log.e(TAG, "Style parsing failed.");
-            }
-        } catch (Resources.NotFoundException e) {
-            Log.e(TAG, "Can't find style. Error: ", e);
-        }
-
+        stylizeMap();
         setUpMap();
-        mMap.setBuildingsEnabled(false);
-        mMap.setMaxZoomPreference(20);
-        mMap.setMinZoomPreference(15);
-
         requestUserImage();
         setViewsIfLoggedIn();
-
         keepRequestingGeoQueries();
 
         //  FAB to create new playlist. Opens a dialog to do this.
@@ -217,7 +203,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double distance = getDistanceBetweenPoints(marker,lastLocation);
                 Log.d(TAG, "onMarkerClick: " + distance);
 
-                if (distance<100) {
+                // I think it's in meters?
+                if (distance < 100) {
                     Intent intent = new Intent(MapsActivity.this, PlaylistActivity.class);
                     intent.putExtra("Playlist Id", marker.getTag().toString());
                     startActivity(intent);
@@ -246,54 +233,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void keepRequestingGeoQueries() {
-        if(lastLocation!=null && geoQuery == null) {
-            moveMapToCurrentLocation(lastLocation);
-            createGeoQuery();
-        }
-        else if (lastLocation == null && geoQuery == null && geoTries < 30){
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            keepRequestingGeoQueries();
-                            geoTries++;
-                        }
-                    });
-                }
-            };
-            timer.schedule(timerTask, 0, 1000);
+    private void stylizeMap() {
+        try {
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
         }
     }
-
-    private void requestUserImage() {
-        if(ME != null && ME.getUserImage() != null){
-            loadUserIcon();
-        } else if(tries < 30){
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    tries++;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            requestUserImage();
-                        }
-                    });
-                }
-            };
-            timer.schedule(timerTask,0,1000);
-        }
-    }
-
-    private void loadUserIcon() {
-        Picasso.with(this).load(ME.getUserImage()).into(vUserIcon);
-    }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
@@ -302,9 +254,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public Dialog onCreateDialog(final Location location) {
+
+        //  Create and Inflate
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         builder.setView(inflater.inflate(R.layout.add_playlist_dialog, null))
+
                 // Add action buttons
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
@@ -323,7 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         playlist.setCover("null");
 
                         //  Push to the playlists branch of the database, and get the
-                        //  unique, randomly generated key for geofire use.
+                        //  unique, randomly generated key for use with geofire/other stuff.
                         final String playlistId = mDatabasePlaylistReference.push().getKey();
                         playlist.setId(playlistId);
                         mDatabasePlaylistReference.child(playlistId).setValue(playlist);
@@ -377,17 +332,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if(playlist.getCover()!=null) {
                                     Log.d(TAG, "onPostExecute: " + playlist.getCover());
                                 }
-//                                PicassoMarker picassoMarker = new PicassoMarker(marker);
-//                                Picasso.with(MapsActivity.this).load(Uri.parse(playlist.getCover()))
-//                                        .placeholder(R.drawable.markerplaceholder)
-//                                        .transform(new CircleTransform())
-//                                        .resize(100,100).into(picassoMarker);
+                                PicassoMarker picassoMarker = new PicassoMarker(marker);
+                                Picasso.with(MapsActivity.this).load(Uri.parse(playlist.getCover()))
+                                        .placeholder(R.drawable.markerplaceholder)
+                                        .transform(new CircleTransform())
+                                        .resize(100,100).into(picassoMarker);
 
                             }
                         }.execute();
-
-
-
                     }
 
                     @Override
@@ -395,7 +347,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 });
-
             }
 
             @Override
@@ -420,31 +371,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-
-
-
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
-    //     Extra methods I probably won't touch much.
+    //      Request User Icon and GeoQuery
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //  Get distance between you and the marker you click
-    private double getDistanceBetweenPoints(Marker marker, Location lastLocation) {
-        double lat1 = marker.getPosition().latitude;
-        double lon1 = marker.getPosition().longitude;
-        double lat2 = lastLocation.getLatitude();
-        double lon2 = lastLocation.getLongitude();
-
-        int R = 6371; // km
-        double x = (lon2 - lon1) * Math.cos((lat1 + lat2) / 2);
-        double y = (lat2 - lat1);
-
-        return Math.sqrt(x * x + y * y) * R;
+    private void keepRequestingGeoQueries() {
+        if(lastLocation!=null && geoQuery == null) {
+            moveMapToCurrentLocation(lastLocation);
+            createGeoQuery();
+        }
+        else if (lastLocation == null && geoQuery == null && geoTries < 30){
+            Timer timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            keepRequestingGeoQueries();
+                            geoTries++;
+                        }
+                    });
+                }
+            };
+            timer.schedule(timerTask, 0, 1000);
+        }
     }
 
+    private void requestUserImage() {
+        if(ME != null && ME.getUserImage() != null){
+            loadUserIcon();
+        } else if(tries < 30){
+            Timer timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    tries++;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            requestUserImage();
+                        }
+                    });
+                }
+            };
+            timer.schedule(timerTask,0,1000);
+        }
+    }
 
+    private void loadUserIcon() {
+        Picasso.with(this).load(ME.getUserImage()).into(vUserIcon);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //     Build the Google Api Client and add Listeners
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -454,25 +439,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
     }
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
-    //     Activity Lifecycle Overrides
+    //         Setup Views and Map and Stuff
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
 
     private void setViewsIfLoggedIn(){
         fab = (FloatingActionButton)findViewById(R.id.fab);
@@ -494,32 +465,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
-        if (geoQuery != null) {
-            geoQuery.removeAllListeners();
-        }
-        if (mAuthListener != null){
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-
-    //  Set up the map by getting permission.
     public void setUpMap() {
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.setBuildingsEnabled(false);
+        mMap.setIndoorEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.setMaxZoomPreference(20);
+        mMap.setMinZoomPreference(15);
         if (!checkPermission()) {
             requestPermission();
-            return;
         }
     }
 
-    //REQUEST STUFF
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //     Request Permissions/Check Permissions
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void requestPermission() {
         ActivityCompat.requestPermissions(MapsActivity.this, new
@@ -557,14 +520,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 result1 == PackageManager.PERMISSION_GRANTED;
     }
 
-    //END REQUEST STUFF
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //          Location Stuff
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void moveMapToCurrentLocation(Location lastLocation) {
         if (lastLocation != null) {
             LatLng current = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(current));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(17f));
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(current)
+                    .zoom(18)
+                    .tilt(60)
+                    .build();
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
@@ -577,21 +547,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (checkPermission()) {
             getLastLocation();
-            mMap.setMyLocationEnabled(true);
             if (lastLocation == null) {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             }
             createLocationRequest();
+            mMap.setMyLocationEnabled(true);
         }
         else{
             requestPermission();
         }
-        }
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -606,15 +575,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
-        createGeoQuery();
-        moveMapToCurrentLocation(lastLocation);
+        if(lastLocation != null) {
+            createGeoQuery();
+            moveMapToCurrentLocation(lastLocation);
+        }
     }
-
-    //=====================================
-    //
-    //          OnCreate Methods
-    //
-    //=====================================
 
 
     private void createLocationRequest() {
@@ -622,5 +587,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 3000)        // 30 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //     Activity Lifecycle Overrides
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+        if (geoQuery != null) {
+            geoQuery.removeAllListeners();
+        }
+        if (mAuthListener != null){
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //     Extra methods I probably won't touch much.
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private double getDistanceBetweenPoints(Marker marker, Location lastLocation) {
+        double lat1 = marker.getPosition().latitude;
+        double lon1 = marker.getPosition().longitude;
+        double lat2 = lastLocation.getLatitude();
+        double lon2 = lastLocation.getLongitude();
+
+        int R = 6371; // km
+        double x = (lon2 - lon1) * Math.cos((lat1 + lat2) / 2);
+        double y = (lat2 - lat1);
+
+        return Math.sqrt(x * x + y * y) * R;
     }
 }

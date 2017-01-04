@@ -30,9 +30,11 @@
         </activity>
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".playlist.PlaylistActivity">
+        <activity android:name=".playlist.PlaylistActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".LoginActivity">
         </activity>
