@@ -82,7 +82,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     /**
-     * Takes the weapons that were armed before the race from an intent and assigns them to the weapon
+     * Takes the weapons that were armed before the race from an shared preferences and assigns
+     * them to the weapon
      * slots above the game board. Click listeners are then assigned to the weapons.
      */
     private void setUpWeapons(){
@@ -224,10 +225,19 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         TextView resultDetailText = (TextView)dialogView.findViewById(R.id.lost_game_message);
         TextView racesWon = (TextView)dialogView.findViewById(R.id.races_won);
         TextView racesLost = (TextView)dialogView.findViewById(R.id.races_lost);
+        TextView coinsWon = (TextView)dialogView.findViewById(R.id.won_coins);
 
         Stats stats = mDBHelper.getStats();
         if(win) {
             gameResultText.setText("You Win!");
+            SharedPreferences prefs = getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
+            int coins = prefs.getInt(ArmoryActivity.COIN_COUNT_KEY, 0);
+            coinsWon.setText("+5 coins for your victory!\nCoins: "+ (coins + 5));
+            coinsWon.setVisibility(View.VISIBLE);
+            prefs.edit()
+                    .putInt(ArmoryActivity.COIN_COUNT_KEY, coins + 5)
+                    .commit();
+
             if(isCorrect) {
                 resultDetailText.setText("You completed the puzzle before the enemy");
                 byte[] data = OPPONENT_FINISHED_MESSAGE.getBytes();
@@ -364,7 +374,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
         super.onResume();
     }
-    
+
     @Override
     public void setUpScoreCard() {
         mStrikes = 0;
@@ -878,6 +888,22 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     //All methods below are required interface overrides
+
+    @Override
+    public void onPeersDisconnected(Room room, List<String> list) {
+        mOpponentDisconnected = true;
+        endGame(true);
+    }
+    @Override
+    public void onP2PDisconnected(String s) {
+        Log.d(TAG, "onP2PDisconnected: ");
+    }
+    @Override
+    public void onLeftRoom(int i, String s) {
+        RaceActivity.this.finish();
+        byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
+        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+    }
     @Override
     public void onRoomConnecting(Room room) {}
     @Override
@@ -897,25 +923,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     @Override
     public void onPeersConnected(Room room, List<String> list) {}
     @Override
-    public void onPeersDisconnected(Room room, List<String> list) {
-        mOpponentDisconnected = true;
-        endGame(true);
-    }
-    @Override
-    public void onP2PConnected(String s) {}
-    @Override
-    public void onP2PDisconnected(String s) {
-        Log.d(TAG, "onP2PDisconnected: ");
-    }
-    @Override
     public void onRoomCreated(int i, Room room) {}
     @Override
     public void onJoinedRoom(int i, Room room) {}
     @Override
-    public void onLeftRoom(int i, String s) {
-        RaceActivity.this.finish();
-        byte[] data = OPPONENT_QUIT_MESSAGE.getBytes();
-        Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
-    }
+    public void onP2PConnected(String s) {}
 
 }

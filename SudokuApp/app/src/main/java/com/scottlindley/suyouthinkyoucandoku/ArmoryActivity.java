@@ -31,7 +31,7 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
 
     private void setUpViews(){
         SharedPreferences prefs = getSharedPreferences(ARMORY_SHARED_PREFS, MODE_PRIVATE);
-        mCoinCount = prefs.getInt(COIN_COUNT_KEY, 100);
+        mCoinCount = prefs.getInt(COIN_COUNT_KEY, 3);
         mCoinCountText = (TextView)findViewById(R.id.coins_text);
         mCoinCountText.setText("Coins: " + mCoinCount);
 

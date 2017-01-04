@@ -29,7 +29,18 @@
         android:layout_margin="16dp"
         android:textSize="18sp"/>
     <TextView
+        android:id="@+id/won_coins"
         android:layout_below="@id/lost_game_message"
+        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:textSize="24sp"
+        android:textColor="@color/colorPrimary"
+        android:visibility="invisible"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:layout_below="@id/won_coins"
         android:id="@+id/races_won"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
@@ -43,4 +54,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"/>
+
 </RelativeLayout>

@@ -3,6 +3,7 @@ package com.scottlindley.suyouthinkyoucandoku;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.firebase.database.DataSnapshot;
@@ -29,14 +30,22 @@ public class PuzzleRefreshService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
-        puzzles = new ArrayList<>();
+        AsyncTask<Void,Void,Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                puzzles = new ArrayList<>();
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference("Puzzles");
+                grabPuzzles(ref.child("easy"), "easy");
+                grabPuzzles(ref.child("medium"), "medium");
+                grabPuzzles(ref.child("hard"), "hard");
+                grabPuzzles(ref.child("expert"), "expert");
+                return null;
+            }
+        };
+        task.execute();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("Puzzles");
-        grabPuzzles(ref.child("easy"), "easy");
-        grabPuzzles(ref.child("medium"), "medium");
-        grabPuzzles(ref.child("hard"), "hard");
-        grabPuzzles(ref.child("expert"), "expert");
+
 
         return false;
     }
