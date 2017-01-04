@@ -8,7 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -68,8 +73,14 @@ import com.korbkenny.peoplesplaylist.objects.Song;
 import com.korbkenny.peoplesplaylist.objects.User;
 import com.korbkenny.peoplesplaylist.playlist.PlaylistActivity;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -102,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button mSignInButton;
     private CardView cardView;
     private LocationManager mLocationManager;
+    private List<Target> mTargetList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +123,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
         loggedIn = settings.getBoolean(LOGGEDIN,false);
         buildGoogleApiClient();
+
+        mTargetList = new ArrayList<>();
 
         sUserSingleton = UserSingleton.getInstance();
 
@@ -200,17 +214,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 getLastLocation();
-                double distance = getDistanceBetweenPoints(marker,lastLocation);
-                Log.d(TAG, "onMarkerClick: " + distance);
+                if(lastLocation!=null) {
+                    double distance = getDistanceBetweenPoints(marker, lastLocation);
+                    Log.d(TAG, "onMarkerClick: " + distance);
 
-                // I think it's in meters?
-                if (distance < 100) {
-                    Intent intent = new Intent(MapsActivity.this, PlaylistActivity.class);
-                    intent.putExtra("Playlist Id", marker.getTag().toString());
-                    startActivity(intent);
-                }
-                else {
-                    Toast.makeText(MapsActivity.this, "Get a bit closer, wouldja?", Toast.LENGTH_SHORT).show();
+                    // I think it's in meters?
+                    if (distance < 50) {
+                        Intent intent = new Intent(MapsActivity.this, PlaylistActivity.class);
+                        intent.putExtra("Playlist Id", marker.getTag().toString());
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MapsActivity.this, "Get a bit closer, wouldja?", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 return false;
             }
@@ -307,6 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void createGeoQuery(){
         moveMapToCurrentLocation(lastLocation);
+        Log.d(TAG, "createGeoQuery: " + lastLocation.getLatitude() + " " + lastLocation.getLongitude());
         geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),100);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
@@ -323,21 +339,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                             @Override
-                            protected void onPostExecute(Playlist playlist) {
-                                Marker marker = mMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(playlist.getLat(),playlist.getLon()))
-                                        .title(playlist.getTitle()));
-                                marker.setTag(playlist.getId());
-
-                                if(playlist.getCover()!=null) {
-                                    Log.d(TAG, "onPostExecute: " + playlist.getCover());
+                            protected void onPostExecute(final Playlist playlist) {
+                                if(playlist.getCover()!=null){
+                                    MarkerOptions options = new MarkerOptions()
+                                            .position(new LatLng(playlist.getLat(),playlist.getLon()))
+                                            .title(playlist.getTitle())
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.dotmarker));
+                                    Marker marker = mMap.addMarker(options);
+                                    marker.setTag(playlist.getId());
+                                    Target target = new PicassoMarker(marker);
+                                    mTargetList.add(target);
+                                    Picasso.with(MapsActivity.this).load(playlist.getCover()).placeholder(R.drawable.markerplaceholder).resize(150,150).into(target);
                                 }
-                                PicassoMarker picassoMarker = new PicassoMarker(marker);
-                                Picasso.with(MapsActivity.this).load(Uri.parse(playlist.getCover()))
-                                        .placeholder(R.drawable.markerplaceholder)
-                                        .transform(new CircleTransform())
-                                        .resize(100,100).into(picassoMarker);
-
                             }
                         }.execute();
                     }
@@ -614,6 +627,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         if (mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+        if(mTargetList!=null){
+            if(mTargetList.size()>0){
+                mTargetList.clear();
+            }
         }
     }
 

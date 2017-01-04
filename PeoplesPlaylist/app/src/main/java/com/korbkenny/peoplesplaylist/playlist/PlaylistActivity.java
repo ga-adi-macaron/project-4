@@ -3,10 +3,13 @@ package com.korbkenny.peoplesplaylist.playlist;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Path;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -51,6 +54,7 @@ import com.korbkenny.peoplesplaylist.objects.User;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,34 +161,52 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
             if(resultCode == RESULT_OK && requestCode == 1){
                 Uri selectedImage = imageReturnedIntent.getData();
-                Bitmap newBitmap;
-
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),selectedImage);
-                    newBitmap = cropToSquare(bitmap);
+                    final Bitmap squareBitmap = cropToSquare(bitmap);
+                    Bitmap resizedBitmap = resizeForCover(squareBitmap);
+                    final Bitmap circleBitmap = cropToCircle(resizedBitmap);
+                    new AsyncTask<Void,Void,String>(){
+                        @Override
+                        protected String doInBackground(Void... voids) {
+                            return saveImageToDisk(circleBitmap);
+                        }
+
+                        @Override
+                        protected void onPostExecute(String coverPath) {
+                            Uri file = Uri.fromFile(new File(coverPath+"/playlistcover.png"));
+                            mCover.setImageURI(file);
+                            mStoragePictureRef.child("playlistcover.png").putFile(file)
+                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            if(taskSnapshot.getDownloadUrl()!=null) {
+                                                mThisPlaylist.setCover(taskSnapshot.getDownloadUrl().toString());
+                                                mPlaylistRef.setValue(mThisPlaylist);
+                                                Picasso.with(PlaylistActivity.this)
+                                                        .load(mThisPlaylist.getCover())
+                                                        .resize(mCover.getWidth(),mCover.getHeight())
+                                                        .into(mCover);
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                        }
+                    }.execute();
+
+
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                Picasso.with(PlaylistActivity.this).load(selectedImage).into(mCover);
-                mCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-                mStoragePictureRef.putFile(selectedImage)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                if(taskSnapshot.getDownloadUrl()!=null) {
-                                    mThisPlaylist.setCover(taskSnapshot.getDownloadUrl().toString());
-                                    mPlaylistRef.setValue(mThisPlaylist);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-
-                            }
-                        });
 
             }
     }
@@ -538,17 +560,79 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         mDbListeners.put(mSongListRef,songsListener);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //          Image Manipulation
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     public Bitmap cropToSquare(Bitmap bitmap){
-        int width  = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        int newWidth = (height > width) ? width : height;
-        int newHeight = (height > width)? height - ( height - width) : height;
-        int cropW = (width - height) / 2;
-        cropW = (cropW < 0)? 0: cropW;
-        int cropH = (height - width) / 2;
-        cropH = (cropH < 0)? 0: cropH;
-        return Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
+        if(bitmap.getWidth() >= bitmap.getHeight()){
+            Bitmap newBitmap = Bitmap.createBitmap(
+                    bitmap,
+                    (bitmap.getWidth() / 2) - (bitmap.getHeight() / 2),
+                    0,
+                    bitmap.getHeight(),
+                    bitmap.getHeight()
+            );
+            return newBitmap;
+        } else{
+            Bitmap newBitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    (bitmap.getHeight()/2) - (bitmap.getWidth()/2),
+                    bitmap.getWidth(),
+                    bitmap.getWidth()
+            );
+            return newBitmap;
+        }
     }
+
+    public Bitmap resizeForCover(Bitmap bitmap){
+        return Bitmap.createScaledBitmap(bitmap,200,200,false);
+    }
+
+    public static Bitmap cropToCircle(Bitmap bitmap) {
+        final int width = bitmap.getWidth();
+        final int height = bitmap.getHeight();
+        final Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        final Path path = new Path();
+        path.addCircle(
+                (float)(width / 2)
+                , (float)(height / 2)
+                , (float) Math.min(width, (height / 2))
+                , Path.Direction.CCW);
+
+        final Canvas canvas = new Canvas(outputBitmap);
+        canvas.clipPath(path);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        return outputBitmap;
+    }
+
+    private String saveImageToDisk(Bitmap bitmap){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        File directory = cw.getDir("imageDir",MODE_PRIVATE);
+        File imagePath = new File(directory,"playlistcover.png");
+
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(imagePath);
+            bitmap.compress(Bitmap.CompressFormat.PNG,0,fos);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        Log.d(TAG, "saveImageToDisk: " + directory.getAbsolutePath());
+        return directory.getAbsolutePath();
+    }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
