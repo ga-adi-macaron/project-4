@@ -28,6 +28,7 @@ import java.io.IOException;
 public class VisionBoardActivity extends AppCompatActivity {
     public static final int IMAGE_REQUEST = 1;
 
+    View.OnTouchListener mTouchListener;
     ImageView mNewImage;
     TextView mNewText;
     ViewGroup mViewGroup;
@@ -41,6 +42,38 @@ public class VisionBoardActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Vision Board");
 
         mViewGroup = (ViewGroup) findViewById(R.id.activity_vision_board);
+
+        mTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                RelativeLayout.LayoutParams getLayoutParams =
+                        (RelativeLayout.LayoutParams) view.getLayoutParams();
+
+                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_POINTER_DOWN:
+                        mStartX = (int) motionEvent.getX();
+                        mStartY = (int) motionEvent.getY();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        int delta_x = (int) motionEvent.getX() - mStartX;
+                        int delta_y = (int) motionEvent.getY() - mStartY;
+                        getLayoutParams.leftMargin = getLayoutParams.leftMargin + delta_x;
+                        getLayoutParams.rightMargin = getLayoutParams.rightMargin - delta_x;
+                        getLayoutParams.topMargin = getLayoutParams.topMargin + delta_y;
+                        getLayoutParams.bottomMargin = getLayoutParams.bottomMargin - delta_y;
+                        view.setLayoutParams(getLayoutParams);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_POINTER_UP:
+                        break;
+                }
+                mViewGroup.invalidate();
+                return true;
+            }
+        };
     }
 
     public void addNewText(){
@@ -73,37 +106,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null);
         builder.create().show();
 
-        mNewText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                RelativeLayout.LayoutParams getLayoutParams =
-                        (RelativeLayout.LayoutParams) view.getLayoutParams();
-
-                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_DOWN:
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        mStartX = (int) motionEvent.getX();
-                        mStartY = (int) motionEvent.getY();
-                        break;
-
-                    case MotionEvent.ACTION_MOVE:
-                        int delta_x = (int) motionEvent.getX() - mStartX;
-                        int delta_y = (int) motionEvent.getY() - mStartY;
-                        getLayoutParams.leftMargin = getLayoutParams.leftMargin + delta_x;
-                        getLayoutParams.rightMargin = getLayoutParams.rightMargin - delta_x;
-                        getLayoutParams.topMargin = getLayoutParams.topMargin + delta_y;
-                        getLayoutParams.bottomMargin = getLayoutParams.bottomMargin - delta_y;
-                        view.setLayoutParams(getLayoutParams);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_POINTER_UP:
-                        break;
-                }
-                mViewGroup.invalidate();
-                return true;
-            }
-        });
+        mNewText.setOnTouchListener(mTouchListener);
     }
 
     public void addNewImage(Bitmap bitmap){
@@ -116,37 +119,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         mViewGroup.addView(mNewImage);
         mNewImage.setImageBitmap(bitmap);
 
-        mNewImage.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                RelativeLayout.LayoutParams getLayoutParams =
-                        (RelativeLayout.LayoutParams) view.getLayoutParams();
-
-                switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_DOWN:
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        mStartX = (int) motionEvent.getX();
-                        mStartY = (int) motionEvent.getY();
-                        break;
-
-                    case MotionEvent.ACTION_MOVE:
-                        int delta_x = (int) motionEvent.getX() - mStartX;
-                        int delta_y = (int) motionEvent.getY() - mStartY;
-                        getLayoutParams.leftMargin = getLayoutParams.leftMargin + delta_x;
-                        getLayoutParams.rightMargin = getLayoutParams.rightMargin - delta_x;
-                        getLayoutParams.topMargin = getLayoutParams.topMargin + delta_y;
-                        getLayoutParams.bottomMargin = getLayoutParams.bottomMargin - delta_y;
-                        view.setLayoutParams(getLayoutParams);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_POINTER_UP:
-                        break;
-                }
-                mViewGroup.invalidate();
-                return true;
-            }
-        });
+        mNewImage.setOnTouchListener(mTouchListener);
     }
 
     @Override
