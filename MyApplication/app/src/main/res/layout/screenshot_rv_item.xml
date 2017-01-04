@@ -12,31 +12,46 @@
     <RelativeLayout
         android:id="@+id/gameclips_item_relativelayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
 
         <ImageView
             android:id="@+id/screenshot_item_img"
             android:layout_width="match_parent"
             android:layout_height="200sp" />
 
+        <com.facebook.share.widget.ShareButton
+            android:id="@+id/ss_fb_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/screenshot_item_img"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8sp"
+            android:layout_marginTop="8sp"/>
+
         <TextView
             android:id="@+id/screenshot_item_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:layout_below="@id/screenshot_item_img"
+            android:layout_toLeftOf="@id/ss_fb_share"
+            android:textColor="#000000"
             android:layout_marginLeft="8sp"
             android:text="Clip Title"/>
 
         <TextView
             android:id="@+id/screeshot_item_game"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:layout_below="@id/screenshot_item_img"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="8sp"
+            android:layout_below="@id/screenshot_item_title"
+            android:layout_toLeftOf="@id/ss_fb_share"
+            android:textColor="#000000"
+            android:layout_marginLeft="8sp"
             android:text="Game Title"/>
+
+
 
 
     </RelativeLayout>

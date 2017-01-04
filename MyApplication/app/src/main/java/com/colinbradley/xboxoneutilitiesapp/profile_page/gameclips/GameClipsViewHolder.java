@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.facebook.share.widget.ShareButton;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -18,7 +19,8 @@ public class GameClipsViewHolder extends RecyclerView.ViewHolder {
     TextView mTitle, mDescription, mGame;
     ImageView mImage;
     View mRootView;
-    ImageButton mPlay, mDownload;
+    ImageButton mPlay;
+    ShareButton mShareButton;
 
     public GameClipsViewHolder(View itemView) {
         super(itemView);
@@ -27,7 +29,7 @@ public class GameClipsViewHolder extends RecyclerView.ViewHolder {
         mGame = (TextView)itemView.findViewById(R.id.gameclips_item_game);
         mImage = (ImageView)itemView.findViewById(R.id.gameclips_item_img);
         mPlay = (ImageButton)itemView.findViewById(R.id.play_gc_button);
-        mDownload = (ImageButton)itemView.findViewById(R.id.download_gc_button);
+        mShareButton = (ShareButton)itemView.findViewById(R.id.gc_fb_share);
         mRootView = itemView;
     }
 

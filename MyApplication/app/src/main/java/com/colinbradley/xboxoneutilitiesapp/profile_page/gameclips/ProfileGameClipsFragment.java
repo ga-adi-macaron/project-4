@@ -2,7 +2,6 @@ package com.colinbradley.xboxoneutilitiesapp.profile_page.gameclips;
 
 import android.app.DownloadManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,19 +12,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
 import com.colinbradley.xboxoneutilitiesapp.VideoPlayerActivity;
 import com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,14 +53,15 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
     String mGCimgUrl;
     DownloadManager mDLmanager;
 
+    ShareDialog mShareDialog;
+    CallbackManager mCallbackManager;
+
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mClipsList = new ArrayList<>();
-
-
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -112,6 +116,25 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
             }
         }.execute();
 
+        mCallbackManager = CallbackManager.Factory.create();
+        mShareDialog = new ShareDialog(this);
+        mShareDialog.registerCallback(mCallbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Toast.makeText(getActivity().getApplicationContext(), "Article Shared", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(getActivity().getApplicationContext(), "Canceled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(getActivity().getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         View rootView = inflater.inflate(R.layout.fragment_gameclips, container, false);
 
         mRV = (RecyclerView)rootView.findViewById(R.id.gameclips_rv);
@@ -122,7 +145,6 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
         return rootView;
     }
 
-
     @Override
     public void onItemSelectedToPlay(String clipURL, String imgURL, String title) {
         Intent intent = new Intent(this.getContext(), VideoPlayerActivity.class);
@@ -130,24 +152,6 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
         intent.putExtra("url", clipURL);
         intent.putExtra("thumb", imgURL);
         startActivity(intent);
-    }
-
-    @Override
-    public void onItemSelectedToDownload(String url) throws MalformedURLException, URISyntaxException {
-
-
-        Uri uri = Uri.parse(url);
-
-
-        Log.d(TAG, "onItemSelectedToDownload: URL --- " + url);
-        Log.d(TAG, "onItemSelectedToDownload: URI --- " + uri);
-
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-
-        mDLmanager.enqueue(request);
-
-
-        Log.d(TAG, "onItemSelectedToDownload: Downloading?");
     }
 
 

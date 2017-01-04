@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">XboxOneUtilitiesApp</string>
     <string name="gamerscore_logo">https://hydra-media.cursecdn.com/wasteland.gamepedia.com/a/a1/Icon_gamerscore.png?version=806b92385543659548fbd2dd0fc2124f</string>
-
+    <string name="facebook_app_id">360430017652160</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

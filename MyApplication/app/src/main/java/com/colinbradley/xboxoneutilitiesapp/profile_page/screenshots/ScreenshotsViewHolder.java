@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.facebook.share.widget.ShareButton;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -18,12 +19,14 @@ public class ScreenshotsViewHolder extends RecyclerView.ViewHolder {
     TextView mTitle, mGame;
     ImageView mScreenshot;
     View mRootView;
+    ShareButton mShareButton;
 
     public ScreenshotsViewHolder(View itemView) {
         super(itemView);
         mTitle = (TextView)itemView.findViewById(R.id.screenshot_item_title);
         mGame = (TextView)itemView.findViewById(R.id.screeshot_item_game);
         mScreenshot = (ImageView)itemView.findViewById(R.id.screenshot_item_img);
+        mShareButton = (ShareButton)itemView.findViewById(R.id.ss_fb_share);
         mRootView = itemView;
     }
 
