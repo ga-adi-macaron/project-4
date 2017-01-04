@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.korbkenny.peoplesplaylist.maps.MapsActivity;
+
 public class SplashActivity extends AppCompatActivity {
 
     @Override

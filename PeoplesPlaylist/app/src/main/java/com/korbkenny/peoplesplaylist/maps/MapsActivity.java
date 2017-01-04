@@ -1,25 +1,17 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.maps;
 
-import android.Manifest;
+import android.animation.ValueAnimator;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -27,11 +19,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,20 +54,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.korbkenny.peoplesplaylist.LoginActivity;
+import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
 import com.korbkenny.peoplesplaylist.objects.Playlist;
-import com.korbkenny.peoplesplaylist.objects.Song;
 import com.korbkenny.peoplesplaylist.objects.User;
 import com.korbkenny.peoplesplaylist.playlist.PlaylistActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -414,28 +400,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void requestUserImage() {
-        if(ME != null && ME.getUserImage() != null){
-            loadUserIcon();
-        } else if(tries < 30){
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    tries++;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            requestUserImage();
-                        }
-                    });
-                }
-            };
-            timer.schedule(timerTask,0,1000);
+        if(tries < 30) {
+            if (ME != null && ME.getUserImage() != null) {
+                loadUserIcon();
+            } else {
+                Timer timer = new Timer();
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        tries++;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                requestUserImage();
+                            }
+                        });
+                    }
+                };
+                timer.schedule(timerTask, 0, 1000);
+            }
         }
     }
 
     private void loadUserIcon() {
-        Picasso.with(this).load(ME.getUserImage()).into(vUserIcon);
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                vUserIcon.setImageBitmap(bitmap);
+                ValueAnimator ani = ValueAnimator.ofFloat(0, 1);
+                ani.setDuration(700);
+                ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        vUserIcon.setAlpha((float) animation.getAnimatedValue());
+                    }
+                });
+                ani.start();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        Picasso.with(this).load(ME.getUserImage()).into(target);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

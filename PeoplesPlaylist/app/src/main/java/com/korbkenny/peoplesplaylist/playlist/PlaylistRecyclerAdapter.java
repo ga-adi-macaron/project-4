@@ -22,7 +22,6 @@ import static android.content.ContentValues.TAG;
  */
 
 public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
-    private static MediaPlayer mMediaPlayer;
     List<Song> mSongList;
     RecyclerItemClickListener mListener;
 
@@ -44,24 +43,6 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
         holder.mSongTitle.setText(mSongList.get(position).getTitle());
         holder.mSongNumber.setText("hey");
 
-//        holder.mLayout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                Log.d(TAG, "onClick: " + mSongList.get(position).getStreamUrl());
-//                if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
-//                    mMediaPlayer.stop();
-//                    mMediaPlayer.reset();
-//                    mMediaPlayer.release();
-//                    mMediaPlayer = null;
-//                }
-//
-//                mMediaPlayer = MediaPlayer.create(view.getContext(),
-//                        Uri.parse(mSongList.get(position).getStreamUrl()));
-//                mMediaPlayer.start();
-//            }
-//        });
-
         Picasso.with(holder.mUserIcon.getContext())
                 .load(mSongList.get(position).getUserImage())
                 .into(holder.mUserIcon);
@@ -71,10 +52,6 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
         }
 
         holder.bind(mSongList.get(position),mListener);
-
-
-
-
     }
 
     @Override

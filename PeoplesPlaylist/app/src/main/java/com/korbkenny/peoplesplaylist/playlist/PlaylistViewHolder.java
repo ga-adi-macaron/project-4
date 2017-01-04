@@ -16,9 +16,7 @@ import com.korbkenny.peoplesplaylist.objects.Song;
  */
 
 public class PlaylistViewHolder extends RecyclerView.ViewHolder {
-//    private static MediaPlayer mMediaPlayer;
     TextView mSongTitle, mSongNumber;
-    Song mSong;
     ImageView mUserIcon;
     RelativeLayout mLayout;
 
@@ -28,23 +26,8 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder {
         mSongTitle = (TextView)itemView.findViewById(R.id.vh_song_title);
         mUserIcon = (ImageView)itemView.findViewById(R.id.song_user_image);
         mSongNumber = (TextView)itemView.findViewById(R.id.vh_song_number);
-
         mLayout = (RelativeLayout)itemView.findViewById(R.id.vh_layout);
 
-//        itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
-//                    mMediaPlayer.stop();
-//                    mMediaPlayer.reset();
-//                    mMediaPlayer.release();
-//                    mMediaPlayer = null;
-//                }
-//
-//                mMediaPlayer = MediaPlayer.create(view.getContext(), Uri.parse(mSong.getStreamUrl()));
-//                mMediaPlayer.start();
-//            }
-//        });
     }
 
     public void bind(final Song song, final PlaylistRecyclerAdapter.RecyclerItemClickListener listener){
