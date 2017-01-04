@@ -1,15 +1,15 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page.gameclips;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.facebook.share.model.ShareLinkContent;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -29,7 +29,6 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
 
     interface OnItemSelectedListener{
         void onItemSelectedToPlay(String clipURL, String imgURL, String title);
-        void onItemSelectedToDownload(String url) throws MalformedURLException, URISyntaxException;
     }
 
     @Override
@@ -46,19 +45,14 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
         holder.mTitle.setText(mGameClipsList.get(position).getClipName());
         holder.bindImage(mGameClipsList.get(position).getImgURL(), mContext);
 
-
-        holder.mDownload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    mOnItemSelectedListener.onItemSelectedToDownload(currentClip.getClipURL());
-                } catch (MalformedURLException | URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
+        Uri imgUri = Uri.parse(mGameClipsList.get(position).getImgURL());
+        Uri clipUri = Uri.parse(mGameClipsList.get(position).getClipURL());
+        ShareLinkContent fbShare = new ShareLinkContent.Builder()
+                .setContentTitle(mGameClipsList.get(position).getClipName() + " from " + mGameClipsList.get(position).getGameName())
+                .setImageUrl(imgUri)
+                .setContentUrl(clipUri)
+                .build();
+        holder.mShareButton.setShareContent(fbShare);
 
         holder.mPlay.setOnClickListener(new View.OnClickListener() {
             @Override

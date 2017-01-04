@@ -1,5 +1,6 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page.screenshots;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,10 +11,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.colinbradley.xboxoneutilitiesapp.FullscreenImageActivity;
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
 import com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +46,9 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
     AsyncTask<Void,Void,Void> mTask;
     ScreenshotsAdapter mAdapter;
     RecyclerView mRV;
+
+    ShareDialog mShareDialog;
+    CallbackManager mCallbackManager;
 
     @Nullable
     @Override
@@ -95,6 +106,25 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
             }
         }.execute();
 
+        mCallbackManager = CallbackManager.Factory.create();
+        mShareDialog = new ShareDialog(this);
+        mShareDialog.registerCallback(mCallbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Toast.makeText(getActivity().getApplicationContext(), "Article Shared", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(getActivity().getApplicationContext(), "Canceled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(getActivity().getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         View rootView = inflater.inflate(R.layout.fragment_screenshots,container,false);
 
         mRV = (RecyclerView)rootView.findViewById(R.id.screenshot_rv);
@@ -108,6 +138,8 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
 
     @Override
     public void onItemSelected(String imgUrl) {
-
+        Intent intent = new Intent(getContext(), FullscreenImageActivity.class);
+        intent.putExtra("url", imgUrl);
+        startActivity(intent);
     }
 }

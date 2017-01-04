@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -82,6 +84,9 @@ public class ProfileActivity extends AppCompatActivity {
         mXUIDtitle = (TextView)findViewById(R.id.profile_xuid);
 
         mGamerscoreLogo.setImageResource(R.drawable.gamerscorelogo);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
 
         Intent intent = getIntent();
         mXUID = intent.getStringExtra("xuid");

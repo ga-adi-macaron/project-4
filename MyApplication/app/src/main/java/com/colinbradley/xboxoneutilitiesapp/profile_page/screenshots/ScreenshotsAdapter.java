@@ -1,12 +1,14 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page.screenshots;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.colinbradley.xboxoneutilitiesapp.R;
+import com.facebook.share.model.ShareLinkContent;
 
 import java.util.List;
 
@@ -45,7 +47,15 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsViewHold
         holder.mGame.setText(mScreenshotList.get(position).getGame());
         holder.bindImage(mScreenshotList.get(position).getImgURL(), mContext);
 
-        holder.mRootView.setOnClickListener(new View.OnClickListener() {
+        Uri imgURL = Uri.parse(mScreenshotList.get(position).getImgURL());
+        ShareLinkContent fbShare = new ShareLinkContent.Builder()
+                .setImageUrl(imgURL)
+                .setContentTitle(mScreenshotList.get(position).getTitle() + " from " + mScreenshotList.get(position).getGame())
+                .build();
+        holder.mShareButton.setShareContent(fbShare);
+
+
+        holder.mScreenshot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOnItemSelectedListener.onItemSelected(currentSS.getImgURL());
