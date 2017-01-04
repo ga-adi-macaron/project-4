@@ -81,6 +81,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 .build();
     }
 
+    /**
+     * Takes the weapons that were armed before the race from an intent and assigns them to the weapon
+     * slots above the game board. Click listeners are then assigned to the weapons.
+     */
     private void setUpWeapons(){
         SharedPreferences prefs =
                 getSharedPreferences(MainMenuActivity.ARMED_WEAPONS_PREFS, MODE_PRIVATE);
@@ -131,6 +135,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         });
     }
 
+    /**
+     * Changes the text found above the weapons when a weapon is either selected or deselected.
+     * @param weaponSlot is the location of the selected weapon (position 1 or position 2).
+     */
     private void adjustCardText(int weaponSlot){
         String weapon = "none";
         if (weaponSlot == 1) {
@@ -154,6 +162,11 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         mWeaponSelected = weapon;
     }
 
+    /**
+     * sets the appropriate image depending on the name of the weapon given.
+     * @param weaponName is the name of the weapon.
+     * @param weaponImage is the ImageView that will be assigned an icon.
+     */
     private void setWeaponImage(String weaponName, ImageView weaponImage){
         switch (weaponName){
             case "bomb":
@@ -171,6 +184,13 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         }
     }
 
+    /**
+     * Override of the method found in BasePuzzle Activity. This version also sends messages to the
+     * opponent. If correct, the user sends off the cell's id, or position on the board. If
+     * incorrect and the user already has three strikes, send a message to the opponent saying the user
+     * has lost.
+     * @param cell
+     */
     @Override
     public void checkCellInput(TextView cell) {
         //If it's correct then send the opponent a message
@@ -283,6 +303,10 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         return random.nextInt(range);
     }
 
+    /**
+     * tints a cell to indicate the opponent has placed a correct input.
+     * @param cellLocation is the location of the opponent's input.
+     */
     private void tintCell(int cellLocation){
         mCellViews.get(cellLocation).setBackgroundColor(getResources().getColor(R.color.oppenentCellColor));
     }
