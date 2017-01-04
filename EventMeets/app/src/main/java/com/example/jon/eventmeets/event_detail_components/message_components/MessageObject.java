@@ -13,6 +13,8 @@ public class MessageObject extends SelfMessageObject {
         super(content);
     }
 
+    public MessageObject() {}
+
     public MessageObject(String content, String sender) {
         this.content = content;
         this.sender = sender;

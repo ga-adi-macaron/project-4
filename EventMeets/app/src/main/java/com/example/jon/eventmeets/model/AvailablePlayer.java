@@ -13,6 +13,8 @@ public class AvailablePlayer {
         this.display = display;
     }
 
+    public AvailablePlayer() {}
+
     public String getUser() {
         return user;
     }

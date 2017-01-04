@@ -1,7 +1,9 @@
 package com.example.jon.eventmeets.event_detail_components.message_components;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +33,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     private MessageRecyclerAdapter mAdapter;
     private DatabaseReference mReference;
     private ChildEventListener mListener;
+    private List<SelfMessageObject> mMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,11 @@ public class ChatGroupActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
+                mMessages = mGroup.getMessages();
+                mAdapter = new MessageRecyclerAdapter(mMessages);
+                mMessageRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
+                        LinearLayoutManager.VERTICAL, false));
+                mMessageRecycler.setAdapter(mAdapter);
             }
 
             @Override
@@ -68,7 +76,7 @@ public class ChatGroupActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() > 0) {
-                    mSendMessage.setBackgroundColor(Color.alpha(255));
+                    mSendMessage.setBackgroundTintList(ColorStateList.valueOf(Color.argb(255,75,175,80)));
                     mSendMessage.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -77,7 +85,7 @@ public class ChatGroupActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    mSendMessage.setBackgroundColor(Color.alpha(100));
+                    mSendMessage.setBackgroundTintList(ColorStateList.valueOf(Color.argb(100,75,175,80)));
                 }
             }
 
@@ -86,10 +94,6 @@ public class ChatGroupActivity extends AppCompatActivity {
 
             }
         });
-
-        mAdapter = new MessageRecyclerAdapter(mGroup.getMessages());
-        mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mMessageRecycler.setAdapter(mAdapter);
     }
 
     @Override
@@ -98,7 +102,8 @@ public class ChatGroupActivity extends AppCompatActivity {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mGroup.addMessage(dataSnapshot.getValue(SelfMessageObject.class));
+                mGroup.addMessage(dataSnapshot.getValue(MessageObject.class));
+                mAdapter.notifyItemInserted(mMessages.size());
             }
 
             @Override
