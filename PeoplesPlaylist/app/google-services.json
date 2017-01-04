@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "814391093351-9q0uh0ovm18q1tuh90sjnpiqkmvbhcir.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.korbkenny.peoplesplaylist",
+            "certificate_hash": "C760A2C6268C9C47822AF8AD668155ADD190C000"
+          }
+        },
+        {
           "client_id": "814391093351-a0sj5jspbv5mh7f11s5olhffpamfih5u.apps.googleusercontent.com",
           "client_type": 3
         }

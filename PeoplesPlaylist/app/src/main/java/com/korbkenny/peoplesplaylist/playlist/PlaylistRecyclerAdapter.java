@@ -4,7 +4,9 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.korbkenny.peoplesplaylist.R;
@@ -13,16 +15,24 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Created by KorbBookProReturns on 12/19/16.
  */
 
 public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
+    private static MediaPlayer mMediaPlayer;
     List<Song> mSongList;
+    RecyclerItemClickListener mListener;
 
-    public PlaylistRecyclerAdapter(List<Song> songList) {
+
+    public PlaylistRecyclerAdapter(List<Song> songList, RecyclerItemClickListener listener) {
         mSongList = songList;
+        mListener = listener;
     }
+
+
 
     @Override
     public PlaylistViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -30,9 +40,27 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
     }
 
     @Override
-    public void onBindViewHolder(PlaylistViewHolder holder, int position) {
+    public void onBindViewHolder(PlaylistViewHolder holder, final int position) {
         holder.mSongTitle.setText(mSongList.get(position).getTitle());
         holder.mSongNumber.setText("hey");
+
+//        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Log.d(TAG, "onClick: " + mSongList.get(position).getStreamUrl());
+//                if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
+//                    mMediaPlayer.stop();
+//                    mMediaPlayer.reset();
+//                    mMediaPlayer.release();
+//                    mMediaPlayer = null;
+//                }
+//
+//                mMediaPlayer = MediaPlayer.create(view.getContext(),
+//                        Uri.parse(mSongList.get(position).getStreamUrl()));
+//                mMediaPlayer.start();
+//            }
+//        });
 
         Picasso.with(holder.mUserIcon.getContext())
                 .load(mSongList.get(position).getUserImage())
@@ -41,6 +69,8 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
         if (position % 2 == 1) {
             holder.mLayout.setBackgroundColor(Color.parseColor("#dddddd"));
         }
+
+        holder.bind(mSongList.get(position),mListener);
 
 
 
@@ -51,4 +81,9 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
     public int getItemCount() {
         return mSongList.size();
     }
+
+    public interface RecyclerItemClickListener{
+        void onClickListener(Song song, int position);
+    }
 }
+

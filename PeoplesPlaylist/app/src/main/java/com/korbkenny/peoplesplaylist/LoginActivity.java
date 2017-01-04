@@ -32,6 +32,9 @@ public class LoginActivity extends AppCompatActivity{
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    public static final String SHARED_PREF = "MySettings";
+    public static final String LOGGEDIN = "LoggedIn";
+
     private EditText signupEmail, signupPassword, loginEmail, loginPassword;
     private RelativeLayout layoutSignup, layoutLogin, layoutAlready;
 
@@ -166,6 +169,13 @@ public class LoginActivity extends AppCompatActivity{
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     sUserSingleton.setUser(dataSnapshot.getValue(User.class));
+
+                                    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putBoolean(LOGGEDIN,true);
+                                    editor.commit();
+
+                                    finish();
                                 }
 
                                 @Override
@@ -204,8 +214,16 @@ public class LoginActivity extends AppCompatActivity{
                                     ME.setUserImage("https://firebasestorage.googleapis.com/v0/b/peoplesplaylist-9c5d9.appspot.com/o/userplaceholder.png?alt=media&token=69ff913e-2eb2-46b5-a210-390e69ddac31");
                                     sUserSingleton.setUser(ME);
                                     mDatabaseUserReference.child(userId).setValue(ME);
+
+                                    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putBoolean(LOGGEDIN,true);
+                                    editor.commit();
+
+                                    finish();
                                     Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
                                     startActivity(intent);
+                                    finish();
                                 }
                             }.execute();
                         }

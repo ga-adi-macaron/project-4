@@ -1,6 +1,7 @@
 package com.korbkenny.peoplesplaylist.playlist;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,7 +16,7 @@ import com.korbkenny.peoplesplaylist.objects.Song;
  */
 
 public class PlaylistViewHolder extends RecyclerView.ViewHolder {
-    private static MediaPlayer mMediaPlayer;
+//    private static MediaPlayer mMediaPlayer;
     TextView mSongTitle, mSongNumber;
     Song mSong;
     ImageView mUserIcon;
@@ -30,18 +31,27 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder {
 
         mLayout = (RelativeLayout)itemView.findViewById(R.id.vh_layout);
 
+//        itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
+//                    mMediaPlayer.stop();
+//                    mMediaPlayer.reset();
+//                    mMediaPlayer.release();
+//                    mMediaPlayer = null;
+//                }
+//
+//                mMediaPlayer = MediaPlayer.create(view.getContext(), Uri.parse(mSong.getStreamUrl()));
+//                mMediaPlayer.start();
+//            }
+//        });
+    }
+
+    public void bind(final Song song, final PlaylistRecyclerAdapter.RecyclerItemClickListener listener){
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
-                    mMediaPlayer.stop();
-                    mMediaPlayer.reset();
-                    mMediaPlayer.release();
-                    mMediaPlayer = null;
-                }
-
-                mMediaPlayer = MediaPlayer.create(view.getContext(),mSong.getStreamUrl());
-                mMediaPlayer.start();
+                listener.onClickListener(song, getLayoutPosition());
             }
         });
     }

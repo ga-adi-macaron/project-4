@@ -7,8 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -18,11 +22,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -40,7 +48,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,6 +78,8 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     private static final String TAG = "MapsActivity: ";
     private static final int REQUEST_CODE_LOCATION = 505;
+    public static final String SHARED_PREF = "MySettings";
+    public static final String LOGGEDIN = "LoggedIn";
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -84,11 +96,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private User ME;
     private UserSingleton sUserSingleton;
     private int tries = 0;
+    private int geoTries = 0;
+    private boolean loggedIn;
+    private Button mSignInButton;
+    private CardView cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        SharedPreferences settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+        loggedIn = settings.getBoolean(LOGGEDIN,false);
+        buildGoogleApiClient();
 
         sUserSingleton = UserSingleton.getInstance();
 
@@ -115,6 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     @Override
                                     protected void onPostExecute(Void aVoid) {
                                         sUserSingleton.setUser(ME);
+
                                     }
                                 }.execute();
                             }
@@ -126,16 +147,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
                     });
-                } else {
-                    Intent intent = new Intent(MapsActivity.this,LoginActivity.class);
-                    startActivity(intent);
                 }
             }
         };
 
-        //Create Google Api Client
-        buildGoogleApiClient();
-        createLocationRequest();
+
 
         mDatabasePlaylistReference = mFirebaseDatabase.getReference("Playlists");
         mGeofireRef = FirebaseDatabase.getInstance().getReference("geofire");
@@ -157,13 +173,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        try {
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
 
         setUpMap();
+        mMap.setBuildingsEnabled(false);
+        mMap.setMaxZoomPreference(20);
+        mMap.setMinZoomPreference(15);
 
-        fab = (FloatingActionButton)findViewById(R.id.fab);
-        vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
+        requestUserImage();
+        setViewsIfLoggedIn();
 
-
+        keepRequestingGeoQueries();
 
         //  FAB to create new playlist. Opens a dialog to do this.
         fab.setOnClickListener(new View.OnClickListener() {
@@ -174,15 +204,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } else {
                     Toast.makeText(MapsActivity.this, "Can't seem to make a new playlist...", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Intent intent = new Intent(MapsActivity.this, ColoringActivity.class);
-                startActivity(intent);
-                return false;
             }
         });
 
@@ -207,6 +228,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+
+        vUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapsActivity.this, ColoringActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mSignInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapsActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void keepRequestingGeoQueries() {
+        if(lastLocation!=null && geoQuery == null) {
+            moveMapToCurrentLocation(lastLocation);
+            createGeoQuery();
+        }
+        else if (lastLocation == null && geoQuery == null && geoTries < 30){
+            Timer timer = new Timer();
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            keepRequestingGeoQueries();
+                            geoTries++;
+                        }
+                    });
+                }
+            };
+            timer.schedule(timerTask, 0, 1000);
+        }
     }
 
     private void requestUserImage() {
@@ -231,7 +291,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void loadUserIcon() {
-
         Picasso.with(this).load(ME.getUserImage()).into(vUserIcon);
     }
 
@@ -261,7 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         playlist.setLat(location.getLatitude());
                         playlist.setLon(location.getLongitude());
                         playlist.setUserId(ME.getId());
-                        playlist.setCover("https://firebasestorage.googleapis.com/v0/b/peoplesplaylist-9c5d9.appspot.com/o/userplaceholder.png?alt=media&token=69ff913e-2eb2-46b5-a210-390e69ddac31");
+                        playlist.setCover("null");
 
                         //  Push to the playlists branch of the database, and get the
                         //  unique, randomly generated key for geofire use.
@@ -292,19 +351,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void createGeoQuery(){
+        moveMapToCurrentLocation(lastLocation);
         geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),100);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 DatabaseReference ref = mFirebaseDatabase.getReference("Playlists/"+key);
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                ref.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Playlist playlist = dataSnapshot.getValue(Playlist.class);
-                        Marker marker = mMap.addMarker(new MarkerOptions()
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        new AsyncTask<Void,Void,Playlist>(){
+                            @Override
+                            protected Playlist doInBackground(Void... voids) {
+                                Playlist playlist = dataSnapshot.getValue(Playlist.class);
+                                return playlist;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Playlist playlist) {
+                                Marker marker = mMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(playlist.getLat(),playlist.getLon()))
                                         .title(playlist.getTitle()));
-                        marker.setTag(playlist.getId());
+                                marker.setTag(playlist.getId());
+
+                                if(playlist.getCover()!=null) {
+                                    Log.d(TAG, "onPostExecute: " + playlist.getCover());
+                                }
+//                                PicassoMarker picassoMarker = new PicassoMarker(marker);
+//                                Picasso.with(MapsActivity.this).load(Uri.parse(playlist.getCover()))
+//                                        .placeholder(R.drawable.markerplaceholder)
+//                                        .transform(new CircleTransform())
+//                                        .resize(100,100).into(picassoMarker);
+
+                            }
+                        }.execute();
+
+
+
                     }
 
                     @Override
@@ -381,23 +464,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
+        mGoogleApiClient.connect();
         mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        requestUserImage();
+
+    }
+
+    private void setViewsIfLoggedIn(){
+        fab = (FloatingActionButton)findViewById(R.id.fab);
+        vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
+        mSignInButton = (Button) findViewById(R.id.sign_in_maps);
+        cardView = (CardView) findViewById(R.id.maps_user_icon_cardview);
+
+        if(!loggedIn){
+            vUserIcon.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
+            mSignInButton.setVisibility(View.VISIBLE);
+            cardView.setVisibility(View.GONE);
+        }
+        if(loggedIn){
+            vUserIcon.setVisibility(View.VISIBLE);
+            fab.setVisibility(View.VISIBLE);
+            mSignInButton.setVisibility(View.GONE);
+            cardView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mGoogleApiClient != null && (!mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected())) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient,this);
+        if(mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
         if (geoQuery != null) {
@@ -435,7 +536,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     boolean CoarsePermission = grantResults[1] ==
                             PackageManager.PERMISSION_GRANTED;
 
-                    if (FinePermission && CoarsePermission) {
+                    if (FinePermission || CoarsePermission) {
                         Toast.makeText(MapsActivity.this, "Permission Granted",
                                 Toast.LENGTH_LONG).show();
                     } else {
@@ -462,30 +563,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void moveMapToCurrentLocation(Location lastLocation) {
         if (lastLocation != null) {
             LatLng current = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(current));
-            mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(current));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(17f));
         }
     }
 
     public void getLastLocation(){
         if(checkPermission()) {
-            if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient)!=null) {
-                lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            }
-            else{
-                requestPermission();
-            }
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        }
+        else {
+            requestPermission();
         }
     }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (checkPermission()) {
+            getLastLocation();
             mMap.setMyLocationEnabled(true);
-            lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (lastLocation == null) {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             }
+            createLocationRequest();
         }
         else{
             requestPermission();
@@ -515,22 +616,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //
     //=====================================
 
-    private void buildApiClient(){
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
 
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(10 * 3000)        // 30 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
     }
-
-
-
-
 }

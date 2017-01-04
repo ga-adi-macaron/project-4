@@ -6,11 +6,13 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +23,7 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -45,28 +48,33 @@ import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.Playlist;
 import com.korbkenny.peoplesplaylist.objects.Song;
 import com.korbkenny.peoplesplaylist.objects.User;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class PlaylistActivity extends AppCompatActivity {
+public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyclerAdapter.RecyclerItemClickListener{
     public static final int RequestPermissionCode = 11335;
-
+    private static final String TAG = "Yes. ";
 
     private RecyclerView mRecyclerView;
     private PlaylistRecyclerAdapter mAdapter;
     private String PLAYLIST_ID, SONG_ID;
     private FirebaseDatabase db;
-    private DatabaseReference mSongListRef;
+
+    private DatabaseReference mSongListRef, mPlaylistRef;
+
     private Playlist mThisPlaylist;
     private CardView mPlayPause, mBack, mSkip;
-    private StorageReference mStorageRef;
+    private StorageReference mStorageRef, mStoragePictureRef;
     private Uri downloadUrl;
     private TextView mTitle,mDescription;
     private ImageView mCover;
@@ -79,6 +87,8 @@ public class PlaylistActivity extends AppCompatActivity {
     private MediaRecorder mMediaRecorder;
     private MediaPlayer mRecordPlayer;
 
+    private HashMap<DatabaseReference,ValueEventListener> mDbListeners;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +96,10 @@ public class PlaylistActivity extends AppCompatActivity {
 
         PLAYLIST_ID = getIntent().getStringExtra("Playlist Id");
         db = FirebaseDatabase.getInstance();
+        mSongListRef = db.getReference("SongLists").child(PLAYLIST_ID);
+        Log.d(TAG, "onCreate: "+ mSongListRef.toString());
         mStorageRef = FirebaseStorage.getInstance().getReference("songs");
+        mStoragePictureRef = FirebaseStorage.getInstance().getReference("albumcovers").child(PLAYLIST_ID);
         ME = UserSingleton.getInstance().getUser();
 
         mSongList = new ArrayList<>();
@@ -97,22 +110,12 @@ public class PlaylistActivity extends AppCompatActivity {
 
         simpleSetup();
 
+        mDbListeners = new HashMap<>();
+        syncToDatabase();
 
 
 
-        new AsyncTask<Void,Void,Void>(){
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                syncToDatabase();
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                mAdapter.notifyDataSetChanged();
-            }
-        }.execute();
+//        mAdapter.notifyDataSetChanged();
 
         //  Choose a song to add to the playlist
         fabAddSong.setOnClickListener(new View.OnClickListener() {
@@ -124,8 +127,78 @@ public class PlaylistActivity extends AppCompatActivity {
                 onRecordTrackDialog().show();
             }
         });
+
+        mCover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mThisPlaylist.getCover().equals("null")){
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto , 1);
+                }
+                else {
+                    Log.d(TAG, "onClick: WEll, this happened...");
+                }
+            }
+        });
+
+        mCover.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto , 1);
+                return false;
+            }
+        });
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+            if(resultCode == RESULT_OK && requestCode == 1){
+                Uri selectedImage = imageReturnedIntent.getData();
+                Bitmap newBitmap;
+
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),selectedImage);
+                    newBitmap = cropToSquare(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Picasso.with(PlaylistActivity.this).load(selectedImage).into(mCover);
+                mCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+                mStoragePictureRef.putFile(selectedImage)
+                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                if(taskSnapshot.getDownloadUrl()!=null) {
+                                    mThisPlaylist.setCover(taskSnapshot.getDownloadUrl().toString());
+                                    mPlaylistRef.setValue(mThisPlaylist);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+
+            }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (Map.Entry<DatabaseReference, ValueEventListener> entry : mDbListeners.entrySet()) {
+            DatabaseReference ref = entry.getKey();
+            ValueEventListener listener = entry.getValue();
+            ref.removeEventListener(listener);
+        }
+
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
@@ -138,7 +211,7 @@ public class PlaylistActivity extends AppCompatActivity {
         View view = inflater.inflate(R.layout.record_song_dialog,null);
         builder.setView(view);
 
-        SONG_ID = mSongListRef.push().getKey();
+        SONG_ID = mSongListRef.child(PLAYLIST_ID).push().getKey();
 
         final EditText songTitle = (EditText) view.findViewById(R.id.record_edittext);
         final Button recordButton = (Button) view.findViewById(R.id.record_button);
@@ -157,17 +230,18 @@ public class PlaylistActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkPermission()){
                     mAudioSavePath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                            + "/Song" + SONG_ID + ".3gp";
+                            + "/mysong.3gp";
                     MediaRecorderReady();
                     mRecordPlayer = new MediaPlayer();
                     try {
                         mMediaRecorder.prepare();
                         mMediaRecorder.start();
+                        recordButton.setVisibility(View.GONE);
+                        stopButton.setVisibility(View.VISIBLE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    recordButton.setVisibility(View.GONE);
-                    stopButton.setVisibility(View.VISIBLE);
+
                 } else {
                     requestPermission();
                 }
@@ -181,6 +255,7 @@ public class PlaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mMediaRecorder.stop();
+                mMediaRecorder.release();
                 stopButton.setVisibility(View.GONE);
                 playButton.setVisibility(View.VISIBLE);
                 submit.setEnabled(true);
@@ -197,6 +272,7 @@ public class PlaylistActivity extends AppCompatActivity {
                 playButton.setVisibility(View.GONE);
                 redo.setVisibility(View.GONE);
                 recordButton.setVisibility(View.VISIBLE);
+                submit.setEnabled(false);
             }
         });
 
@@ -241,6 +317,8 @@ public class PlaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mRecordPlayer.start();
+                pauseButton.setVisibility(View.VISIBLE);
+                continuePlaying.setVisibility(View.GONE);
             }
         });
 
@@ -268,19 +346,19 @@ public class PlaylistActivity extends AppCompatActivity {
 
                 //Get the file ready to upload.
                 Uri audioFileUri = Uri.fromFile(new File(mAudioSavePath));
-                StorageReference songRef = mStorageRef.child(audioFileUri.getLastPathSegment());
+                StorageReference songRef = mStorageRef.child(PLAYLIST_ID).child(SONG_ID).child(audioFileUri.getLastPathSegment());
 
                 //Upload the file to Firebase Storage.
                 songRef.putFile(audioFileUri)
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
+                            public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                                Log.d(TAG, "onSuccess: ");
                                 progressDialog.dismiss();
 
                                 //The final piece of the Song object is to add the
                                 //link to the song file itself on Firebase Storage.
-                                mSongToUpload.setStreamUrl(taskSnapshot.getDownloadUrl());
+                                mSongToUpload.setStreamUrl(taskSnapshot.getDownloadUrl().toString());
 
                                 //Then upload the Song Object to the database.
                                 mSongListRef.child(SONG_ID).setValue(mSongToUpload);
@@ -288,22 +366,32 @@ public class PlaylistActivity extends AppCompatActivity {
 
                                 //Once it's uploaded to the database, add it to the list of songs
                                 //and notify the adapter that the song was added.
-                                mSongListRef.child(SONG_ID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.getValue()==null) {
-                                            mSongList.add(dataSnapshot.getValue(Song.class));
-                                            mAdapter.notifyDataSetChanged();
+//                                mSongListRef.child(SONG_ID).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(final DataSnapshot dataSnapshot) {
+//                                        if (dataSnapshot.getValue()!=null) {
+//                                            new AsyncTask<Void,Void,Void>(){
+//                                                @Override
+//                                                protected Void doInBackground(Void... voids) {
+//                                                    mSongList.add(dataSnapshot.getValue(Song.class));
+//                                                    return null;
+//                                                }
+//
+//                                                @Override
+//                                                protected void onPostExecute(Void aVoid) {
+//                                                    finish();
+//// mAdapter.notifyDataSetChanged();
+//                                                }
+//                                            }.execute();
                                         }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                            }
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(DatabaseError databaseError) {
+//
+//                                    }
+//                                });
+//                            }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -353,7 +441,7 @@ public class PlaylistActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.playlist_recycler);
         LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         mRecyclerView.setLayoutManager(llm);
-        mAdapter = new PlaylistRecyclerAdapter(mSongList);
+        mAdapter = new PlaylistRecyclerAdapter(mSongList, this);
         mRecyclerView.setAdapter(mAdapter);
 
         //  Views
@@ -382,37 +470,84 @@ public class PlaylistActivity extends AppCompatActivity {
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void syncToDatabase(){
-        DatabaseReference playlistRef = db.getReference("Playlists/"+PLAYLIST_ID);
-        mSongListRef = db.getReference("Songs/"+PLAYLIST_ID);
+        mPlaylistRef = db.getReference("Playlists/"+PLAYLIST_ID);
 
-        playlistRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ValueEventListener listener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mThisPlaylist = dataSnapshot.getValue(Playlist.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        mSongListRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue()==null) {
-                    for (DataSnapshot songSnapshot:dataSnapshot.getChildren()) {
-                        mSongList.add(songSnapshot.getValue(Song.class));
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                new AsyncTask<Void,Void,Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mThisPlaylist = dataSnapshot.getValue(Playlist.class);
+                        return null;
                     }
-                    Collections.shuffle(mSongList);
-                }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        mTitle.setText(mThisPlaylist.getTitle());
+                        mDescription.setText(mThisPlaylist.getDescription());
+                        if (mThisPlaylist.getCover().equals("null")){
+                            mCover.setBackgroundResource(R.drawable.userplaceholder);
+                        } else {
+                            Picasso.with(PlaylistActivity.this).load(mThisPlaylist.getCover()).into(mCover);
+                        }
+                    }
+                }.execute();
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+
+        mPlaylistRef.addListenerForSingleValueEvent(listener);
+        mDbListeners.put(mPlaylistRef,listener);
+
+        ValueEventListener songsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                new AsyncTask<Void,Void,Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        if (dataSnapshot.getValue()!=null) {
+                            for (DataSnapshot songSnapshot:dataSnapshot.getChildren()) {
+                                mSongList.add(songSnapshot.getValue(Song.class));
+                            }
+                            Collections.shuffle(mSongList);
+
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }.execute();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        mSongListRef.addListenerForSingleValueEvent(songsListener);
+        mDbListeners.put(mSongListRef,songsListener);
+    }
+
+    public Bitmap cropToSquare(Bitmap bitmap){
+        int width  = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int newWidth = (height > width) ? width : height;
+        int newHeight = (height > width)? height - ( height - width) : height;
+        int cropW = (width - height) / 2;
+        cropW = (cropW < 0)? 0: cropW;
+        int cropH = (height - width) / 2;
+        cropH = (cropH < 0)? 0: cropH;
+        return Bitmap.createBitmap(bitmap, cropW, cropH, newWidth, newHeight);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -457,4 +592,18 @@ public class PlaylistActivity extends AppCompatActivity {
         return result == PackageManager.PERMISSION_GRANTED &&
                 result1 == PackageManager.PERMISSION_GRANTED;
     }
+
+
+    @Override
+    public void onClickListener(Song song, int position) {
+        if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+                mMediaPlayer.release();
+                mMediaPlayer = null;
+            }
+
+            mMediaPlayer = MediaPlayer.create(this, Uri.parse(song.getStreamUrl()));
+            mMediaPlayer.start();
+        }
 }
