@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ezequielc.successplanner.models.Affirmation;
-import com.ezequielc.successplanner.models.DailyData;
 import com.ezequielc.successplanner.models.Goal;
 import com.ezequielc.successplanner.models.Schedule;
 
