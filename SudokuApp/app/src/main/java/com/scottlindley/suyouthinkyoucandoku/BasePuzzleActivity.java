@@ -161,7 +161,7 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
         cell.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mKey[cell.getId()] == 0){
+                if (mUserAnswers[cell.getId()] == 0){
                     checkCellInput(cell);
                 } else {
                     int number = Integer.parseInt(cell.getText().toString());
@@ -182,41 +182,38 @@ public abstract class BasePuzzleActivity extends AppCompatActivity implements Pu
      * @param cell
      */
     public void checkCellInput(TextView cell){
-        Log.d("BASE PUZZLE", "checkCellInput: "+cell.getId());
-        Log.d("BASE PUZZLE", "checkCellInput: "+mKey[cell.getId()]);
+        //If a choice tile has been selected
         if (mSelectedNum != 0) {
             if (mSolution[cell.getId()] == mSelectedNum) {
-
                 //Choice was right
                 cell.setText(String.valueOf(mSelectedNum));
                 cell.setTextColor(getResources().getColor(R.color.colorAccent));
                 mUserAnswers[cell.getId()] = Integer.parseInt(cell.getText().toString());
-                Log.d("BASE PUZZLE", "checkCellInput: "+ mKey[cell.getId()]);
+                Log.d("BASE PUZZLE", "checkCellInput: " + mKey[cell.getId()]);
                 /*
                 If the user has found all instances of this number in the puzzle,
                 remove that number down in the choice tiles.
                  */
                 int numberCounter = 0;
-                for (int i=0; i<mUserAnswers.length; i++){
-                    if (mSelectedNum == mUserAnswers[i]){
+                for (int i = 0; i < mUserAnswers.length; i++) {
+                    if (mSelectedNum == mUserAnswers[i]) {
                         numberCounter++;
                     }
                 }
-                if (numberCounter == 9){
-                    ((CardView)mChoiceTiles.get(mSelectedNum-1).getParent())
+                if (numberCounter == 9) {
+                    ((CardView) mChoiceTiles.get(mSelectedNum - 1).getParent())
                             .setVisibility(View.INVISIBLE);
                     mSelectedNum = 0;
                 }
                 checkForWin();
             } else {
                 //Choice was wrong
-                cell.setText("");
                 //Vibrate the phone to give a negative feedback
                 ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(200);
 
                 mStrikes++;
                 //Tint the puzzle's color to indicate visually how many strikes the user has.
-                switch (mStrikes){
+                switch (mStrikes) {
                     case 1:
                         findViewById(R.id.strike_layer).setAlpha(0.25f);
                         break;
