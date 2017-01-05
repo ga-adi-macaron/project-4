@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.colinbradley.xboxoneutilitiesapp.DownloaderActivity;
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
 import com.colinbradley.xboxoneutilitiesapp.VideoPlayerActivity;
@@ -151,6 +152,14 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
         intent.putExtra("title", title);
         intent.putExtra("url", clipURL);
         intent.putExtra("thumb", imgURL);
+        startActivity(intent);
+    }
+
+    @Override
+    public void downloadVideo(String clipURL, String title) {
+        Intent intent = new Intent(getContext(), DownloaderActivity.class);
+        intent.putExtra("clipURL", clipURL);
+        intent.putExtra("title", title);
         startActivity(intent);
     }
 

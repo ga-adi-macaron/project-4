@@ -1,9 +1,11 @@
 package com.colinbradley.xboxoneutilitiesapp.profile_page;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -57,11 +59,17 @@ public class ProfileActivity extends AppCompatActivity {
     TabLayout mTablayout;
     ProfileViewPagerAdapter mVPadapter;
 
+    DownloadManager mDownloadManager;
+    Uri mImgDLuri;
+    View mImgDLview;
+    String mImgDLtitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         mLayout = (RelativeLayout)findViewById(R.id.activity_profile);
+        mDownloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
 
         mToolbar = (Toolbar)findViewById(R.id.profile_toolbar);
 
@@ -195,4 +203,9 @@ public class ProfileActivity extends AppCompatActivity {
         mToolbar.setBackgroundColor(Color.parseColor("#" + mFavColor));
         mLayout.setBackgroundColor(Color.parseColor("#" + mFavColor));
     }
+
+
+
+
+
 }

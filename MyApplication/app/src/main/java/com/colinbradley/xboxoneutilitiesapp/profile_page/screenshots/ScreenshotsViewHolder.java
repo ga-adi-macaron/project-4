@@ -18,6 +18,7 @@ public class ScreenshotsViewHolder extends RecyclerView.ViewHolder {
 
     TextView mTitle, mGame;
     ImageView mScreenshot;
+    ImageView mDLButton;
     View mRootView;
     ShareButton mShareButton;
 
@@ -27,6 +28,7 @@ public class ScreenshotsViewHolder extends RecyclerView.ViewHolder {
         mGame = (TextView)itemView.findViewById(R.id.screeshot_item_game);
         mScreenshot = (ImageView)itemView.findViewById(R.id.screenshot_item_img);
         mShareButton = (ShareButton)itemView.findViewById(R.id.ss_fb_share);
+        mDLButton = (ImageView)itemView.findViewById(R.id.ss_download);
         mRootView = itemView;
     }
 

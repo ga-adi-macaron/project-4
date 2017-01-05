@@ -30,6 +30,7 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsViewHold
 
     public interface OnItemSelectedListener{
         void onItemSelected(String imgUrl);
+        void downloadImg(String imgUrl, String title);
     }
 
     @Override
@@ -53,6 +54,13 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsViewHold
                 .setContentTitle(mScreenshotList.get(position).getTitle() + " from " + mScreenshotList.get(position).getGame())
                 .build();
         holder.mShareButton.setShareContent(fbShare);
+
+        holder.mDLButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemSelectedListener.downloadImg(currentSS.getImgURL(), "Screenshot_");
+            }
+        });
 
 
         holder.mScreenshot.setOnClickListener(new View.OnClickListener() {

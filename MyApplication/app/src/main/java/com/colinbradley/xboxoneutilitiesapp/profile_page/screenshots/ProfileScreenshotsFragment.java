@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.colinbradley.xboxoneutilitiesapp.DownloaderActivity;
 import com.colinbradley.xboxoneutilitiesapp.FullscreenImageActivity;
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
@@ -50,10 +51,14 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
     ShareDialog mShareDialog;
     CallbackManager mCallbackManager;
 
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mScreenshotList = new ArrayList<>();
+
+
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -142,4 +147,14 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
         intent.putExtra("url", imgUrl);
         startActivity(intent);
     }
+
+    @Override
+    public void downloadImg(String imgUrl, String title) {
+        Intent intent = new Intent(getContext(), DownloaderActivity.class);
+        intent.putExtra("imgURL", imgUrl);
+        intent.putExtra("title", title);
+        startActivity(intent);
+    }
+
+
 }

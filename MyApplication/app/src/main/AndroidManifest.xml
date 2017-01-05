@@ -43,6 +43,7 @@
         <activity android:name=".store_page.games_with_gold.GameWithGoldDetails" />
         <activity android:name=".store_page.xbox_marketplace.XBMarketplaceGameDetails" />
         <activity android:name=".store_page.deals_with_gold.DealWithGoldDetails" />
+        <activity android:name=".DownloaderActivity"/>
         <activity
             android:name=".FullscreenImageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
