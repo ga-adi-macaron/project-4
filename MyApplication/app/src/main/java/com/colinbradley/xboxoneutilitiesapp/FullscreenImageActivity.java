@@ -95,6 +95,7 @@ public class FullscreenImageActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_fullscreen_image);
 
+
         Intent intent = getIntent();
         String imgURL = intent.getStringExtra("url");
 
@@ -113,10 +114,6 @@ public class FullscreenImageActivity extends AppCompatActivity {
                 toggle();
             }
         });
-
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
     }
 
     @Override

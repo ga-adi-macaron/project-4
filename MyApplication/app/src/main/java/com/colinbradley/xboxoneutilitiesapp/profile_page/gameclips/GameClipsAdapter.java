@@ -29,6 +29,7 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
 
     interface OnItemSelectedListener{
         void onItemSelectedToPlay(String clipURL, String imgURL, String title);
+        void downloadVideo(String clipURL, String title);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
         holder.bindImage(mGameClipsList.get(position).getImgURL(), mContext);
 
         Uri imgUri = Uri.parse(mGameClipsList.get(position).getImgURL());
-        Uri clipUri = Uri.parse(mGameClipsList.get(position).getClipURL());
+        final Uri clipUri = Uri.parse(mGameClipsList.get(position).getClipURL());
         ShareLinkContent fbShare = new ShareLinkContent.Builder()
                 .setContentTitle(mGameClipsList.get(position).getClipName() + " from " + mGameClipsList.get(position).getGameName())
                 .setImageUrl(imgUri)
@@ -54,7 +55,14 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
                 .build();
         holder.mShareButton.setShareContent(fbShare);
 
-        holder.mPlay.setOnClickListener(new View.OnClickListener() {
+        holder.mDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mOnItemSelectedListener.downloadVideo(currentClip.getClipURL(), "GameClip_");
+            }
+        });
+
+        holder.mImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOnItemSelectedListener.onItemSelectedToPlay(currentClip.getClipURL(), currentClip.getImgURL(), currentClip.getClipName());
