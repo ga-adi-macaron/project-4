@@ -49,15 +49,15 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 switch (i) {
                                     case 0: // Edit option
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                                        AlertDialog.Builder editOptionBuilder = new AlertDialog.Builder(view.getContext());
                                         LayoutInflater inflater = LayoutInflater.from(view.getContext());
                                         View dialogView = inflater.inflate(R.layout.dialog_add_affirmations, null);
-                                        builder.setView(dialogView);
+                                        editOptionBuilder.setView(dialogView);
 
                                         final EditText editText = (EditText) dialogView.findViewById(R.id.affirmations_edit_text);
                                         editText.setText(mAffirmationList.get(holder.getAdapterPosition()).getAffirmation());
 
-                                        builder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                                        editOptionBuilder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
                                                 if (editText.getText().toString().trim().length() == 0) {
@@ -74,15 +74,24 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
                                             }
                                         })
                                                 .setNegativeButton("Cancel", null);
-                                        builder.create().show();
+                                        editOptionBuilder.create().show();
                                         break;
 
                                     case 1: // Delete option
-                                        // TODO: ADD AN "ARE YOU SURE YOU WANT TO DELETE?" DIALOG
-                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
-                                        databaseHelper.deleteAffirmations(mAffirmationList.get(holder.getAdapterPosition()));
-                                        mAffirmationList.remove(holder.getAdapterPosition());
-                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        // AlertDialog asking users if they want to delete affirmation
+                                        AlertDialog.Builder deleteOptionBuilder = new AlertDialog.Builder(view.getContext());
+                                        deleteOptionBuilder.setMessage("Delete Affirmation?")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                                                        databaseHelper.deleteAffirmations(mAffirmationList.get(holder.getAdapterPosition()));
+                                                        mAffirmationList.remove(holder.getAdapterPosition());
+                                                        notifyItemRemoved(holder.getAdapterPosition());
+                                                    }
+                                                })
+                                                .setNegativeButton("No", null);
+                                        deleteOptionBuilder.create().show();
                                         break;
                                 }
                             }

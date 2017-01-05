@@ -49,15 +49,15 @@ public class GoalRecyclerViewAdapter extends RecyclerView.Adapter<GoalRecyclerVi
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 switch (i) {
                                     case 0: // Edit Option
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                                        AlertDialog.Builder editOptionBuilder = new AlertDialog.Builder(view.getContext());
                                         LayoutInflater inflater = LayoutInflater.from(view.getContext());
                                         View dialogView = inflater.inflate(R.layout.dialog_add_goals, null);
-                                        builder.setView(dialogView);
+                                        editOptionBuilder.setView(dialogView);
 
                                         final EditText editText = (EditText) dialogView.findViewById(R.id.goal_edit_text);
                                         editText.setText(mGoalList.get(holder.getAdapterPosition()).getGoal());
 
-                                        builder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                                        editOptionBuilder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
                                                 if (editText.getText().toString().trim().length() == 0) {
@@ -74,15 +74,24 @@ public class GoalRecyclerViewAdapter extends RecyclerView.Adapter<GoalRecyclerVi
                                             }
                                         })
                                                 .setNegativeButton("Cancel", null);
-                                        builder.create().show();
+                                        editOptionBuilder.create().show();
                                         break;
 
                                     case 1: // Delete option
-                                        // TODO: ADD AN "ARE YOU SURE YOU WANT TO DELETE?" DIALOG
-                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
-                                        databaseHelper.deleteGoal(mGoalList.get(holder.getAdapterPosition()));
-                                        mGoalList.remove(holder.getAdapterPosition());
-                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        // AlertDialog asking users if they want to delete goal
+                                        AlertDialog.Builder deleteOptionBuilder = new AlertDialog.Builder(view.getContext());
+                                        deleteOptionBuilder.setMessage("Delete goal?")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(view.getContext());
+                                                        databaseHelper.deleteGoal(mGoalList.get(holder.getAdapterPosition()));
+                                                        mGoalList.remove(holder.getAdapterPosition());
+                                                        notifyItemRemoved(holder.getAdapterPosition());
+                                                    }
+                                                })
+                                                .setNegativeButton("No", null);
+                                        deleteOptionBuilder.create().show();
                                         break;
                                 }
                             }

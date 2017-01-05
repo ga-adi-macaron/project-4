@@ -21,4 +21,9 @@
         android:icon="@android:drawable/ic_menu_save"
         android:title="Save"
         app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/action_settings"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="Settings"
+        app:showAsAction="ifRoom"/>
 </menu>

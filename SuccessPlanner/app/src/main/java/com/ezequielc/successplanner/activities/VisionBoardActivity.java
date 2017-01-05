@@ -33,6 +33,7 @@ public class VisionBoardActivity extends AppCompatActivity {
     TextView mNewText;
     ViewGroup mViewGroup;
     int mStartX, mStartY;
+    boolean mDeleting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,10 @@ public class VisionBoardActivity extends AppCompatActivity {
         mTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mDeleting) {
+                    return false;
+                }
+
                 RelativeLayout.LayoutParams getLayoutParams =
                         (RelativeLayout.LayoutParams) view.getLayoutParams();
 
@@ -106,6 +111,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null);
         builder.create().show();
 
+        mNewText.setTextSize(24); // TODO; TEMP CODE // REPLACE WITH OPTION
         mNewText.setOnTouchListener(mTouchListener);
     }
 
@@ -120,6 +126,56 @@ public class VisionBoardActivity extends AppCompatActivity {
         mNewImage.setImageBitmap(bitmap);
 
         mNewImage.setOnTouchListener(mTouchListener);
+    }
+
+    public void deletionOptions(){
+        if (mViewGroup.getChildCount() == 0) {
+            Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (mViewGroup.getChildCount() <= 1) {
+            deleteAllViews();
+            return;
+        }
+
+        CharSequence[] deleteOptions = {"Delete Item", "Delete All"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+                .setTitle("Deletion Options:")
+                .setItems(deleteOptions, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (i) {
+                            case 0: // Delete One View
+                                deleteView();
+                                break;
+                            case 1: // Delete All Views
+                                deleteAllViews();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
+    }
+
+    public void deleteAllViews(){
+        mViewGroup.removeAllViews();
+    }
+
+    public void deleteView(){
+        mDeleting = true;
+        Toast.makeText(this, "Choose Item to Delete...", Toast.LENGTH_LONG).show();
+
+        for (int i = 0; i < mViewGroup.getChildCount(); i++) {
+            final View child = mViewGroup.getChildAt(i);
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mViewGroup.removeView(child);
+                    mDeleting = false;
+                }
+            });
+        }
     }
 
     @Override
@@ -142,11 +198,16 @@ public class VisionBoardActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_delete:
-                Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
+                deletionOptions();
                 return true;
 
             case R.id.action_save:
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(VisionBoardActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
 
             default:
