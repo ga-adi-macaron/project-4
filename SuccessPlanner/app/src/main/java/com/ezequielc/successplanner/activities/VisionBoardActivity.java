@@ -84,7 +84,7 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void textOptions(){
-        CharSequence[] textOptions = {"Add New Text", "Edit Text", "Change Color", "Change Size"};
+        CharSequence[] textOptions = {"New", "Edit", "Change Color", "Change Size"};
         AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Text Options:")
                 .setItems(textOptions, new DialogInterface.OnClickListener() {
@@ -244,6 +244,35 @@ public class VisionBoardActivity extends AppCompatActivity {
         builder.create().show();
     }
 
+    public void pickColor(final ViewGroup viewGroup){
+        // TODO: ADD MORE COLORS
+        CharSequence[] colors = {"Green", "Red", "Blue", "Black"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+                .setTitle("Pick Color to Change BackGround:")
+                .setItems(colors, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (i) {
+                            case 0: // Green
+                                viewGroup.setBackgroundColor(Color.GREEN);
+                                break;
+                            case 1: // Red
+                                viewGroup.setBackgroundColor(Color.RED);
+                                break;
+                            case 2: // Blue
+                                viewGroup.setBackgroundColor(Color.BLUE);
+                                break;
+                            case 3: // Black
+                                viewGroup.setBackgroundColor(Color.BLACK);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
+    }
+
     public void changeTextSize(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
@@ -374,6 +403,10 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    public void changeBackgroundColor(){
+        pickColor(mViewGroup);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -401,9 +434,8 @@ public class VisionBoardActivity extends AppCompatActivity {
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
                 return true;
 
-            case R.id.action_settings:
-                Intent settingsIntent = new Intent(VisionBoardActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
+            case R.id.action_change_background:
+                changeBackgroundColor();
                 return true;
 
             default:

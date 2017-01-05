@@ -6,7 +6,7 @@
         android:title="Vision Board"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/action_settings"
+    <item android:id="@+id/action_change_background"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="Settings"
         app:showAsAction="always"/>
