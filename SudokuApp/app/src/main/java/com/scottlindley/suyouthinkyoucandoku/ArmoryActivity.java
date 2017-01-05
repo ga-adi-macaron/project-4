@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +23,8 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
         setContentView(R.layout.activity_armory);
 
         getSupportActionBar().hide();
@@ -90,5 +93,11 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
             prefsEdit.commit();
             mCoinCountText.setText("Coins: " + mCoinCount);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAfterTransition();
+        super.onBackPressed();
     }
 }

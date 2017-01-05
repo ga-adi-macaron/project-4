@@ -101,6 +101,14 @@
                 android:textColor="#eee"/>
         </android.support.v7.widget.CardView>
     </GridLayout>
+    <android.support.v7.widget.CardView
+        android:id="@+id/tinyActivity"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorAccent"
+        android:transitionName="@string/activityExplode"
+        android:layout_centerInParent="true"/>
 </RelativeLayout>
 
 

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ChangeTransform;
@@ -62,7 +63,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         DBHelper mDbHelper = DBHelper.getInstance(this);
         boolean hasPuzzlesLocally = false;
-        if (!mDbHelper.getAllPuzzles().isEmpty()){
+        if (mDbHelper.getAllPuzzles() != null){
             hasPuzzlesLocally = true;
         }
         checkForNewPuzzles(hasPuzzlesLocally);
@@ -110,13 +111,20 @@ public class MainMenuActivity extends AppCompatActivity {
         mStatsCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Pair<View, String> pair =
+                Pair<View, String> pair1 =
                         Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+                Pair<View, String> pair2 =
+                        Pair.create(findViewById(R.id.solo_card), getString(R.string.transition1));
+                Pair<View, String> pair3 =
+                        Pair.create(findViewById(R.id.race_card), getString(R.string.transition2));
+                Pair<View, String> pair4 =
+                        Pair.create(findViewById(R.id.armory_card), getString(R.string.transition3));
                 Pair<View, String> backgroundPair =
                         Pair.create(findViewById(R.id.main_menu_acivity), getString(R.string.background_transition));
 
                 ActivityOptions options =
-                        ActivityOptions.makeSceneTransitionAnimation(MainMenuActivity.this, pair, backgroundPair);
+                        ActivityOptions.makeSceneTransitionAnimation(
+                                MainMenuActivity.this, pair1, pair2, pair3, pair4, backgroundPair);
                 startActivity(new Intent(MainMenuActivity.this, StatsActivity.class), options.toBundle());
             }
         });
@@ -124,7 +132,23 @@ public class MainMenuActivity extends AppCompatActivity {
         mArmoryCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainMenuActivity.this, ArmoryActivity.class));
+                Pair<View, String> pair1 =
+                        Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+                Pair<View, String> pair2 =
+                        Pair.create(findViewById(R.id.solo_card), getString(R.string.transition1));
+                Pair<View, String> pair3 =
+                        Pair.create(findViewById(R.id.race_card), getString(R.string.transition2));
+                Pair<View, String> pair4 =
+                        Pair.create(findViewById(R.id.armory_card), getString(R.string.transition3));
+                Pair<View, String> pair5 =
+                        Pair.create(findViewById(R.id.tinyActivity), getString(R.string.activityExplode));
+                Pair<View, String> backgroundPair =
+                        Pair.create(findViewById(R.id.main_menu_acivity), getString(R.string.background_transition));
+                ActivityOptions options =
+                ActivityOptions.makeSceneTransitionAnimation(
+                        MainMenuActivity.this, pair1, pair2, pair3, pair4, pair5, backgroundPair);
+                ActivityCompat.startActivity(MainMenuActivity.this,
+                        new Intent(MainMenuActivity.this, ArmoryActivity.class), options.toBundle());
             }
         });
     }

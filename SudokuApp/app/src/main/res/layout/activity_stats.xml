@@ -70,5 +70,26 @@
             android:textColor="#eee"/>
         </LinearLayout>
     </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:transitionName="@string/transition1"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition2"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition3"/>
 
 </RelativeLayout>

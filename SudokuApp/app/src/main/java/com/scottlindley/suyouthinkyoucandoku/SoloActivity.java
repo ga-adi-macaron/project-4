@@ -1,9 +1,12 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Pair;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 public class SoloActivity extends AppCompatActivity implements View.OnClickListener{
@@ -15,6 +18,7 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_solo);
 
         getSupportActionBar().hide();
@@ -28,7 +32,6 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
         mMediumText.setOnClickListener(this);
         mHardText.setOnClickListener(this);
         mExpertText.setOnClickListener(this);
-
     }
 
     @Override
@@ -61,7 +64,23 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(SoloActivity.this, SoloPuzzleActivity.class);
         intent.putExtra(DIFFICULTY_INTENT_KEY, difficulty);
         intent.putExtra(PUZZLE_KEY_INTENT_KEY, stringKey);
-        startActivity(intent);
+
+        Pair<View, String> pair1 =
+                Pair.create(findViewById(R.id.stats_card), getString(R.string.transition4));
+        Pair<View, String> pair2 =
+                Pair.create(findViewById(R.id.solo_card), getString(R.string.transition1));
+        Pair<View, String> pair3 =
+                Pair.create(findViewById(R.id.race_card), getString(R.string.transition2));
+        Pair<View, String> pair4 =
+                Pair.create(findViewById(R.id.armory_card), getString(R.string.transition3));
+        Pair<View, String> pair5 =
+                Pair.create(findViewById(R.id.tinyActivity), getString(R.string.activityExplode));
+        Pair<View, String> backgroundPair =
+                Pair.create(findViewById(R.id.activity_solo), getString(R.string.background_transition));
+        ActivityOptions options =
+                ActivityOptions.makeSceneTransitionAnimation(
+                        SoloActivity.this, pair1, pair2, pair3, pair4, pair5, backgroundPair);
+        startActivity(intent, options.toBundle());
     }
 
     @Override

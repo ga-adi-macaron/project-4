@@ -33,6 +33,7 @@
 
     <com.scottlindley.suyouthinkyoucandoku.SudokuGridLayout
         android:id="@+id/board_view"
+        android:transitionName="@string/activityExplode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/score_card"
@@ -221,5 +222,34 @@
         android:layout_alignBottom="@id/board_view"
         android:background="#d50000"
         android:alpha="0"/>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:transitionName="@string/transition1"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition2"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:transitionName="@string/transition4"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition3"/>
 
 </RelativeLayout>
