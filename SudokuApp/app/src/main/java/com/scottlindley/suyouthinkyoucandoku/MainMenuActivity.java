@@ -58,10 +58,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
         setUpCardViews();
 
-        //TODO: REPLACE CURRENT PUZZLES WITH NEW ONES
 //        addPuzzle();
 
-        checkForNewPuzzles();
+        DBHelper mDbHelper = DBHelper.getInstance(this);
+        boolean hasPuzzlesLocally = false;
+        if (!mDbHelper.getAllPuzzles().isEmpty()){
+            hasPuzzlesLocally = true;
+        }
+        checkForNewPuzzles(hasPuzzlesLocally);
     }
 
 
@@ -125,20 +129,27 @@ public class MainMenuActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    When Wifi connection is established, download new puzzles from the remote
-    database and store them locally.
-    */
-    private void checkForNewPuzzles(){
+    /**
+     * Creates job services that download puzzles from the remote database. The required network
+     * type of the service depends upon the boolean parameter.
+     * @param hasPuzzlesLocally denotes whether or not the local database contains any puzzles already.
+     */
+    private void checkForNewPuzzles(boolean hasPuzzlesLocally){
         NetworkConnectivityChecker networkChecker = new NetworkConnectivityChecker(MainMenuActivity.this);
         if (networkChecker.isConnected()) {
             DBHelper.getInstance(this).setUpBroadcastReceiver();
-            JobInfo puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
-                    new ComponentName(this, PuzzleRefreshService.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                    .build();
+            JobInfo.Builder puzzleRefreshJob = new JobInfo.Builder(PUZZLE_REFRESH_JOB_ID,
+                    new ComponentName(this, PuzzleRefreshService.class));
+            if (hasPuzzlesLocally) {
+                puzzleRefreshJob.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
+            } else {
+                puzzleRefreshJob.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+            }
             JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            scheduler.schedule(puzzleRefreshJob);
+            scheduler.schedule(puzzleRefreshJob.build());
+        } else {
+            Toast.makeText(this, "Please connect to network to download puzzles.",
+                    Toast.LENGTH_LONG).show();
         }
     }
 
