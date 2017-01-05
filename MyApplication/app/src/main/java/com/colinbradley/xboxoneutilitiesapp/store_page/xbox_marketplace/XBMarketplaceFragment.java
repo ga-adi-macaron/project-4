@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
@@ -31,19 +32,22 @@ import okhttp3.Response;
  * Created by colinbradley on 12/29/16.
  */
 
-public class XBMarketplaceFragment extends Fragment implements XboxMarketplaceAdapter.OnItemSelectedListener {
+public class XBMarketplaceFragment extends Fragment implements XBMarketplaceAdapter.OnItemSelectedListener {
     public static final String TAG = "XBMarketplaceFragment";
 
-    XboxMarketplaceAdapter mAdapter;
+    XBMarketplaceAdapter mAdapter;
     RecyclerView mRV;
     List<Game> mGameList;
     AsyncTask<Void,Void,Void> mTask;
+    ProgressBar mProgressBar;
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mGameList = new ArrayList<>();
+        View v = inflater.inflate(R.layout.fragment_xbox_marketplace, container, false);
 
+        mProgressBar = (ProgressBar)v.findViewById(R.id.xbm_progressbar);
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -81,14 +85,14 @@ public class XBMarketplaceFragment extends Fragment implements XboxMarketplaceAd
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
-        View v = inflater.inflate(R.layout.fragment_xbox_marketplace, container, false);
 
         mRV = (RecyclerView)v.findViewById(R.id.xbm_recyclerview);
         mRV.setLayoutManager(new LinearLayoutManager(v.getContext(), LinearLayoutManager.VERTICAL, false));
-        mAdapter = new XboxMarketplaceAdapter(mGameList, v.getContext(), XBMarketplaceFragment.this);
+        mAdapter = new XBMarketplaceAdapter(mGameList, v.getContext(), XBMarketplaceFragment.this);
         mRV.setAdapter(mAdapter);
 
         return v;

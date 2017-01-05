@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
@@ -31,18 +32,23 @@ import okhttp3.Response;
  * Created by colinbradley on 1/3/17.
  */
 
-public class DealsWithGoldFragment extends Fragment implements DealsWithGoldAdapter.OnItemSelectedListener {
+public class DWGFragment extends Fragment implements DWGAdapter.OnItemSelectedListener {
     public static final String TAG = "DWGFragment";
 
-    DealsWithGoldAdapter mAdapter;
+    DWGAdapter mAdapter;
     RecyclerView mRV;
     List<DealWithGold> mDWGList;
     AsyncTask<Void,Void,Void> mTask;
+    ProgressBar mProgressBar;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mDWGList = new ArrayList<>();
+        View v = inflater.inflate(R.layout.fragment_deals_with_gold, container, false);
+
+        mProgressBar = (ProgressBar)v.findViewById(R.id.dwg_progressbar);
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -85,14 +91,14 @@ public class DealsWithGoldFragment extends Fragment implements DealsWithGoldAdap
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
-        View v = inflater.inflate(R.layout.fragment_deals_with_gold, container, false);
 
         mRV = (RecyclerView)v.findViewById(R.id.dwg_recyclerview);
         mRV.setLayoutManager(new LinearLayoutManager(v.getContext(), LinearLayoutManager.VERTICAL, false));
-        mAdapter = new DealsWithGoldAdapter(mDWGList, DealsWithGoldFragment.this, getContext());
+        mAdapter = new DWGAdapter(mDWGList, DWGFragment.this, getContext());
         mRV.setAdapter(mAdapter);
         return v;
     }
@@ -100,7 +106,7 @@ public class DealsWithGoldFragment extends Fragment implements DealsWithGoldAdap
 
     @Override
     public void onItemSelected(String id, String oldp, String newp) {
-        Intent intent = new Intent(getContext(), DealWithGoldDetails.class);
+        Intent intent = new Intent(getContext(), DWGDetails.class);
         intent.putExtra("id", id);
         intent.putExtra("oldp", oldp);
         intent.putExtra("newp", newp);

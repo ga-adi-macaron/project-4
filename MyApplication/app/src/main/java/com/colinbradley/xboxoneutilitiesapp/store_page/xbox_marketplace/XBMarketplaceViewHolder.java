@@ -13,13 +13,13 @@ import com.squareup.picasso.Picasso;
  * Created by colinbradley on 12/29/16.
  */
 
-public class XboxMarketplaceViewHolder extends RecyclerView.ViewHolder {
+public class XBMarketplaceViewHolder extends RecyclerView.ViewHolder {
 
     TextView mTitle;
     TextView mDevName;
     ImageView mImg;
 
-    public XboxMarketplaceViewHolder(View itemView) {
+    public XBMarketplaceViewHolder(View itemView) {
         super(itemView);
         mTitle = (TextView)itemView.findViewById(R.id.xbm_title);
         mDevName = (TextView)itemView.findViewById(R.id.xbm_dev);

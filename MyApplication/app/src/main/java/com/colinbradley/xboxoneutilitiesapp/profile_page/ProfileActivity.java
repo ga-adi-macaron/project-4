@@ -85,7 +85,6 @@ public class ProfileActivity extends AppCompatActivity {
         mAccountStatus = (TextView)findViewById(R.id.profile_account_status);
         mXUIDview = (TextView)findViewById(R.id.profile_xuid_num);
         mProfilePic = (ImageView)findViewById(R.id.profile_pic);
-        mProgressBar = (ProgressBar)findViewById(R.id.profile_progressbar);
 
         mAcctStatus = (TextView)findViewById(R.id.profile_account);
         mGamerscoreLogo = (ImageView)findViewById(R.id.profile_gs_logo);
@@ -197,7 +196,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         mToolbar.setVisibility(View.VISIBLE);
 
-        mProgressBar.setVisibility(View.GONE);
 
 
         mToolbar.setBackgroundColor(Color.parseColor("#" + mFavColor));

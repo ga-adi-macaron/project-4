@@ -13,11 +13,11 @@ import com.squareup.picasso.Picasso;
  * Created by colinbradley on 1/3/17.
  */
 
-public class DealsWithGoldViewHolder extends RecyclerView.ViewHolder {
+public class DWGViewHolder extends RecyclerView.ViewHolder {
     TextView mTitle, mOriginalPrice, mNewPrice;
     ImageView mImage;
 
-    public DealsWithGoldViewHolder(View itemView) {
+    public DWGViewHolder(View itemView) {
         super(itemView);
         mTitle = (TextView)itemView.findViewById(R.id.dwg_title);
         mOriginalPrice = (TextView)itemView.findViewById(R.id.dwg_original_price);

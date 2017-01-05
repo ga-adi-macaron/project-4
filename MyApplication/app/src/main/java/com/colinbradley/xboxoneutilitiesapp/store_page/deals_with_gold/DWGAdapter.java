@@ -14,14 +14,14 @@ import java.util.List;
  * Created by colinbradley on 1/3/17.
  */
 
-public class DealsWithGoldAdapter extends RecyclerView.Adapter<DealsWithGoldViewHolder> {
-    public static final String TAG = "DealsWithGoldAdapter";
+public class DWGAdapter extends RecyclerView.Adapter<DWGViewHolder> {
+    public static final String TAG = "DWGAdapter";
 
     private List<DealWithGold> mDWGList;
     private OnItemSelectedListener mOnItemSelectedListener;
     private Context mContext;
 
-    public DealsWithGoldAdapter(List<DealWithGold> mDWGList, OnItemSelectedListener mOnItemSelectedListener, Context mContext) {
+    public DWGAdapter(List<DealWithGold> mDWGList, OnItemSelectedListener mOnItemSelectedListener, Context mContext) {
         this.mDWGList = mDWGList;
         this.mOnItemSelectedListener = mOnItemSelectedListener;
         this.mContext = mContext;
@@ -32,13 +32,13 @@ public class DealsWithGoldAdapter extends RecyclerView.Adapter<DealsWithGoldView
     }
 
     @Override
-    public DealsWithGoldViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DWGViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.dwg_rv_item, parent, false);
-        return new DealsWithGoldViewHolder(v);
+        return new DWGViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(DealsWithGoldViewHolder holder, final int position) {
+    public void onBindViewHolder(DWGViewHolder holder, final int position) {
         holder.mTitle.setText(mDWGList.get(position).getmTitle());
         holder.mOriginalPrice.setText(mDWGList.get(position).getmOriginalPrice());
         holder.mNewPrice.setText(mDWGList.get(position).getmNewPrice());

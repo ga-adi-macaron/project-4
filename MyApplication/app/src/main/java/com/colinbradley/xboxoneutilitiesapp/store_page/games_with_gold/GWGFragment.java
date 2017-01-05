@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
@@ -27,13 +28,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class GamesWithGoldFragment extends Fragment implements GWGAdapter.OnItemSelectedListener{
-    public static final String TAG = "GamesWithGoldFragment";
+public class GWGFragment extends Fragment implements GWGAdapter.OnItemSelectedListener{
+    public static final String TAG = "GWGFragment";
 
     GWGAdapter mAdapter;
     RecyclerView mRV;
     List<GameWithGold> mGwGList;
     AsyncTask<Void,Void,Void> mTask;
+    ProgressBar mProgressBar;
+
 
     @Nullable
     @Override
@@ -41,6 +44,9 @@ public class GamesWithGoldFragment extends Fragment implements GWGAdapter.OnItem
                              @Nullable Bundle savedInstanceState) {
         mGwGList = new ArrayList<>();
         Log.d(TAG, "onCreateView: made list");
+        View rootView = inflater.inflate(R.layout.fragment_games_with_gold, container, false);
+
+        mProgressBar = (ProgressBar)rootView.findViewById(R.id.gwg_progressbar);
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -82,17 +88,17 @@ public class GamesWithGoldFragment extends Fragment implements GWGAdapter.OnItem
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
-        View rootView = inflater.inflate(R.layout.fragment_games_with_gold, container, false);
         Log.d(TAG, "onCreateView: identifiy rootview");
 
         mRV = (RecyclerView)rootView.findViewById(R.id.gwg_recyclerview);
         Log.d(TAG, "onCreateView: rv instanciated");
         mRV.setLayoutManager(new LinearLayoutManager(rootView.getContext(),LinearLayoutManager.VERTICAL,false));
         Log.d(TAG, "onCreateView: set layout manager");
-        mAdapter = new GWGAdapter(mGwGList, GamesWithGoldFragment.this, rootView.getContext());
+        mAdapter = new GWGAdapter(mGwGList, GWGFragment.this, rootView.getContext());
         Log.d(TAG, "onCreateView: created adapter");
         mRV.setAdapter(mAdapter);
         Log.d(TAG, "onCreateView: set adapter");
@@ -103,7 +109,7 @@ public class GamesWithGoldFragment extends Fragment implements GWGAdapter.OnItem
 
     @Override
     public void onItemSelected(String id) {
-        Intent intent = new Intent(getContext(),GameWithGoldDetails.class);
+        Intent intent = new Intent(getContext(),GWGDetails.class);
         intent.putExtra("id", id);
         startActivity(intent);
     }

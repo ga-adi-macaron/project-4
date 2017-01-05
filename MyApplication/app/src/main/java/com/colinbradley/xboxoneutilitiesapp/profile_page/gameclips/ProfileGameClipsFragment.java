@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.colinbradley.xboxoneutilitiesapp.DownloaderActivity;
@@ -57,12 +58,17 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
     ShareDialog mShareDialog;
     CallbackManager mCallbackManager;
 
+    ProgressBar mProgressBar;
+
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mClipsList = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_gameclips, container, false);
+
+        mProgressBar = (ProgressBar)rootView.findViewById(R.id.gameclips_progressbar);
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -114,6 +120,7 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
@@ -136,7 +143,6 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
             }
         });
 
-        View rootView = inflater.inflate(R.layout.fragment_gameclips, container, false);
 
         mRV = (RecyclerView)rootView.findViewById(R.id.gameclips_rv);
         mRV.setLayoutManager(new LinearLayoutManager(rootView.getContext(),LinearLayoutManager.VERTICAL, false));
