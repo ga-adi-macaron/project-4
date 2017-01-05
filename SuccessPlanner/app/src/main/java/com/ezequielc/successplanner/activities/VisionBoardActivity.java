@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +84,7 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void textOptions(){
-        CharSequence[] textOptions = {"Add New Text", "Edit Text", "Change Color"};
+        CharSequence[] textOptions = {"Add New Text", "Edit Text", "Change Color", "Change Size"};
         AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Text Options:")
                 .setItems(textOptions, new DialogInterface.OnClickListener() {
@@ -98,6 +99,10 @@ public class VisionBoardActivity extends AppCompatActivity {
                                 break;
                             case 2: // Change Color of Text
                                 changeTextColor();
+                                break;
+                            case 3: // Change Size of Text
+                                changeTextSize();
+                                break;
                             default:
                                 break;
                         }
@@ -136,7 +141,6 @@ public class VisionBoardActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null);
         builder.create().show();
 
-        mNewText.setTextSize(24); // TODO; TEMP CODE // REPLACE WITH OPTION
         mNewText.setOnTouchListener(mTouchListener);
     }
 
@@ -237,6 +241,58 @@ public class VisionBoardActivity extends AppCompatActivity {
                         }
                     }
                 });
+        builder.create().show();
+    }
+
+    public void changeTextSize(){
+        if (mViewGroup.getChildCount() == 0) {
+            Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mEditingOrDeleting = true;
+        Toast.makeText(this, "Choose Text to Change Size...", Toast.LENGTH_LONG).show();
+
+        for (int i = 0; i < mViewGroup.getChildCount(); i++) {
+            final View child = mViewGroup.getChildAt(i);
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Handles Error when picking an ImageView instead of a TextView, ClassCastException
+                    if (child instanceof ImageView) {
+                        Toast.makeText(VisionBoardActivity.this, "This is an Image", Toast.LENGTH_SHORT).show();
+                        mEditingOrDeleting = false;
+                        return;
+                    }
+                    pickSize((TextView) child);
+                    mEditingOrDeleting = false;
+                }
+            });
+        }
+    }
+
+    public void pickSize(final TextView textView){
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
+        LayoutInflater inflater = LayoutInflater.from(VisionBoardActivity.this);
+        View view = inflater.inflate(R.layout.dialog_number_picker, null);
+        builder.setView(view);
+
+        final NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+
+        numberPicker.setMaxValue(100);
+        numberPicker.setMinValue(10);
+        float currentSize = textView.getTextSize() / getResources().getDisplayMetrics().scaledDensity;
+        numberPicker.setValue((int) currentSize);
+
+        builder.setTitle("Choose Size")
+                .setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int value = numberPicker.getValue();
+                        textView.setTextSize(value);
+                    }
+                })
+                .setNegativeButton("Cancel", null);
         builder.create().show();
     }
 
