@@ -1,4 +1,4 @@
-package com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold;
+package com.colinbradley.xboxoneutilitiesapp.store_page.deals_with_gold;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,17 +26,21 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class GameWithGoldDetails extends AppCompatActivity {
-    public static final String TAG = "GameWithGoldDetails";
+/**
+ * Created by colinbradley on 1/3/17.
+ */
 
-    TextView mTitle, mOriginalPrice, mDescription, mDevName, mGenreView;
+public class DWGDetails extends AppCompatActivity {
+    public static final String TAG = "DWGDetails";
+
+    TextView mTitle, mOriginalPrice, mNewPrice, mDescription, mDevName, mGenreView;
     ImageView mImageView, mPrevious, mNext;
 
-    TextView mFreeWithGold, mGenre;
+    TextView mGenre;
     ImageView mCrossout;
     ProgressBar mProgressBar;
 
-    String mGameID, mGameTitle, mGameDescription, mGameDevName, mGamePrice;
+    String mGameID, mGameTitle, mGameDescription, mGameDevName, mGameOldPrice, mGameNewPrice;
     List<String> mImgURLs;
     List<String> mGenres;
     int currentIndex;
@@ -46,29 +50,31 @@ public class GameWithGoldDetails extends AppCompatActivity {
     AsyncTask<Void,Void,Void> mTask;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_with_gold_details);
+        setContentView(R.layout.activity_deal_with_gold_details);
         mImgURLs = new ArrayList<>();
         mGenres = new ArrayList<>();
 
-        mProgressBar = (ProgressBar)findViewById(R.id.gwgd_progress_bar);
+        mProgressBar = (ProgressBar)findViewById(R.id.dwgd_progress_bar);
 
-        mTitle = (TextView)findViewById(R.id.gwgd_title);
-        mOriginalPrice = (TextView)findViewById(R.id.gwgd_price);
-        mDescription = (TextView)findViewById(R.id.gwgd_description);
-        mDevName = (TextView)findViewById(R.id.gwgd_dev_name);
-        mImageView = (ImageView) findViewById(R.id.gwgd_main_img);
-        mPrevious = (ImageView)findViewById(R.id.gwgd_previous_button);
-        mNext = (ImageView)findViewById(R.id.gwgd_next_button);
-        mGenreView = (TextView)findViewById(R.id.gwgd_genre_list);
+        mTitle = (TextView)findViewById(R.id.dwgd_title);
+        mOriginalPrice = (TextView)findViewById(R.id.dwgd_old_price);
+        mNewPrice = (TextView)findViewById(R.id.dwgd_new_price);
+        mDescription = (TextView)findViewById(R.id.dwgd_description);
+        mDevName = (TextView)findViewById(R.id.dwgd_dev_name);
+        mGenreView = (TextView)findViewById(R.id.dwgd_genre_list);
+        mImageView = (ImageView)findViewById(R.id.dwgd_main_img);
+        mNext = (ImageView)findViewById(R.id.dwgd_next_button);
+        mPrevious = (ImageView)findViewById(R.id.dwgd_previous_button);
 
-        mGenre = (TextView)findViewById(R.id.gwgd_genres);
-        mCrossout = (ImageView)findViewById(R.id.gwgd_crossout);
-        mFreeWithGold = (TextView)findViewById(R.id.gwgd_free_w_gold);
+        mGenre = (TextView)findViewById(R.id.dwgd_genres);
+        mCrossout = (ImageView)findViewById(R.id.dwgd_crossout);
 
-        final Intent intent = getIntent();
+        Intent intent = getIntent();
         mGameID = intent.getStringExtra("id");
+        mGameOldPrice = intent.getStringExtra("oldp");
+        mGameNewPrice = intent.getStringExtra("newp");
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -90,13 +96,6 @@ public class GameWithGoldDetails extends AppCompatActivity {
                     mGameTitle = game.getString("Name");
                     mGameDescription = game.getString("Description");
                     mGameDevName = game.getString("DeveloperName");
-
-                    JSONArray availabilitiesArray = game.getJSONArray("Availabilities");
-                    JSONObject obj = availabilitiesArray.getJSONObject(0);
-                    JSONObject offerDisplayData = obj.getJSONObject("OfferDisplayData");
-                    double priceAsInt = offerDisplayData.getDouble("listPrice");
-
-                    mGamePrice = "$" + priceAsInt;
 
                     JSONArray imgArray = game.getJSONArray("Images");
                     for (int i = 0; i < imgArray.length(); i++){
@@ -120,7 +119,8 @@ public class GameWithGoldDetails extends AppCompatActivity {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mTitle.setText(mGameTitle);
-                mOriginalPrice.setText(mGamePrice);
+                mOriginalPrice.setText(mGameOldPrice);
+                mNewPrice.setText(mGameNewPrice);
                 mDescription.setText(mGameDescription);
                 mDevName.setText(mGameDevName);
                 mGenreView.setText(mGenres.toString());
@@ -128,7 +128,6 @@ public class GameWithGoldDetails extends AppCompatActivity {
 
                 mProgressBar.setVisibility(View.INVISIBLE);
 
-                mFreeWithGold.setVisibility(View.VISIBLE);
                 mCrossout.setVisibility(View.VISIBLE);
                 mImageView.setVisibility(View.VISIBLE);
                 mGenre.setVisibility(View.VISIBLE);
@@ -136,6 +135,7 @@ public class GameWithGoldDetails extends AppCompatActivity {
                 mDevName.setVisibility(View.VISIBLE);
                 mGenreView.setVisibility(View.VISIBLE);
                 mOriginalPrice.setVisibility(View.VISIBLE);
+                mNewPrice.setVisibility(View.VISIBLE);
                 mTitle.setVisibility(View.VISIBLE);
                 mNext.setVisibility(View.VISIBLE);
                 mPrevious.setVisibility(View.VISIBLE);

@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.colinbradley.xboxoneutilitiesapp.store_page.deals_with_gold.DealsWithGoldFragment;
-import com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold.GamesWithGoldFragment;
+import com.colinbradley.xboxoneutilitiesapp.store_page.deals_with_gold.DWGFragment;
+import com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold.GWGFragment;
 import com.colinbradley.xboxoneutilitiesapp.store_page.xbox_marketplace.XBMarketplaceFragment;
 
 /**
@@ -21,9 +21,9 @@ public class StoreViewPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new GamesWithGoldFragment();
+                return new GWGFragment();
             case 1:
-                return new DealsWithGoldFragment();
+                return new DWGFragment();
             case 2:
                 return new XBMarketplaceFragment();
             default:
@@ -40,11 +40,11 @@ public class StoreViewPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0:
-                return "Games With Gold";
+                return "Free With Gold";
             case 1:
-                return "Deals With Gold";
+                return "Sales With Gold";
             case 2:
-                return "Xbox Live Marketplace";
+                return "Marketplace";
             default:
                 return "???";
         }

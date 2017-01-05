@@ -112,13 +112,6 @@
         />
 
 
-
-    <ProgressBar
-        android:id="@+id/profile_progressbar"
-        android:layout_width="50sp"
-        android:layout_height="50sp"
-        android:layout_centerInParent="true"/>
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/profile_toolbar"
         android:layout_width="match_parent"
@@ -133,11 +126,11 @@
             android:id="@+id/profile_tablayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/profile_account_status"
             android:layout_below="@id/profile_toolbar"
             app:tabTextColor="@color/textColor"
             app:tabIndicatorColor="@color/colorAccent"
             app:tabSelectedTextColor="@color/colorAccent"
+            android:layout_marginRight="12sp"
             />
 
     </android.support.v7.widget.Toolbar>

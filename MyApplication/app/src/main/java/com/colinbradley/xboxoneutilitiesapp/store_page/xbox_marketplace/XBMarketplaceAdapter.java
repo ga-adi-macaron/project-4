@@ -14,13 +14,13 @@ import java.util.List;
  * Created by colinbradley on 12/29/16.
  */
 
-public class XboxMarketplaceAdapter extends RecyclerView.Adapter<XboxMarketplaceViewHolder> {
+public class XBMarketplaceAdapter extends RecyclerView.Adapter<XBMarketplaceViewHolder> {
 
     private List<Game> mGameList;
     private Context mContext;
     private OnItemSelectedListener mOnItemSelectedListener;
 
-    public XboxMarketplaceAdapter(List<Game> mGameList, Context mContext, OnItemSelectedListener mOnItemSelectedListener) {
+    public XBMarketplaceAdapter(List<Game> mGameList, Context mContext, OnItemSelectedListener mOnItemSelectedListener) {
         this.mGameList = mGameList;
         this.mContext = mContext;
         this.mOnItemSelectedListener = mOnItemSelectedListener;
@@ -31,13 +31,13 @@ public class XboxMarketplaceAdapter extends RecyclerView.Adapter<XboxMarketplace
     }
 
     @Override
-    public XboxMarketplaceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public XBMarketplaceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.marketplace_rv_item, parent, false);
-        return new XboxMarketplaceViewHolder(v);
+        return new XBMarketplaceViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(XboxMarketplaceViewHolder holder, final int position) {
+    public void onBindViewHolder(XBMarketplaceViewHolder holder, final int position) {
         holder.mTitle.setText(mGameList.get(position).getmTitle());
         holder.mDevName.setText(mGameList.get(position).getmDevName());
         holder.bindImage(mGameList.get(position).getmMainImgURL(), mContext);

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
@@ -39,11 +40,22 @@ public class ProfileFriendsFragment extends Fragment implements FriendsListAdapt
     FriendsListAdapter mAdapter;
     List<Friend> mFriendsList;
     AsyncTask<Void,Void,Void> mTask;
+    ProgressBar mProgressBar;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFriendsList = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
+
+        mProgressBar = (ProgressBar)rootView.findViewById(R.id.friends_progressbar);
 
         mTask = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -77,10 +89,11 @@ public class ProfileFriendsFragment extends Fragment implements FriendsListAdapt
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
-        View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
+
 
         mRV = (RecyclerView)rootView.findViewById(R.id.friends_rv);
         mRV.setLayoutManager(new LinearLayoutManager(rootView.getContext(),

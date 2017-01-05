@@ -40,9 +40,9 @@
         <activity android:name=".profile_page.ProfileActivity" />
         <activity android:name=".VideoPlayerActivity" />
         <activity android:name=".store_page.StoreActivity" />
-        <activity android:name=".store_page.games_with_gold.GameWithGoldDetails" />
+        <activity android:name=".store_page.games_with_gold.GWGDetails" />
         <activity android:name=".store_page.xbox_marketplace.XBMarketplaceGameDetails" />
-        <activity android:name=".store_page.deals_with_gold.DealWithGoldDetails" />
+        <activity android:name=".store_page.deals_with_gold.DWGDetails" />
         <activity android:name=".DownloaderActivity"/>
         <activity
             android:name=".FullscreenImageActivity"

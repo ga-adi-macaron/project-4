@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.colinbradley.xboxoneutilitiesapp.DownloaderActivity;
@@ -51,13 +52,18 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
     ShareDialog mShareDialog;
     CallbackManager mCallbackManager;
 
+    ProgressBar mProgressBar;
+
+
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mScreenshotList = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_screenshots,container,false);
 
+        mProgressBar = (ProgressBar)rootView.findViewById(R.id.screenshot_progressbar);
 
 
         mTask = new AsyncTask<Void, Void, Void>() {
@@ -108,6 +114,7 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 mAdapter.notifyDataSetChanged();
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }.execute();
 
@@ -130,7 +137,6 @@ public class ProfileScreenshotsFragment extends Fragment implements ScreenshotsA
             }
         });
 
-        View rootView = inflater.inflate(R.layout.fragment_screenshots,container,false);
 
         mRV = (RecyclerView)rootView.findViewById(R.id.screenshot_rv);
         mRV.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
