@@ -36,10 +36,10 @@ public class MessageGroup {
      * @param creatorName the first name of the {@link AvailablePlayer} that started the room
      */
     public void addCreateMessage(String creatorName) {
-        MessageObject start = new MessageObject("Created by "+creatorName);
-        start.setType("start");
-        start.setSender(creatorName);
-        messages.put("created", start);
+        if(messages.size() == 0) {
+            SystemMessageObject start = new SystemMessageObject(creatorName);
+            messages.put("create", start);
+        }
     }
 
     public void addMessage(String key, SelfMessageObject message) {

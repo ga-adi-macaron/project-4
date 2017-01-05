@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
+import com.example.jon.eventmeets.model.AvailablePlayer;
 import com.example.jon.eventmeets.model.DatabaseGameObject;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,10 +25,12 @@ public class EventMessageActivity extends AppCompatActivity {
     private DatabaseGameObject mGameObject;
     private String mName, mPlatform, mId, mScreenshot, mCover;
     private DatabaseReference mReference;
+    private FirebaseDatabase mDatabase;
     private List<String> mPlayerIDs;
     private AvailablePlayerRecycler mAdapter;
     private RecyclerView mPlayerRecycler;
     private TextView mTotalPlayers;
+    private List<AvailablePlayer> mPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,19 +51,18 @@ public class EventMessageActivity extends AppCompatActivity {
 
         mGameObject = new DatabaseGameObject(mId, mName, mScreenshot, mCover, mPlatform);
         mPlayerIDs = new ArrayList<>();
+        mPlayers = new ArrayList<>();
 
-        FirebaseDatabase db = FirebaseDatabase.getInstance();
-        mReference = db.getReference("games");
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("games");
 
-        mAdapter = new AvailablePlayerRecycler(mPlayerIDs);
         mPlayerRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mPlayerRecycler.setAdapter(mAdapter);
 
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                if(!dataSnapshot.hasChild(mId)) {
+                if(!dataSnapshot.hasChild(mId)&&!dataSnapshot.hasChild(mPlatform)) {
                     mReference.child(mId).child(mPlatform).setValue(mGameObject);
                 } else {
                     for(DataSnapshot data :dataSnapshot.child(mId).child(mPlatform).getChildren()) {
@@ -70,14 +72,12 @@ public class EventMessageActivity extends AppCompatActivity {
                         }
                     }
                 }
-                mReference.child(mId).child(mPlatform).child(user).setValue("looking", new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        mPlayerIDs.add(user);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
+                if(!dataSnapshot.child(mId).child(mPlatform).hasChild(user)) {
+                    mReference.child(mId).child(mPlatform).child(user).setValue("looking");
+                    mPlayerIDs.add(user);
+                }
                 mTotalPlayers.setText(mPlayerIDs.size()+" players searching");
+                findPlayersById();
             }
 
             @Override
@@ -86,5 +86,25 @@ public class EventMessageActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void findPlayersById() {
+        for(int i=0;i<mPlayerIDs.size();i++) {
+            mDatabase.getReference("users").child(mPlayerIDs.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    mPlayers.add(dataSnapshot.getValue(AvailablePlayer.class));
+                    if(mPlayers.size() == mPlayerIDs.size()) {
+                        mAdapter = new AvailablePlayerRecycler(mPlayers);
+                        mPlayerRecycler.setAdapter(mAdapter);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

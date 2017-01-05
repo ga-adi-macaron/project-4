@@ -3,6 +3,7 @@ package com.example.jon.eventmeets;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
+import com.example.jon.eventmeets.model.AvailablePlayer;
 import com.example.jon.eventmeets.model.BaseUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.RuntimeExecutionException;
@@ -116,10 +117,11 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private void addUserToDatabase(String userKey, String first, String last) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference("users");
-        BaseUser.getInstance().setFirstName(first);
-        BaseUser.getInstance().setLastName(last);
-        BaseUser.getInstance().setUsername(userKey);
-        ref.child(userKey).setValue(BaseUser.getInstance());
+//        BaseUser.getInstance().setFirstName(first);
+//        BaseUser.getInstance().setLastName(last);
+//        BaseUser.getInstance().setUsername(userKey);
+        AvailablePlayer player = new AvailablePlayer(userKey, first);
+        ref.child(userKey).setValue(player);
     }
 
     private void requestAccount(final String username, final String password, String first, String last) {

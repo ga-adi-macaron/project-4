@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +18,9 @@ import com.example.jon.eventmeets.model.BaseUser;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,14 +28,13 @@ import java.util.List;
  */
 
 class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHolder> {
-    private List<String> mPlayerKeys;
     private FirebaseDatabase mDatabase;
     private List<AvailablePlayer> mPlayers;
+    private AvailablePlayer mPlayer;
 
-    AvailablePlayerRecycler(List<String> list) {
-        mPlayerKeys = list;
+    AvailablePlayerRecycler(List<AvailablePlayer> list) {
+        mPlayers = list;
         mDatabase = FirebaseDatabase.getInstance();
-        mPlayers = new ArrayList<>();
     }
 
     @Override
@@ -50,36 +45,38 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
 
     @Override
     public void onBindViewHolder(final AvailablePlayerViewHolder holder, int position) {
-        String key = mPlayerKeys.get(position);
+        String key = mPlayers.get(position).getUser();
 
         if(!key.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String firstName = (String)dataSnapshot.child("firstName").getValue();
-                    String picture = (String)dataSnapshot.child("thumb").getValue();
-                    String key = dataSnapshot.getKey();
-                    mPlayers.add(new AvailablePlayer(key, firstName));
-
-                    holder.mDisplayName.setText(firstName);
-                    if(picture.equals("none")) {
-                        holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
-                    } else {
-                        Picasso.with(holder.mContext).load(picture).into(holder.mThumbnail);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("HERE", "onCancelled: "+databaseError);
-                }
-            });
+//            mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    String firstName = (String)dataSnapshot.child("firstName").getValue();
+////                    String picture = (String)dataSnapshot.child("thumb").getValue();
+//                    String key = dataSnapshot.getKey();
+//                    mPlayers.add(new AvailablePlayer(key, firstName));
+//
+//                    holder.mDisplayName.setText(firstName);
+////                    if(picture.equals("none")) {
+//                        holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
+////                    } else {
+////                        Picasso.with(holder.mContext).load(picture).into(holder.mThumbnail);
+////                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//                    Log.d("HERE", "onCancelled: "+databaseError);
+//                }
+//            });
+            holder.mDisplayName.setText(mPlayers.get(position).getFirstName());
+            holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
 
             holder.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String added = mPlayers.get(holder.getAdapterPosition()).getUser();
-                    String name = mPlayers.get(holder.getAdapterPosition()).getDisplay();
+                    String name = mPlayers.get(holder.getAdapterPosition()).getFirstName();
                     String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     String chatKey = current.substring(0, 6) + added.substring(0, 6);
                     confirmPlayerSelection(mPlayers.get(holder.getAdapterPosition()), name, chatKey, holder.mContext);
@@ -87,13 +84,14 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
             });
         } else {
             holder.mDisplayName.setText("(YOU)");
+            mPlayers.add(new AvailablePlayer("you", "you"));
             holder.mLayout.setBackgroundColor(Color.BLUE);
         }
     }
 
     @Override
     public int getItemCount() {
-        return mPlayerKeys.size();
+        return mPlayers.size();
     }
 
     private void confirmPlayerSelection(final AvailablePlayer player, String name, final String chatKey, final Context context) {
@@ -103,8 +101,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final MessageGroup group = new MessageGroup();
-                        group.addUsers(new AvailablePlayer(BaseUser.getInstance().getUsername(),
-                                BaseUser.getInstance().getFirstName()), player);
+                        group.addUsers(getSelf(), player);
                         group.addCreateMessage(BaseUser.getInstance().getFirstName());
 
                         mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -134,5 +131,22 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                     }
                 });
         dialog.show();
+    }
+
+    private AvailablePlayer getSelf() {
+        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mDatabase.getReference("users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mPlayer = new AvailablePlayer(dataSnapshot.child("username").getValue(String.class),
+                        dataSnapshot.child("firstName").getValue(String.class));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return mPlayer;
     }
 }

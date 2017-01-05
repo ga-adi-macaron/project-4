@@ -6,11 +6,11 @@ package com.example.jon.eventmeets.model;
 
 public class AvailablePlayer {
     private String user;
-    private String display;
+    private String firstName;
 
-    public AvailablePlayer(String user, String display) {
+    public AvailablePlayer(String user, String firstName) {
         this.user = user;
-        this.display = display;
+        this.firstName = firstName;
     }
 
     public AvailablePlayer() {}
@@ -23,11 +23,11 @@ public class AvailablePlayer {
         this.user = user;
     }
 
-    public String getDisplay() {
-        return display;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setDisplay(String display) {
-        this.display = display;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 }

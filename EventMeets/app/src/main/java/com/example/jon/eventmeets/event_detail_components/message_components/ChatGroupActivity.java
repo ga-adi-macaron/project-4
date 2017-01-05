@@ -56,7 +56,6 @@ public class ChatGroupActivity extends AppCompatActivity {
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("tag", "onDataChange: "+dataSnapshot.toString());
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
                 mMessages = mGroup.getMessages();
                 mContent = new ArrayList<>(mMessages.values());
