@@ -3,6 +3,7 @@ package com.ezequielc.successplanner.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
@@ -82,19 +83,21 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void textOptions(){
-        CharSequence[] textOptions = {"Add New", "Edit Text"};
+        CharSequence[] textOptions = {"Add New Text", "Edit Text", "Change Color"};
         AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
-                .setTitle("Text Options")
+                .setTitle("Text Options:")
                 .setItems(textOptions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         switch (i) {
-                            case 0: // Add New
+                            case 0: // Add New Text
                                 addNewText();
                                 break;
                             case 1: // Edit Text
                                 editTextView();
                                 break;
+                            case 2: // Change Color of Text
+                                changeTextColor();
                             default:
                                 break;
                         }
@@ -179,6 +182,62 @@ public class VisionBoardActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    public void changeTextColor(){
+        if (mViewGroup.getChildCount() == 0) {
+            Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mEditingOrDeleting = true;
+        Toast.makeText(this, "Choose Text to Change Color...", Toast.LENGTH_LONG).show();
+
+        for (int i = 0; i < mViewGroup.getChildCount(); i++) {
+            final View child = mViewGroup.getChildAt(i);
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Handles Error when picking an ImageView instead of a TextView, ClassCastException
+                    if (child instanceof ImageView) {
+                        Toast.makeText(VisionBoardActivity.this, "This is an Image", Toast.LENGTH_SHORT).show();
+                        mEditingOrDeleting = false;
+                        return;
+                    }
+                    pickColor((TextView) child);
+                    mEditingOrDeleting = false;
+                }
+            });
+        }
+    }
+
+    public void pickColor(final TextView textView){
+        // TODO: ADD MORE COLORS
+        CharSequence[] colors = {"Green", "Red", "Blue", "Black"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+                .setTitle("Pick Color:")
+                .setItems(colors, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (i) {
+                            case 0: // Green
+                                textView.setTextColor(Color.GREEN);
+                                break;
+                            case 1: // Red
+                                textView.setTextColor(Color.RED);
+                                break;
+                            case 2: // Blue
+                                textView.setTextColor(Color.BLUE);
+                                break;
+                            case 3: // Black
+                                textView.setTextColor(Color.BLACK);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
     }
 
     public void addNewImage(Bitmap bitmap){
