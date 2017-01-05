@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.example.jon.eventmeets.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -35,16 +36,19 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        SelfMessageObject message = mMessages.get(position);
         int viewType = holder.getItemViewType();
         switch (viewType) {
             case 0:
-
+                ((MessageViewHolder)holder).mMessageText.setText(message.getContent());
+                ((MessageViewHolder)holder).mSenderName.setText(message.getSender());
+                ((MessageViewHolder)holder).mSenderIcon.setText(""+message.getSender().charAt(0));
                 break;
             case 1:
-
+                ((SystemMessageViewHolder)holder).mMessage.setText(message.getContent());
                 break;
             case 2:
-
+                ((SelfMessageViewHolder)holder).mContent.setText(message.getContent());
                 break;
         }
     }
@@ -56,12 +60,13 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public int getItemViewType(int position) {
-        if(mMessages.get(position) instanceof MessageObject) {
-            return 0;
-        } else if(mMessages.get(position) instanceof SystemMessageObject){
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if(mMessages.get(position).getSender().equals(user)) {
+            return 2;
+        } else if(mMessages.get(position).getSender().equals("system")) {
             return 1;
         } else {
-            return 2;
+            return 0;
         }
     }
 }

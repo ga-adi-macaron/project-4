@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,7 +24,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatGroupActivity extends AppCompatActivity {
     private RecyclerView mMessageRecycler;
@@ -33,7 +37,8 @@ public class ChatGroupActivity extends AppCompatActivity {
     private MessageRecyclerAdapter mAdapter;
     private DatabaseReference mReference;
     private ChildEventListener mListener;
-    private List<SelfMessageObject> mMessages;
+    private Map<String,SelfMessageObject> mMessages;
+    private List<SelfMessageObject> mContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +51,20 @@ public class ChatGroupActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mReference = database.getReference("chats").child(chatKey);
 
+        mMessages = new HashMap<>();
+
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("tag", "onDataChange: "+dataSnapshot.toString());
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
                 mMessages = mGroup.getMessages();
-                mAdapter = new MessageRecyclerAdapter(mMessages);
+                mContent = new ArrayList<>(mMessages.values());
+                mAdapter = new MessageRecyclerAdapter(mContent);
                 mMessageRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
                         LinearLayoutManager.VERTICAL, false));
                 mMessageRecycler.setAdapter(mAdapter);
+                setListener();
             }
 
             @Override
@@ -82,10 +92,13 @@ public class ChatGroupActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             String message = mMessageText.getText().toString();
                             SelfMessageObject sending = new SelfMessageObject(message);
+                            mReference.child("messages").push().setValue(sending);
+                            mMessageText.setText("");
                         }
                     });
                 } else {
                     mSendMessage.setBackgroundTintList(ColorStateList.valueOf(Color.argb(100,75,175,80)));
+                    mSendMessage.setOnClickListener(null);
                 }
             }
 
@@ -99,11 +112,21 @@ public class ChatGroupActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mReference.child("messages").removeEventListener(mListener);
+    }
+
+    private void setListener() {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mGroup.addMessage(dataSnapshot.getValue(MessageObject.class));
-                mAdapter.notifyItemInserted(mMessages.size());
+                mGroup.addMessage(dataSnapshot.getKey(),dataSnapshot.getValue(MessageObject.class));
+                mContent.add(dataSnapshot.getValue(MessageObject.class));
+                mAdapter.notifyItemInserted(mContent.size());
             }
 
             @Override
@@ -117,15 +140,9 @@ public class ChatGroupActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(ChatGroupActivity.this, "Message Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatGroupActivity.this, "Chat Error", Toast.LENGTH_SHORT).show();
             }
         };
         mReference.child("messages").addChildEventListener(mListener);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mReference.child("messages").removeEventListener(mListener);
     }
 }

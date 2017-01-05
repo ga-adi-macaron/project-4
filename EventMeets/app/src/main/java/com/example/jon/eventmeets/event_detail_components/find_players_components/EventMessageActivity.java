@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.DatabaseGameObject;
@@ -26,6 +27,7 @@ public class EventMessageActivity extends AppCompatActivity {
     private List<String> mPlayerIDs;
     private AvailablePlayerRecycler mAdapter;
     private RecyclerView mPlayerRecycler;
+    private TextView mTotalPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class EventMessageActivity extends AppCompatActivity {
 
         setTitle(mName);
         mPlayerRecycler = (RecyclerView)findViewById(R.id.player_recycler);
+        mTotalPlayers = (TextView)findViewById(R.id.total_players);
 
         mGameObject = new DatabaseGameObject(mId, mName, mScreenshot, mCover, mPlatform);
         mPlayerIDs = new ArrayList<>();
@@ -74,6 +77,7 @@ public class EventMessageActivity extends AppCompatActivity {
                         mAdapter.notifyDataSetChanged();
                     }
                 });
+                mTotalPlayers.setText(mPlayerIDs.size()+" players searching");
             }
 
             @Override

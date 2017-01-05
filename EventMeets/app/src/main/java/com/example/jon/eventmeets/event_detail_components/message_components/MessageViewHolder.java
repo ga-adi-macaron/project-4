@@ -14,10 +14,13 @@ import com.example.jon.eventmeets.R;
 public class MessageViewHolder extends RecyclerView.ViewHolder {
     public TextView mMessageText;
     public TextView mSenderName;
-    public ImageView mUserPhoto;
+    public TextView mSenderIcon;
 
     public MessageViewHolder(View itemView) {
         super(itemView);
 
+        mMessageText = (TextView)itemView.findViewById(R.id.message_layout_text);
+        mSenderIcon = (TextView) itemView.findViewById(R.id.user_first_letter);
+        mSenderName = (TextView)itemView.findViewById(R.id.message_sender_name);
     }
 }

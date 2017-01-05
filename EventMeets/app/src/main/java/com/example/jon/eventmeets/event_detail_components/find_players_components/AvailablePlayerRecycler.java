@@ -3,6 +3,7 @@ package com.example.jon.eventmeets.event_detail_components.find_players_componen
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -51,37 +52,43 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
     public void onBindViewHolder(final AvailablePlayerViewHolder holder, int position) {
         String key = mPlayerKeys.get(position);
 
-        mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String firstName = (String)dataSnapshot.child("firstName").getValue();
-                String picture = (String)dataSnapshot.child("thumb").getValue();
-                String key = dataSnapshot.getKey();
-                mPlayers.add(new AvailablePlayer(key, firstName));
+        if(!key.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+            mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String firstName = (String)dataSnapshot.child("firstName").getValue();
+                    String picture = (String)dataSnapshot.child("thumb").getValue();
+                    String key = dataSnapshot.getKey();
+                    mPlayers.add(new AvailablePlayer(key, firstName));
 
-                holder.mDisplayName.setText(firstName);
-                if(picture.equals("none")) {
-                    holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
-                } else {
-                    Picasso.with(holder.mContext).load(picture).into(holder.mThumbnail);
+                    holder.mDisplayName.setText(firstName);
+                    if(picture.equals("none")) {
+                        holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
+                    } else {
+                        Picasso.with(holder.mContext).load(picture).into(holder.mThumbnail);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("HERE", "onCancelled: "+databaseError);
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("HERE", "onCancelled: "+databaseError);
+                }
+            });
 
-        holder.mLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String added = mPlayers.get(holder.getAdapterPosition()).getUser();
-                String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                String chatKey = current.substring(0, 6)+added.substring(0, 6);
-                confirmPlayerSelection(mPlayers.get(holder.getAdapterPosition()), added, chatKey, holder.mContext);
-            }
-        });
+            holder.mLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String added = mPlayers.get(holder.getAdapterPosition()).getUser();
+                    String name = mPlayers.get(holder.getAdapterPosition()).getDisplay();
+                    String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    String chatKey = current.substring(0, 6) + added.substring(0, 6);
+                    confirmPlayerSelection(mPlayers.get(holder.getAdapterPosition()), name, chatKey, holder.mContext);
+                }
+            });
+        } else {
+            holder.mDisplayName.setText("(YOU)");
+            holder.mLayout.setBackgroundColor(Color.BLUE);
+        }
     }
 
     @Override
@@ -95,15 +102,29 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MessageGroup group = new MessageGroup();
+                        final MessageGroup group = new MessageGroup();
                         group.addUsers(new AvailablePlayer(BaseUser.getInstance().getUsername(),
                                 BaseUser.getInstance().getFirstName()), player);
                         group.addCreateMessage(BaseUser.getInstance().getFirstName());
-                        createRemoteChat(group, chatKey);
 
-                        Intent intent = new Intent(context, ChatGroupActivity.class);
-                        intent.putExtra("chatKey", chatKey);
-                        context.startActivity(intent);
+                        mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Intent intent = new Intent(context, ChatGroupActivity.class);
+                                intent.putExtra("chatKey", chatKey);
+
+                                if(!dataSnapshot.hasChild("users")) {
+                                    mDatabase.getReference("chats").child(chatKey).setValue(group);
+                                }
+
+                                context.startActivity(intent);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -113,9 +134,5 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                     }
                 });
         dialog.show();
-    }
-
-    private void createRemoteChat(MessageGroup group, String key) {
-        mDatabase.getReference("chats").child(key).setValue(group);
     }
 }
