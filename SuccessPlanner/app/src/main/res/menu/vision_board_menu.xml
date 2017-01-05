@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_upload"
+    <item android:id="@+id/action_upload_image"
         android:icon="@android:drawable/ic_menu_upload"
         android:title="Upload Image"
         app:showAsAction="always"/>
 
-    <item android:id="@+id/action_add_text"
+    <item android:id="@+id/action_text"
         android:icon="@android:drawable/ic_menu_edit"
         android:title="Add Text"
         app:showAsAction="ifRoom"/>

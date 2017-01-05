@@ -33,7 +33,7 @@ public class VisionBoardActivity extends AppCompatActivity {
     TextView mNewText;
     ViewGroup mViewGroup;
     int mStartX, mStartY;
-    boolean mDeleting;
+    boolean mEditingOrDeleting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         mTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (mDeleting) {
+                if (mEditingOrDeleting) {
                     return false;
                 }
 
@@ -79,6 +79,28 @@ public class VisionBoardActivity extends AppCompatActivity {
                 return true;
             }
         };
+    }
+
+    public void textOptions(){
+        CharSequence[] textOptions = {"Add New", "Edit Text"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+                .setTitle("Text Options")
+                .setItems(textOptions, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (i) {
+                            case 0: // Add New
+                                addNewText();
+                                break;
+                            case 1: // Edit Text
+                                editTextView();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
     }
 
     public void addNewText(){
@@ -115,6 +137,50 @@ public class VisionBoardActivity extends AppCompatActivity {
         mNewText.setOnTouchListener(mTouchListener);
     }
 
+    public void editTextView(){
+        if (mViewGroup.getChildCount() == 0) {
+            Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mEditingOrDeleting = true;
+        Toast.makeText(this, "Choose Text to Edit...", Toast.LENGTH_LONG).show();
+
+        for (int i = 0; i < mViewGroup.getChildCount(); i++) {
+            final View child = mViewGroup.getChildAt(i);
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Handles Error when picking an ImageView instead of a TextView, ClassCastException
+                    if (child instanceof ImageView) {
+                        Toast.makeText(VisionBoardActivity.this, "This is an Image", Toast.LENGTH_SHORT).show();
+                        mEditingOrDeleting = false;
+                        return;
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
+                    LayoutInflater inflater = LayoutInflater.from(VisionBoardActivity.this);
+                    View dialogView = inflater.inflate(R.layout.dialog_add_text, null);
+                    builder.setView(dialogView);
+
+                    final EditText editText = (EditText) dialogView.findViewById(R.id.new_text_edit_text);
+                    editText.setText(((TextView) child).getText().toString());
+
+                    builder.setPositiveButton("EDIT", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            String input = editText.getText().toString();
+                            ((TextView) child).setText(input);
+                        }
+                    })
+                            .setNegativeButton("Cancel", null);
+                    builder.create().show();
+                    mEditingOrDeleting = false;
+                }
+            });
+        }
+    }
+
     public void addNewImage(Bitmap bitmap){
         RelativeLayout.LayoutParams wrapContent =
                 new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -131,9 +197,6 @@ public class VisionBoardActivity extends AppCompatActivity {
     public void deletionOptions(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
-            return;
-        } else if (mViewGroup.getChildCount() <= 1) {
-            deleteAllViews();
             return;
         }
 
@@ -159,11 +222,20 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void deleteAllViews(){
-        mViewGroup.removeAllViews();
+        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
+        builder.setMessage("Delete All?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mViewGroup.removeAllViews();
+                    }
+                })
+                .setNegativeButton("No", null);
+        builder.create().show();
     }
 
     public void deleteView(){
-        mDeleting = true;
+        mEditingOrDeleting = true;
         Toast.makeText(this, "Choose Item to Delete...", Toast.LENGTH_LONG).show();
 
         for (int i = 0; i < mViewGroup.getChildCount(); i++) {
@@ -171,8 +243,17 @@ public class VisionBoardActivity extends AppCompatActivity {
             child.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mViewGroup.removeView(child);
-                    mDeleting = false;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
+                    builder.setMessage("Delete Item?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    mViewGroup.removeView(child);
+                                }
+                            })
+                            .setNegativeButton("No", null);
+                    builder.create().show();
+                    mEditingOrDeleting = false;
                 }
             });
         }
@@ -189,12 +270,12 @@ public class VisionBoardActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_upload:
+            case R.id.action_upload_image:
                 selectImage();
                 return true;
 
-            case R.id.action_add_text:
-                addNewText();
+            case R.id.action_text:
+                textOptions();
                 return true;
 
             case R.id.action_delete:
