@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,7 +20,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder> {
-    private List<MyReps> mRepList;
+    private List<MyRep> mRepList;
     private OnRepsItemSelectedListener mListener;
     private String mState;
     private Context mContext;
@@ -30,7 +29,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
         void OnRepsItemSelected(String id);
     }
 
-    public RepsAdapter(List<MyReps> repList, String state, OnRepsItemSelectedListener listener, Context context) {
+    public RepsAdapter(List<MyRep> repList, String state, OnRepsItemSelectedListener listener, Context context) {
         mRepList = repList;
         mListener = listener;
         mState = state;
@@ -46,7 +45,7 @@ public class RepsAdapter extends RecyclerView.Adapter<RepsAdapter.RepsViewHolder
 
     @Override
     public void onBindViewHolder(RepsViewHolder holder, int position) {
-        final MyReps current = mRepList.get(position);
+        final MyRep current = mRepList.get(position);
         Picasso.with(mContext)
                 .load(mContext.getFileStreamPath(current.getFileName()))
                 .error(R.drawable.ic_reps)

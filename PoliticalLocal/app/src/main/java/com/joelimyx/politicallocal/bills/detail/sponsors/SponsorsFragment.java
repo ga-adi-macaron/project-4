@@ -48,10 +48,10 @@ public class SponsorsFragment extends Fragment {
     public SponsorsFragment() {
     }
 
-    public static SponsorsFragment newInstance(String param1) {
+    public static SponsorsFragment newInstance(String billId) {
         SponsorsFragment fragment = new SponsorsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_BILL_ID, param1);
+        args.putString(ARG_BILL_ID, billId);
         fragment.setArguments(args);
         return fragment;
     }

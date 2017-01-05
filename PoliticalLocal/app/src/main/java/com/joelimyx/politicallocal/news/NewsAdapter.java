@@ -19,8 +19,8 @@ import java.util.List;
  * Created by Joe on 12/13/16.
  */
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
-    List<Value> mNewsList;
+class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
+    private List<Value> mNewsList;
     private Context mContext;
     private OnNewsItemSelectedListener mListener;
 
@@ -31,7 +31,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         void onNewsItemSelected(String url);
     }
 
-    public NewsAdapter(List<Value> newsList, Context context, OnNewsItemSelectedListener listener) {
+    NewsAdapter(List<Value> newsList, Context context, OnNewsItemSelectedListener listener) {
         mNewsList = newsList;
         mContext = context;
         mListener = listener;
@@ -57,19 +57,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         }
         holder.mNewsTitle.setText(current.getName());
         holder.mNewsSource.setText(current.getProvider().get(0).getName());
-        holder.mNewsItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onNewsItemSelected(current.getUrl());
-            }
-        });
+        holder.mNewsItem.setOnClickListener(view -> mListener.onNewsItemSelected(current.getUrl()));
     }
 
-    public void swapData(List<Value> updateList){
-        mNewsList = updateList;
+    void clearData(){
+        mNewsList.clear();
         notifyDataSetChanged();
     }
 
+    void addData(List<Value> addOnList){
+        int size = mNewsList.size()-1;
+        mNewsList.addAll(addOnList);
+        notifyItemRangeInserted(size,addOnList.size());
+    }
     @Override
     public int getItemCount() {
         return mNewsList.size();
@@ -80,7 +80,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         private TextView mNewsTitle, mNewsSource;
         private RelativeLayout mNewsItem;
 
-        public NewsViewHolder(View itemView) {
+        NewsViewHolder(View itemView) {
             super(itemView);
             mNewsImage = (ImageView) itemView.findViewById(R.id.news_image);
             mNewsTitle= (TextView) itemView.findViewById(R.id.news_title);

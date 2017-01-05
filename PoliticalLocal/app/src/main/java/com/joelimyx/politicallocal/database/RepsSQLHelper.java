@@ -5,9 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import com.joelimyx.politicallocal.reps.MyReps;
+import com.joelimyx.politicallocal.reps.MyRep;
 import com.joelimyx.politicallocal.reps.gson.congress.Result;
 
 import java.util.ArrayList;
@@ -106,9 +105,9 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<MyReps> getRepsList(){
+    public List<MyRep> getRepsList(){
         SQLiteDatabase db = getReadableDatabase();
-        List<MyReps> myRepsList = new ArrayList<>();
+        List<MyRep> myRepList = new ArrayList<>();
         Cursor cursor = db.query(REPS_TABLE_NAME,
                 null,
                 null,
@@ -118,7 +117,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                 COL_CHAMBER);
         if (cursor.moveToFirst()){
             while (!cursor.isAfterLast()){
-                myRepsList.add(new MyReps(
+                myRepList.add(new MyRep(
                         cursor.getString(cursor.getColumnIndex(COL_BIO_ID)),
                         cursor.getString(cursor.getColumnIndex(COL_C_ID)),
                         cursor.getString(cursor.getColumnIndex(COL_NAME)),
@@ -135,11 +134,11 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
             }
         }
         cursor.close();
-        return myRepsList;
+        return myRepList;
     }
-    public MyReps getMyRepByID(String id){
+    public MyRep getMyRepByID(String id){
         SQLiteDatabase db = getReadableDatabase();
-        MyReps myReps = null;
+        MyRep myRep = null;
         Cursor cursor = db.query(REPS_TABLE_NAME,
                 null,
                 COL_BIO_ID+" LIKE ?",
@@ -149,7 +148,7 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                 null,
                 "1");
         if (cursor.moveToFirst()){
-            myReps = new MyReps(
+            myRep = new MyRep(
                     cursor.getString(cursor.getColumnIndex(COL_BIO_ID)),
                     cursor.getString(cursor.getColumnIndex(COL_C_ID)),
                     cursor.getString(cursor.getColumnIndex(COL_NAME)),
@@ -163,6 +162,6 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndex(COL_FILE_NAME)));
         }
         cursor.close();
-        return myReps;
+        return myRep;
     }
 }

@@ -6,11 +6,11 @@ import android.support.annotation.Nullable;
  * Created by Joe on 12/17/16.
  */
 
-public class MyReps {
+public class MyRep {
     private String mBioId, mCId, mName, mParty, mPhone,mEmail,mWebsite, mTwitter, mChamber, mFileName;
     private int mDistrictClass;
 
-    public MyReps(String bioId, String CId, String name, String party, String chamber, int districtClass, @Nullable String phone, @Nullable String email, @Nullable String website, @Nullable String twitter, @Nullable String fileName) {
+    public MyRep(String bioId, String CId, String name, String party, String chamber, int districtClass, @Nullable String phone, @Nullable String email, @Nullable String website, @Nullable String twitter, @Nullable String fileName) {
         mBioId = bioId;
         mCId = CId;
         mName = name;

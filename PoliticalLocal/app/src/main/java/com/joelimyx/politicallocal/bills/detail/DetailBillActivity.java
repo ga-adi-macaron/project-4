@@ -59,6 +59,9 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_bill);
 
+        /*---------------------------------------------------------------------------------
+        // Reference and set up
+        ---------------------------------------------------------------------------------*/
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.detail_bill_collapsing_toolbar);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.detail_bill_appbar_layout);
         appBarLayout.addOnOffsetChangedListener(this);
@@ -75,6 +78,9 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
         mDetailBillTitle= (TextView) findViewById(R.id.detail_bill_title);
         mDetailBillPDF= (TextView) findViewById(R.id.detail_bill_pdf);
 
+        /*---------------------------------------------------------------------------------
+        // Call to get detail bill
+        ---------------------------------------------------------------------------------*/
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BillFragment.propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -97,6 +103,8 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                     SpannableString content = new SpannableString("Full detail(PDF)");
                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                     mDetailBillPDF.setText(content);
+
+                    //On Click for PDF file
                     mDetailBillPDF.setOnClickListener(v ->{
                             String packageName = "com.android.chrome";
                             CustomTabsClient.bindCustomTabsService(DetailBillActivity.this, packageName, new CustomTabsServiceConnection() {
@@ -130,6 +138,10 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                 Toast.makeText(DetailBillActivity.this, "Fail to get Detail Bill", Toast.LENGTH_SHORT).show();
             }
         });
+
+        /*---------------------------------------------------------------------------------
+        // ViewPage AREA
+        ---------------------------------------------------------------------------------*/
         DetailBillPagerAdapter detailBillPagerAdapter = new DetailBillPagerAdapter(getSupportFragmentManager());
         ViewPager viewPager = (ViewPager) findViewById(R.id.detail_bill_container);
         viewPager.setAdapter(detailBillPagerAdapter);

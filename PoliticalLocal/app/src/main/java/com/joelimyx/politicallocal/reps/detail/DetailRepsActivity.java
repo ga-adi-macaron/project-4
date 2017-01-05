@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionButton;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.database.RepsSQLHelper;
-import com.joelimyx.politicallocal.reps.MyReps;
+import com.joelimyx.politicallocal.reps.MyRep;
 import com.joelimyx.politicallocal.reps.service.TwitterIdClient;
 import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.Twitter;
@@ -48,7 +48,7 @@ public class DetailRepsActivity extends AppCompatActivity
     private DetailRepsPagerAdapter mDetailRepsPagerAdapter;
     private ViewPager mViewPager;
 
-    private MyReps mMyReps;
+    private MyRep mMyRep;
     private TwitterIdClient mClient;
     private static final String TAG = "DetailRepsActivity";
 
@@ -79,11 +79,11 @@ public class DetailRepsActivity extends AppCompatActivity
         linkFab.setOnClickListener(this);
         twitterFab.setOnClickListener(this);
 
-        mMyReps = db.getMyRepByID(getIntent().getStringExtra("id"));
+        mMyRep = db.getMyRepByID(getIntent().getStringExtra("id"));
         Picasso.with(this)
-                .load(getFileStreamPath(mMyReps.getFileName()))
+                .load(getFileStreamPath(mMyRep.getFileName()))
                 .fit().into(detailRepsImage);
-        namePartyText.setText(mMyReps.getName());
+        namePartyText.setText(mMyRep.getName());
 
         /*---------------------------------------------------------------------------------
         // Toolbar Area
@@ -112,14 +112,14 @@ public class DetailRepsActivity extends AppCompatActivity
         switch (view.getId()){
             case R.id.phone_fab:
                 //Show up the phone dial for user to decide whether to call
-                Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+mMyReps.getPhone()));
+                Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:"+ mMyRep.getPhone()));
                 startActivity(phoneIntent);
 
                 break;
             case R.id.email_fab:
                 //Open email app for user to send email with their desire email app
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{mMyReps.getEmail()});
+                emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{mMyRep.getEmail()});
                 emailIntent.setType("plain/text");
                 startActivity(Intent.createChooser(emailIntent,"Send Email..."));
                 break;
@@ -131,7 +131,7 @@ public class DetailRepsActivity extends AppCompatActivity
                     public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
                         client.warmup(10L);
 
-                        Uri uri = Uri.parse(mMyReps.getWebsite());
+                        Uri uri = Uri.parse(mMyRep.getWebsite());
                         CustomTabsSession session = client.newSession(null);
                         session.mayLaunchUrl(uri,null,null);
 
@@ -151,7 +151,7 @@ public class DetailRepsActivity extends AppCompatActivity
             case R.id.twitter_fab:
                 //Use custom call to get twitter id from the presented user name
                 mClient = new TwitterIdClient(new OkHttpClient.Builder().build());
-                Call<User> call = mClient.getIdService().getId(mMyReps.getTwitter());
+                Call<User> call = mClient.getIdService().getId(mMyRep.getTwitter());
                 call.enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
@@ -160,11 +160,11 @@ public class DetailRepsActivity extends AppCompatActivity
                         try {
                             //Launch the official twitter app
                             getPackageManager().getPackageInfo("com.twitter.android",0);
-                            Log.d(TAG, "onClick: "+ mMyReps.getTwitter());
+                            Log.d(TAG, "onClick: "+ mMyRep.getTwitter());
                             twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?user_id="+id));
                         } catch (Exception e) {
                             // no Twitter app, revert to browser
-                            twitterIntent= new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/"+mMyReps.getTwitter()));
+                            twitterIntent= new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/"+ mMyRep.getTwitter()));
                         }
                         startActivity(twitterIntent);
                     }
@@ -199,10 +199,10 @@ public class DetailRepsActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             if (position==1){
-                return ContributorFragment.newInstance(mMyReps.getCId());
+                return ContributorFragment.newInstance(mMyRep.getCId());
             }
             // TODO: 12/20/16 Add a issue fragment basic info
-            return ContributorFragment.newInstance(mMyReps.getCId());
+            return ContributorFragment.newInstance(mMyRep.getCId());
         }
 
         @Override
