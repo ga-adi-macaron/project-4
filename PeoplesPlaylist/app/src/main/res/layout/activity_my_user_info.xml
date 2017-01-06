@@ -9,6 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/water"
     tools:context="com.korbkenny.peoplesplaylist.MyUserInfoActivity"
     >
 
@@ -19,8 +20,8 @@
         android:layout_centerHorizontal="true">
     <ImageView
         android:id="@+id/my_icon"
-        android:layout_width="150dp"
-        android:layout_height="150dp"/>
+        android:layout_width="180dp"
+        android:layout_height="180dp"/>
 
     <ImageView
         android:id="@+id/my_saved"
@@ -39,6 +40,7 @@
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:layout_above="@id/my_saved"
+        android:textColor="@color/road"
         android:layout_toRightOf="@id/my_icon"
         android:layout_marginLeft="20dp"/>
     </RelativeLayout>
@@ -51,6 +53,7 @@
         android:layout_below="@id/top_row"
         android:fontFamily="sans-serif-condensed"
         android:textSize="26sp"
+        android:textColor="@color/road"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         />

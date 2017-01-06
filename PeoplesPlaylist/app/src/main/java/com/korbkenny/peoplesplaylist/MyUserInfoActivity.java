@@ -1,9 +1,11 @@
 package com.korbkenny.peoplesplaylist;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -100,6 +102,32 @@ public class MyUserInfoActivity extends AppCompatActivity {
             }
         });
 
+        for (ImageView i:mMyPlaylistsList) {
+            i.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    new AlertDialog.Builder(MyUserInfoActivity.this)
+                            .setTitle("Delete Playlist")
+                            .setMessage("Are you sure you want to delete this playlist? Everybody's tracks will be erased.")
+                            .setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+                            .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                    return false;
+                }
+            });
+        }
+
         mSavedPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,6 +152,7 @@ public class MyUserInfoActivity extends AppCompatActivity {
         final FirebaseDatabase db = FirebaseDatabase.getInstance();
         final DatabaseReference getPlaylists = db.getReference("UserPlaylists").child(ME.getId());
 
+        //  First, get your playlist ids from the database
          getPlaylists.addListenerForSingleValueEvent(new ValueEventListener() {
              @Override
              public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -219,5 +248,10 @@ public class MyUserInfoActivity extends AppCompatActivity {
         mMyPlaylistsList.add(my6);
         mMyPlaylistsList.add(my7);
         mMyPlaylistsList.add(my8);
+
+    }
+
+    public void deletePlaylist(){
+
     }
 }

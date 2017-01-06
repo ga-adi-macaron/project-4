@@ -76,10 +76,16 @@
             app:cardCornerRadius="40dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true">
-            <ImageView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/saveforlater"
+                android:text="Save\n4 l8r"
+                android:textSize="20sp"
+                android:textColor="#fffffc"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:textStyle="bold"
+
                 android:background="@color/natural"/>
         </android.support.v7.widget.CardView>
 
@@ -110,10 +116,15 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             >
-            <ImageView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/addatrack"
+                android:text="Add\nTrack"
+                android:textColor="#fffffc"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:fontFamily="sans-serif-condensed"
                 android:background="@color/colorAccent"/>
         </android.support.v7.widget.CardView>
 

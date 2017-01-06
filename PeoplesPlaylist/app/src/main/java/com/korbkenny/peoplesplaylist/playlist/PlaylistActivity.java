@@ -502,18 +502,10 @@ public class PlaylistActivity extends AppCompatActivity implements
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
     public void onClickListener(Song song, final int position) {
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if(mediaPlayer != null){
-                    mediaPlayer.reset();
-                    mediaPlayer.release();
-                    mPlayPause.setTag(PAUSED);
-                    mPlayPause.setImageResource(R.drawable.playbutton);
-                }
-
-            }
-        });
+        if (mPlayPause.getTag() == PAUSED){
+            mPlayPause.setTag(PLAYING);
+            mPlayPause.setImageResource(R.drawable.pausebutton);
+        }
         if (mMediaPlayer!=null){
             if(mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
@@ -525,14 +517,26 @@ public class PlaylistActivity extends AppCompatActivity implements
                 mMediaPlayer.release();
             }
         }
+        firstTimePlaying = false;
+
+
             mMediaPlayer = MediaPlayer.create(this, Uri.parse(song.getStreamUrl()));
             mMediaPlayer.start();
-            firstTimePlaying = false;
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                Log.d(TAG, "onCompletion: ");
+                if(mediaPlayer != null){
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mPlayPause.setTag(PAUSED);
+                    mPlayPause.setImageResource(R.drawable.playbutton);
+                }
 
-        if(mPlayPause.getTag() == PAUSED){
-            mPlayPause.setTag(PLAYING);
-            mPlayPause.setImageResource(R.drawable.pausebutton);
-        }
+            }
+        });
+
     }
 
     public void mediaPlayerButtons(){
@@ -540,61 +544,63 @@ public class PlaylistActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
-                mPlayPause.setEnabled(false);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e){
-                            e.printStackTrace();
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mPlayPause.setEnabled(true);
-                            }
-                        });
-                    }
-                }).start();
+//                mPlayPause.setEnabled(false);
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try{
+//                            Thread.sleep(1000);
+//                        } catch (InterruptedException e){
+//                            e.printStackTrace();
+//                        }
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mPlayPause.setEnabled(true);
+//                            }
+//                        });
+//                    }
+//                }).start();
 
                 if(mMediaPlayer!=null) {
                     if(firstTimePlaying){
                         if(mSongList.size() > 0) {
+                            mPlayPause.setTag(PLAYING);
+                            mPlayPause.setImageResource(R.drawable.pausebutton);
                             mMediaPlayer.reset();
                             mMediaPlayer.release();
                             mMediaPlayer = MediaPlayer.create(PlaylistActivity.this, Uri.parse(mSongList.get(0).getStreamUrl()));
                             mMediaPlayer.start();
-                            if (mPlayPause.getTag() == PAUSED) {
-                                mPlayPause.setTag(PLAYING);
-                                mPlayPause.setImageResource(R.drawable.pausebutton);
-                            }
                             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
                                 public void onCompletion(MediaPlayer mediaPlayer) {
+                                    Log.d(TAG, "onCompletion: ");
                                     if(mediaPlayer != null){
+                                        mediaPlayer.stop();
+                                        mediaPlayer.reset();
                                         mediaPlayer.release();
                                     }
-                                    mPlayPause.setTag(PAUSED);
-                                    mPlayPause.setImageResource(R.drawable.playbutton);
+
                                 }
                             });
+//                            if (mPlayPause.getTag() == PAUSED) {
+//                                mPlayPause.setTag(PLAYING);
+//                                mPlayPause.setImageResource(R.drawable.pausebutton);
+//                            }
+
                         }
                     } else {
                         if (mMediaPlayer.isPlaying()) {
+                            mPlayPause.setTag(PAUSED);
+                            mPlayPause.setImageResource(R.drawable.playbutton);
                             mMediaPlayer.pause();
-                            if (mPlayPause.getTag() == PLAYING) {
-                                mPlayPause.setTag(PAUSED);
-                                mPlayPause.setImageResource(R.drawable.pausebutton);
-                            }
-                        } else if (!mMediaPlayer.isPlaying()) {
-                            mMediaPlayer.start();
-                            if (mPlayPause.getTag() == PAUSED) {
-                                mPlayPause.setTag(PLAYING);
-                                mPlayPause.setImageResource(R.drawable.pausebutton);
-                            }
-                            firstTimePlaying = false;
                         }
+                        else if (!mMediaPlayer.isPlaying()) {
+                            mPlayPause.setTag(PLAYING);
+                            mPlayPause.setImageResource(R.drawable.pausebutton);
+                            mMediaPlayer.start();
+                        }
+                            firstTimePlaying = false;
                     }
                 }
             }

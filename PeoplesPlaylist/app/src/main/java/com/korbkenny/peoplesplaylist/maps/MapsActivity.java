@@ -84,7 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
     private Location lastLocation;
     private LocationRequest mLocationRequest;
-    private FloatingActionButton fab;
+    private CardView fab;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabasePlaylistReference, mGeofireRef, mUserRef;
     private GeoFire geoFire;
@@ -471,7 +471,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void setViewsIfLoggedIn(){
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = (CardView)findViewById(R.id.fab);
         vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
         mSignInButton = (Button) findViewById(R.id.sign_in_maps);
         cardView = (CardView) findViewById(R.id.maps_user_icon_cardview);
