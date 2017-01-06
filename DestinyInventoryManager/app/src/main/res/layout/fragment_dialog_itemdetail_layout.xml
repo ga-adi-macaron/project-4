@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_marginLeft="100dp"
+              android:layout_marginRight="100dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/dialog_fragment_background"
+              android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lorem ipsum dolor sit amet..."
+                android:textSize="22dp" />
+
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_weight="0.25"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:transitionName="icon"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:id="@+id/icon"
+                        android:adjustViewBounds="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginRight="5dp"
+                    android:orientation="vertical"
+                    android:layout_weight="0.75"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginLeft="5dp"
+                        android:textSize="17sp"
+                        android:id="@+id/selectedItem_lightLevel"
+                        android:text="LightLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginLeft="5dp"
+                        android:textSize="17sp"
+                        android:id="@+id/selectedItem_itemTierType"
+                        android:text="Item Tier Type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginLeft="5dp"
+                        android:textSize="12sp"
+                        android:text="Description"
+                        android:textStyle="italic"
+                        android:id="@+id/selectedItem_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/transfer_title"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Transfer"
+                android:textSize="19dp" />
+
+            <EditText
+                android:inputType="number"
+                android:digits="0123456789"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textColor="@color/colorWhite"
+                android:visibility="gone"
+                android:id="@+id/entry_quantity"
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <RelativeLayout
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:id="@+id/other_char1_layout"
+                android:background="@color/item_color_exotic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_weight="0.15"
+                        android:layout_margin="5dp"
+                        android:id="@+id/other_char1_emblem"
+                        android:adjustViewBounds="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+                    <RelativeLayout
+                        android:layout_weight="0.75"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_marginLeft="3dp"
+                            android:textColor="@color/colorWhite"
+                            android:textStyle="bold"
+                            android:id="@+id/transfer_class_name1"
+                            android:text="Titan"
+                            android:textSize="20sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_racegender_name1"
+                            android:layout_marginLeft="3dp"
+                            android:textColor="@color/colorWhite"
+                            android:layout_below="@id/transfer_class_name1"
+                            android:text="Human Female"
+                            android:textSize="16sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_level1"
+                            android:layout_marginRight="7dp"
+                            android:textColor="@color/colorWhite"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:text="40"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_lightlevellevel1"
+                            android:layout_marginRight="7dp"
+                            android:textColor="@color/item_color_exotic"
+                            android:textSize="16sp"
+                            android:layout_below="@id/transfer_level1"
+                            android:text="350"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:id="@+id/other_char2_layout"
+                android:background="@color/item_color_exotic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_weight="0.15"
+                        android:layout_margin="5dp"
+                        android:id="@+id/other_char2_emblem"
+                        android:adjustViewBounds="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"/>
+
+                    <RelativeLayout
+                        android:layout_weight="0.75"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_marginLeft="3dp"
+                            android:textColor="@color/colorWhite"
+                            android:textStyle="bold"
+                            android:id="@+id/transfer_class_name2"
+                            android:text="Titan"
+                            android:textSize="20sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_racegender_name2"
+                            android:layout_marginLeft="3dp"
+                            android:textColor="@color/colorWhite"
+                            android:layout_below="@id/transfer_class_name2"
+                            android:text="Human Female"
+                            android:textSize="16sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_level2"
+                            android:layout_marginRight="7dp"
+                            android:textColor="@color/colorWhite"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:text="40"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/transfer_lightlevellevel2"
+                            android:layout_marginRight="7dp"
+                            android:textColor="@color/item_color_exotic"
+                            android:textSize="16sp"
+                            android:layout_below="@id/transfer_level2"
+                            android:text="350"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+
+            <TextView
+                android:id="@+id/button_transferToVault"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:background="@color/vault_banner_background"
+                android:textColor="@color/colorWhite"
+                android:gravity="center"
+                android:text="Vault"
+                android:textSize="20sp"
+                android:layout_marginRight="30dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <LinearLayout
+                android:id="@+id/layout_equipAndClose"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:background="@color/item_color_exotic"
+                    android:gravity="center"
+                    android:id="@+id/button_equip"
+                    android:text="Equip"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="20sp"
+                    android:background="@color/dialog_fragment_dismiss_button"
+                    android:gravity="center"
+                    android:id="@+id/button_close"
+                    android:text="Close"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/layout_vaultAndClose"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginLeft="30dp"
+                    android:layout_gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="20sp"
+                    android:background="@color/vault_banner_background"
+                    android:gravity="center"
+                    android:id="@+id/button_smallVault"
+                    android:text="Vault"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:layout_marginRight="30dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="20sp"
+                    android:background="@color/dialog_fragment_dismiss_button"
+                    android:gravity="center"
+                    android:id="@+id/button_closeOther"
+                    android:text="Close"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

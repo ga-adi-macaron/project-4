@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin"
+              android:background="@color/destiny_dark_blue"
+              tools:context="com.crocusgames.destinyinventorymanager.Activities.MainActivity"
+              android:orientation="vertical">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.05"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textStyle="bold"
+            android:id="@+id/title"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="25sp"
+            android:text="The Vault"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/description"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="15sp"
+            android:text="item manager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"/>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/colorWhite"
+            android:text="Please log in with your PSN or Xbox Live account"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/button_login"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:paddingRight="35dp"
+            android:paddingLeft="35dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:text="LOG IN"
+            android:background="@color/item_color_exotic"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/progress_bar_main"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.05"/>
+
+</LinearLayout>

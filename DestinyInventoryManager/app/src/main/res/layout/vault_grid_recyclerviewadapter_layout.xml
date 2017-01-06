@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:paddingBottom="3dp"
+              android:paddingLeft="2dp"
+              android:paddingRight="2dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/item_icon"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:paddingLeft="3dp"
+            android:paddingRight="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:background="@color/item_color_common"
+            android:text="5"
+            android:layout_gravity="end|bottom"
+            android:id="@+id/item_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:paddingRight="3dp"
+            android:paddingLeft="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:textColor="@color/item_color_exotic"
+            android:background="@color/destiny_dark_blue_with_alpha"
+            android:text="5"
+            android:layout_gravity="start|top"
+            android:id="@+id/item_lightlevel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
+
+</LinearLayout>
