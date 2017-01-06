@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainMenuActivity extends AppCompatActivity {
-    private static final String TAG = "MainMenuActivity";
     public static final String ARMED_WEAPONS_PREFS = "armed weapons";
     public static final String WEAPON_SLOT1_KEY = "slot 1";
     public static final String WEAPON_SLOT2_KEY = "slot 2";
@@ -187,10 +186,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
+                    public void onClick(DialogInterface dialogInterface, int i) {}});
         setUpDialogViews(dialogView, dialog);
         dialog.setPositiveButton("okay", new DialogInterface.OnClickListener() {
             @Override
@@ -219,7 +215,7 @@ public class MainMenuActivity extends AppCompatActivity {
         final ImageView interfIcon = (ImageView)dialogView.findViewById(R.id.interference_inventory_icon);
 
         final CardView weaponSlot1 = (CardView)dialogView.findViewById(R.id.weapon1);
-        CardView weaponSlot2 = (CardView)dialogView.findViewById(R.id.weapon2);
+        final CardView weaponSlot2 = (CardView)dialogView.findViewById(R.id.weapon2);
 
         final int bombCount = prefs.getInt(ArmoryActivity.BOMB_COUNT_KEY, 0);
         final int spyCount = prefs.getInt(ArmoryActivity.SPY_COUNT_KEY, 0);
@@ -233,37 +229,37 @@ public class MainMenuActivity extends AppCompatActivity {
         spyInventoryText.setText(String.valueOf(spyCount));
         interfInventoryText.setText(String.valueOf(interfCount));
 
-        bombIcon.setOnClickListener(new View.OnClickListener() {
+        dialogView.findViewById(R.id.bomb_card).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (Integer.parseInt(bombInventoryText.getText().toString()) > 0){
                     interfIcon.setColorFilter(Color.WHITE);
                     spyIcon.setColorFilter(Color.WHITE);
-                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
+                    bombIcon.setColorFilter(getResources().getColor(R.color.colorAccent));
                     dialog.mSelectedWeapon = "bomb";
                 }
             }
         });
 
-        spyIcon.setOnClickListener(new View.OnClickListener() {
+        dialogView.findViewById(R.id.spy_card).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(Integer.parseInt(spyInventoryText.getText().toString()) > 0){
                     bombIcon.setColorFilter(Color.WHITE);
                     interfIcon.setColorFilter(Color.WHITE);
-                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
+                    spyIcon.setColorFilter(getResources().getColor(R.color.colorAccent));
                     dialog.mSelectedWeapon = "spy";
                 }
             }
         });
 
-        interfIcon.setOnClickListener(new View.OnClickListener() {
+        dialogView.findViewById(R.id.interference_card).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(Integer.parseInt(interfInventoryText.getText().toString()) > 0){
                     bombIcon.setColorFilter(Color.WHITE);
                     spyIcon.setColorFilter(Color.WHITE);
-                    ((ImageView)view).setColorFilter(Color.rgb(75,75,75));
+                    interfIcon.setColorFilter(getResources().getColor(R.color.colorAccent));
                     dialog.mSelectedWeapon = "interference";
                 }
             }
@@ -370,7 +366,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     dialog.mWeaponSlot2 = "none";
                 }
                 dialog.mSelectedWeapon = "";
-                weaponImage.setImageResource(R.drawable.none);
+                weaponImage.setImageResource(R.drawable.empty);
                 bombIcon.setColorFilter(Color.WHITE);
                 spyIcon.setColorFilter(Color.WHITE);
                 interfIcon.setColorFilter(Color.WHITE);
