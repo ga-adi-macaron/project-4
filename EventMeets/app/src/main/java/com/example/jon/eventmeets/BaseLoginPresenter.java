@@ -3,7 +3,6 @@ package com.example.jon.eventmeets;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import com.example.jon.eventmeets.model.AvailablePlayer;
 import com.example.jon.eventmeets.model.RegularPlayer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
