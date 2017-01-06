@@ -60,21 +60,19 @@ public class ChatGroupActivity extends AppCompatActivity {
 
         mGroup = new MessageGroup();
         mMessages = new HashMap<>();
+        mContent = new ArrayList<>();
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mAdapter = new MessageRecyclerAdapter(mContent);
+        mMessageRecycler.setAdapter(mAdapter);
 
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
                 mMessages = mGroup.getMessages();
-                mContent = new ArrayList<>();
                 if(mGroup.getMessages()==null||mGroup.getMessages().size()==0) {
                     mReference.child("messages").push().setValue(new SelfMessageObject("started a new chat", mGroup.getCreator()));
                 }
-                mContent.addAll(mMessages.values());
-                mAdapter = new MessageRecyclerAdapter(mContent);
-                mMessageRecycler.setAdapter(mAdapter);
-                hasMessages = true;
             }
 
             @Override
@@ -117,24 +115,22 @@ public class ChatGroupActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
         setListener();
+        super.onStart();
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
         mReference.child("messages").removeEventListener(mListener);
+        super.onStop();
     }
 
     private void setListener() {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(mContent.size() < mMessages.size()) {
                     mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
                     mAdapter.notifyItemInserted(mContent.size()-1);
-                }
             }
 
             @Override
