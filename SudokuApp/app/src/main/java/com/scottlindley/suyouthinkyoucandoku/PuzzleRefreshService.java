@@ -20,7 +20,6 @@ import java.util.List;
  */
 
 public class PuzzleRefreshService extends JobService {
-    private static final String TAG = "PuzzleRefreshService";
     public static final String PUZZLE_REFRESH_SERVICE = "puzzle refresh service";
     public static final String KEYS_INTENT_KEY = "keys";
     public static final String DIFFICULTIES_INTENT_KEY = "difficulties";

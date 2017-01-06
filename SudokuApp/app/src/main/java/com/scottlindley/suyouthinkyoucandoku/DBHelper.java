@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +21,6 @@ import java.util.List;
  */
 
 public class DBHelper extends SQLiteOpenHelper{
-    private static final String TAG = "DBHelper";
     public static final String DATABASE_NAME = DBAssetHelper.DATA_BASE_NAME;
     public static final int VERSION_NUMBER = 1;
 
@@ -287,7 +285,6 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     public void addPuzzle(Puzzle puzzle){
-        Log.d(TAG, "addPuzzle: ");
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DIFFICULTY, puzzle.getDifficulty());

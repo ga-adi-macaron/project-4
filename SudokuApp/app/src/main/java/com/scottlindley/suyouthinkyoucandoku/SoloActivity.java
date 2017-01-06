@@ -10,7 +10,6 @@ import android.view.Window;
 import android.widget.TextView;
 
 public class SoloActivity extends AppCompatActivity implements View.OnClickListener{
-    private static final String TAG = "SoloActivity";
     public static final String DIFFICULTY_INTENT_KEY = "difficulty";
     public static final String PUZZLE_KEY_INTENT_KEY = "puzzle key";
     public static final int SOLO_PUZZLE_REQUEST_CODE = 5667;

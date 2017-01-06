@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ArmoryActivity extends AppCompatActivity implements View.OnClickListener{
-    private static final String TAG = "ArmoryActivity";
     public static final String ARMORY_SHARED_PREFS = "armory prefs";
     public static final String COIN_COUNT_KEY = "coin count";
     public static final String BOMB_COUNT_KEY = "bomb count";
