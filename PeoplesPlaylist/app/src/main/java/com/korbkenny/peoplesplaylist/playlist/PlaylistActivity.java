@@ -1,5 +1,6 @@
 package com.korbkenny.peoplesplaylist.playlist;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -32,6 +34,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,12 +49,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.korbkenny.peoplesplaylist.BitmapManipulation;
 import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.RecordingActivity;
 import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.Playlist;
 import com.korbkenny.peoplesplaylist.objects.Song;
 import com.korbkenny.peoplesplaylist.objects.User;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,11 +68,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
-public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyclerAdapter.RecyclerItemClickListener{
-    public static final int RequestPermissionCode = 11335;
+public class PlaylistActivity extends AppCompatActivity implements
+        PlaylistRecyclerAdapter.RecyclerItemClickListener,
+        MediaPlayer.OnCompletionListener{
+    public static final int RECORDING_RESULT_CODE = 666;
     private static final String TAG = "Yes. ";
 
     private RecyclerView mRecyclerView;
@@ -77,19 +82,18 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
     private DatabaseReference mSongListRef, mPlaylistRef;
 
     private Playlist mThisPlaylist;
-    private CardView mPlayPause, mBack, mSkip;
-    private StorageReference mStorageRef, mStoragePictureRef;
+    private CardView mPlayPause, fabAddSong;
+    private StorageReference mStoragePictureRef;
     private Uri downloadUrl;
     private TextView mTitle,mDescription;
-    private ImageView mCover;
-    private FloatingActionButton fabAddSong;
+    private ImageView mCover, vUserIcon, mBigCover;
     private MediaPlayer mMediaPlayer;
     private Song mSongToUpload;
     private List<Song> mSongList;
     private User ME;
-    private String mAudioSavePath;
     private MediaRecorder mMediaRecorder;
-    private MediaPlayer mRecordPlayer;
+    private RecyclerNextTrackListener mNextTrackListener;
+    private RelativeLayout mFrame;
 
     private HashMap<DatabaseReference,ValueEventListener> mDbListeners;
 
@@ -101,34 +105,27 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         PLAYLIST_ID = getIntent().getStringExtra("Playlist Id");
         db = FirebaseDatabase.getInstance();
         mSongListRef = db.getReference("SongLists").child(PLAYLIST_ID);
-        Log.d(TAG, "onCreate: "+ mSongListRef.toString());
-        mStorageRef = FirebaseStorage.getInstance().getReference("songs");
         mStoragePictureRef = FirebaseStorage.getInstance().getReference("albumcovers").child(PLAYLIST_ID);
         ME = UserSingleton.getInstance().getUser();
 
         mSongList = new ArrayList<>();
-        Song song = new Song();
-        song.setTitle("HEllo there");
-        song.setUserId(ME.getId());
-        mSongList.add(song);
 
         simpleSetup();
 
+        mMediaPlayer.setOnCompletionListener(this);
+
+        mediaPlayerButtons();
+
         mDbListeners = new HashMap<>();
         syncToDatabase();
-
-
-
-//        mAdapter.notifyDataSetChanged();
 
         //  Choose a song to add to the playlist
         fabAddSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mSongToUpload == null) {
-                    mSongToUpload = new Song();
-                }
-                onRecordTrackDialog().show();
+                Intent intent = new Intent(PlaylistActivity.this, RecordingActivity.class);
+                intent.putExtra("PlaylistId",PLAYLIST_ID);
+                startActivityForResult(intent,RECORDING_RESULT_CODE);
             }
         });
 
@@ -141,7 +138,60 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
                     startActivityForResult(pickPhoto , 1);
                 }
                 else {
-                    Log.d(TAG, "onClick: WEll, this happened...");
+                    mFrame.setVisibility(View.VISIBLE);
+                    mBigCover.setVisibility(View.VISIBLE);
+                    Target target = new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            mBigCover.setImageBitmap(bitmap);
+                            ValueAnimator ani = ValueAnimator.ofFloat(0.3f, 1);
+                            ani.setDuration(300);
+                            ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    mBigCover.setAlpha((float) animation.getAnimatedValue());
+                                    mFrame.setAlpha((float) animation.getAnimatedValue());
+                                }
+                            });
+                            ani.start();
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                        }
+                    };
+                    mBigCover.setTag(target);
+
+                    Picasso.with(PlaylistActivity.this).load(mThisPlaylist.getCover()).into(target);
+
+                    mFrame.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mFrame.setVisibility(View.GONE);
+                            mBigCover.setVisibility(View.GONE);
+                        }
+                    });
+
+                    mBigCover.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(mThisPlaylist.getUserId().equals(ME.getId())){
+                                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                startActivityForResult(pickPhoto , 1);
+                            }
+                            else{
+                                mFrame.setVisibility(View.GONE);
+                                mBigCover.setVisibility(View.GONE);
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -157,15 +207,55 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         });
     }
 
+
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-            if(resultCode == RESULT_OK && requestCode == 1){
+
+        //COMING FROM A SUCCESSFUL RECORDING ACTIVITY
+        if(resultCode == RESULT_OK && requestCode == RECORDING_RESULT_CODE)  {
+            SONG_ID = imageReturnedIntent.getStringExtra("result");
+
+            mSongListRef.child(SONG_ID).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(final DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue()!=null) {
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                mSongList.add(dataSnapshot.getValue(Song.class));
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                mAdapter.notifyDataSetChanged();
+
+                            }
+                        }.execute();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        if(resultCode == RESULT_OK && requestCode == 1){
+                if(mBigCover.getVisibility()==View.VISIBLE){
+                    mBigCover.setVisibility(View.GONE);
+                    mFrame.setVisibility(View.GONE);
+                }
+
                 Uri selectedImage = imageReturnedIntent.getData();
+            Log.d(TAG, "onActivityResult: " + selectedImage.toString());
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),selectedImage);
-                    final Bitmap squareBitmap = cropToSquare(bitmap);
-                    Bitmap resizedBitmap = resizeForCover(squareBitmap);
-                    final Bitmap circleBitmap = cropToCircle(resizedBitmap);
+                    final Bitmap squareBitmap = BitmapManipulation.cropToSquare(bitmap);
+                    Bitmap resizedBitmap = BitmapManipulation.resizeForCover(squareBitmap,400);
+                    final Bitmap circleBitmap = BitmapManipulation.cropToCircle(resizedBitmap);
+
                     new AsyncTask<Void,Void,String>(){
                         @Override
                         protected String doInBackground(Void... voids) {
@@ -174,6 +264,7 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
 
                         @Override
                         protected void onPostExecute(String coverPath) {
+                            Log.d(TAG, "onPostExecute: " + coverPath);
                             Uri file = Uri.fromFile(new File(coverPath+"/playlistcover.png"));
                             mCover.setImageURI(file);
                             mStoragePictureRef.child("playlistcover.png").putFile(file)
@@ -183,10 +274,6 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
                                             if(taskSnapshot.getDownloadUrl()!=null) {
                                                 mThisPlaylist.setCover(taskSnapshot.getDownloadUrl().toString());
                                                 mPlaylistRef.setValue(mThisPlaylist);
-                                                Picasso.with(PlaylistActivity.this)
-                                                        .load(mThisPlaylist.getCover())
-                                                        .resize(mCover.getWidth(),mCover.getHeight())
-                                                        .into(mCover);
                                             }
                                         }
                                     })
@@ -198,16 +285,9 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
                                     });
                         }
                     }.execute();
-
-
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-
             }
     }
 
@@ -219,238 +299,7 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
             ValueEventListener listener = entry.getValue();
             ref.removeEventListener(listener);
         }
-
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //     Record Song Dialog. Uploads to Firebase Storage
-    //
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public Dialog onRecordTrackDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.record_song_dialog,null);
-        builder.setView(view);
-
-        SONG_ID = mSongListRef.child(PLAYLIST_ID).push().getKey();
-
-        final EditText songTitle = (EditText) view.findViewById(R.id.record_edittext);
-        final Button recordButton = (Button) view.findViewById(R.id.record_button);
-        final Button stopButton = (Button) view.findViewById(R.id.stop_button);
-        final Button playButton = (Button) view.findViewById(R.id.play_button);
-        final Button pauseButton = (Button) view.findViewById(R.id.pause_button);
-        final Button submit = (Button) view.findViewById(R.id.submit_button);
-        final Button continuePlaying = (Button) view.findViewById(R.id.play_button_continue);
-        final TextView redo = (TextView) view.findViewById(R.id.redo_button);
-
-        //================
-        //     RECORD
-        //================
-        recordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkPermission()){
-                    mAudioSavePath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                            + "/mysong.3gp";
-                    MediaRecorderReady();
-                    mRecordPlayer = new MediaPlayer();
-                    try {
-                        mMediaRecorder.prepare();
-                        mMediaRecorder.start();
-                        recordButton.setVisibility(View.GONE);
-                        stopButton.setVisibility(View.VISIBLE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    requestPermission();
-                }
-            }
-        });
-
-        //================
-        //     STOP
-        //================
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mMediaRecorder.stop();
-                mMediaRecorder.release();
-                stopButton.setVisibility(View.GONE);
-                playButton.setVisibility(View.VISIBLE);
-                submit.setEnabled(true);
-                redo.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //================
-        //     REDO
-        //================
-        redo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                playButton.setVisibility(View.GONE);
-                redo.setVisibility(View.GONE);
-                recordButton.setVisibility(View.VISIBLE);
-                submit.setEnabled(false);
-            }
-        });
-
-        //================
-        //  BEGIN PLAYING
-        //================
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) throws IllegalArgumentException,
-                    SecurityException, IllegalStateException{
-                try{
-                    mRecordPlayer.setDataSource(mAudioSavePath);
-                    mRecordPlayer.prepare();
-                } catch(IOException e){
-                    e.printStackTrace();
-                }
-                mRecordPlayer.start();
-                playButton.setVisibility(View.GONE);
-                pauseButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //================
-        //     PAUSE
-        //================
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mRecordPlayer.isPlaying()) {
-                    mRecordPlayer.pause();
-                    pauseButton.setVisibility(View.GONE);
-                    continuePlaying.setVisibility(View.VISIBLE);
-                }
-
-            }
-        });
-
-        //=====================
-        //   CONTINUE PLAYING
-        //=====================
-        continuePlaying.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mRecordPlayer.start();
-                pauseButton.setVisibility(View.VISIBLE);
-                continuePlaying.setVisibility(View.GONE);
-            }
-        });
-
-
-        //================
-        //     SUBMIT
-        //================
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //Create the song to upload and set references (Ids) to
-                //the playlist it's on, the user (you) who uploaded it,
-                //and the Id of the song itself.
-                mSongToUpload = new Song();
-                mSongToUpload.setTitle(songTitle.getText().toString());
-                mSongToUpload.setPlaylistId(PLAYLIST_ID);
-                mSongToUpload.setUserId(ME.getId());
-                mSongToUpload.setSongId(SONG_ID);
-
-                //Show the progress of the uploading file.
-                final ProgressDialog progressDialog = new ProgressDialog(PlaylistActivity.this);
-                progressDialog.setTitle("Uploading!");
-                progressDialog.show();
-
-                //Get the file ready to upload.
-                Uri audioFileUri = Uri.fromFile(new File(mAudioSavePath));
-                StorageReference songRef = mStorageRef.child(PLAYLIST_ID).child(SONG_ID).child(audioFileUri.getLastPathSegment());
-
-                //Upload the file to Firebase Storage.
-                songRef.putFile(audioFileUri)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
-                                Log.d(TAG, "onSuccess: ");
-                                progressDialog.dismiss();
-
-                                //The final piece of the Song object is to add the
-                                //link to the song file itself on Firebase Storage.
-                                mSongToUpload.setStreamUrl(taskSnapshot.getDownloadUrl().toString());
-
-                                //Then upload the Song Object to the database.
-                                mSongListRef.child(SONG_ID).setValue(mSongToUpload);
-                                Toast.makeText(getApplicationContext(), "Finished!", Toast.LENGTH_SHORT).show();
-
-                                //Once it's uploaded to the database, add it to the list of songs
-                                //and notify the adapter that the song was added.
-//                                mSongListRef.child(SONG_ID).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(final DataSnapshot dataSnapshot) {
-//                                        if (dataSnapshot.getValue()!=null) {
-//                                            new AsyncTask<Void,Void,Void>(){
-//                                                @Override
-//                                                protected Void doInBackground(Void... voids) {
-//                                                    mSongList.add(dataSnapshot.getValue(Song.class));
-//                                                    return null;
-//                                                }
-//
-//                                                @Override
-//                                                protected void onPostExecute(Void aVoid) {
-//                                                    finish();
-//// mAdapter.notifyDataSetChanged();
-//                                                }
-//                                            }.execute();
-                                        }
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(DatabaseError databaseError) {
-//
-//                                    }
-//                                });
-//                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                progressDialog.dismiss();
-                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                                double progress = (100.0 * taskSnapshot.getBytesTransferred())
-                                        /taskSnapshot.getTotalByteCount();
-                                progressDialog.setMessage((int)progress+"% uploaded...");
-                            }
-                        });
-
-
-            }
-        });
-
-        return builder.create();
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //    Setup MediaRecorder for recording dialog
-    //
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    public void MediaRecorderReady(){
-        mMediaRecorder = new MediaRecorder();
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-        mMediaRecorder.setOutputFile(mAudioSavePath);
-    }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
@@ -471,9 +320,13 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         mDescription = (TextView)findViewById(R.id.playlist_description);
         mCover = (ImageView)findViewById(R.id.cover_image);
         mPlayPause = (CardView)findViewById(R.id.player_play_pause);
-        mBack = (CardView)findViewById(R.id.player_back);
-        mSkip = (CardView)findViewById(R.id.player_skip);
-        fabAddSong = (FloatingActionButton)findViewById(R.id.fab_song);
+        fabAddSong = (CardView) findViewById(R.id.add_song);
+        vUserIcon = (ImageView) findViewById(R.id.playlist_user_icon);
+
+        //  Big Cover Views
+        mFrame = (RelativeLayout)findViewById(R.id.big_cover_frame);
+        mBigCover = (ImageView)findViewById(R.id.big_big_cover);
+
 
         if(ME.getId()==null){
             fabAddSong.setVisibility(View.GONE);
@@ -509,13 +362,13 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
                         mTitle.setText(mThisPlaylist.getTitle());
                         mDescription.setText(mThisPlaylist.getDescription());
                         if (mThisPlaylist.getCover().equals("null")){
-                            mCover.setBackgroundResource(R.drawable.userplaceholder);
+                            mCover.setBackgroundResource(R.drawable.coverplaceholder);
                         } else {
                             Picasso.with(PlaylistActivity.this).load(mThisPlaylist.getCover()).into(mCover);
                         }
+                        Picasso.with(PlaylistActivity.this).load(mThisPlaylist.getUserIcon()).into(vUserIcon);
                     }
                 }.execute();
-
             }
 
             @Override
@@ -560,55 +413,7 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         mDbListeners.put(mSongListRef,songsListener);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //          Image Manipulation
-    //
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public Bitmap cropToSquare(Bitmap bitmap){
-        if(bitmap.getWidth() >= bitmap.getHeight()){
-            Bitmap newBitmap = Bitmap.createBitmap(
-                    bitmap,
-                    (bitmap.getWidth() / 2) - (bitmap.getHeight() / 2),
-                    0,
-                    bitmap.getHeight(),
-                    bitmap.getHeight()
-            );
-            return newBitmap;
-        } else{
-            Bitmap newBitmap = Bitmap.createBitmap(
-                    bitmap,
-                    0,
-                    (bitmap.getHeight()/2) - (bitmap.getWidth()/2),
-                    bitmap.getWidth(),
-                    bitmap.getWidth()
-            );
-            return newBitmap;
-        }
-    }
-
-    public Bitmap resizeForCover(Bitmap bitmap){
-        return Bitmap.createScaledBitmap(bitmap,200,200,false);
-    }
-
-    public static Bitmap cropToCircle(Bitmap bitmap) {
-        final int width = bitmap.getWidth();
-        final int height = bitmap.getHeight();
-        final Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-        final Path path = new Path();
-        path.addCircle(
-                (float)(width / 2)
-                , (float)(height / 2)
-                , (float) Math.min(width, (height / 2))
-                , Path.Direction.CCW);
-
-        final Canvas canvas = new Canvas(outputBitmap);
-        canvas.clipPath(path);
-        canvas.drawBitmap(bitmap, 0, 0, null);
-        return outputBitmap;
-    }
 
     private String saveImageToDisk(Bitmap bitmap){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
@@ -633,61 +438,75 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistRecyc
         return directory.getAbsolutePath();
     }
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //          Check and Request Permissions
-    //
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(PlaylistActivity.this, new
-                String[]{WRITE_EXTERNAL_STORAGE, RECORD_AUDIO}, RequestPermissionCode);
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case RequestPermissionCode:
-                if (grantResults.length> 0) {
-                    boolean StoragePermission = grantResults[0] ==
-                            PackageManager.PERMISSION_GRANTED;
-                    boolean RecordPermission = grantResults[1] ==
-                            PackageManager.PERMISSION_GRANTED;
-
-                    if (StoragePermission && RecordPermission) {
-                        Toast.makeText(PlaylistActivity.this, "Permission Granted",
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(PlaylistActivity.this,"Permission Denied",
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-        }
-    }
-
-    public boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
-                WRITE_EXTERNAL_STORAGE);
-        int result1 = ContextCompat.checkSelfPermission(getApplicationContext(),
-                RECORD_AUDIO);
-        return result == PackageManager.PERMISSION_GRANTED &&
-                result1 == PackageManager.PERMISSION_GRANTED;
-    }
-
-
-    @Override
-    public void onClickListener(Song song, int position) {
-        if (mMediaPlayer!=null && mMediaPlayer.isPlaying()){
+    public void onClickListener(Song song, final int position) {
+        if (mMediaPlayer!=null){
+            if(mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
                 mMediaPlayer.reset();
                 mMediaPlayer.release();
                 mMediaPlayer = null;
+            } else {
+                mMediaPlayer.reset();
+                mMediaPlayer.release();
             }
-
+        }
             mMediaPlayer = MediaPlayer.create(this, Uri.parse(song.getStreamUrl()));
             mMediaPlayer.start();
         }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+
+    }
+
+    public interface RecyclerNextTrackListener{
+        void onSongCompleted(int position, MediaPlayer mediaPlayer);
+    }
+
+    public void mediaPlayerButtons(){
+        mPlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mMediaPlayer!=null) {
+                    if (mMediaPlayer.isPlaying()) {
+                        mMediaPlayer.pause();
+                    } else if (!mMediaPlayer.isPlaying()) {
+                        mMediaPlayer.start();
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadUserIcon() {
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                vUserIcon.setImageBitmap(bitmap);
+                ValueAnimator ani = ValueAnimator.ofFloat(0.3f, 1);
+                ani.setDuration(300);
+                ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        vUserIcon.setAlpha((float) animation.getAnimatedValue());
+                    }
+                });
+                ani.start();
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+        vUserIcon.setTag(target);
+        Picasso.with(this).load(mThisPlaylist.getUserIcon()).into(target);
+        Log.d(TAG, "loadUserIcon: " + mThisPlaylist.getUserIcon());
+    }
 }

@@ -113,48 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mTargetList = new ArrayList<>();
 
         sUserSingleton = UserSingleton.getInstance();
-
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user != null){
-                    mUserRef = mFirebaseDatabase.getReference("Users").child(user.getUid());
-                    mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(final DataSnapshot dataSnapshot) {
-                            if(dataSnapshot!=null){
-                                new AsyncTask<Void,Void,Void>(){
-                                    @Override
-                                    protected Void doInBackground(Void... voids) {
-                                        ME = dataSnapshot.getValue(User.class);
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Void aVoid) {
-                                        sUserSingleton.setUser(ME);
-
-                                    }
-                                }.execute();
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-        };
-
-
-
         mDatabasePlaylistReference = mFirebaseDatabase.getReference("Playlists");
         mGeofireRef = FirebaseDatabase.getInstance().getReference("geofire");
         geoFire = new GeoFire(mGeofireRef);
@@ -177,7 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         stylizeMap();
         setUpMap();
-        requestUserImage();
+        createAuthListener();
         setViewsIfLoggedIn();
         keepRequestingGeoQueries();
 
@@ -234,6 +193,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    private void createAuthListener() {
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user != null){
+                    mUserRef = mFirebaseDatabase.getReference("Users").child(user.getUid());
+                    mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                            if(dataSnapshot!=null){
+                                new AsyncTask<Void,Void,Void>(){
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        ME = dataSnapshot.getValue(User.class);
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        sUserSingleton.setUser(ME);
+                                        if (ME != null && ME.getUserImage() != null) {
+                                            loadUserIcon();
+                                        }
+                                    }
+                                }.execute();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+        };
+        mAuth.addAuthStateListener(mAuthListener);
+
+    }
+
     private void stylizeMap() {
         try {
             boolean success = mMap.setMapStyle(
@@ -276,6 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         playlist.setLat(location.getLatitude());
                         playlist.setLon(location.getLongitude());
                         playlist.setUserId(ME.getId());
+                        playlist.setUserIcon(ME.getUserImage());
                         playlist.setCover("null");
 
                         //  Push to the playlists branch of the database, and get the
@@ -335,7 +338,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     marker.setTag(playlist.getId());
                                     Target target = new PicassoMarker(marker);
                                     mTargetList.add(target);
-                                    Picasso.with(MapsActivity.this).load(playlist.getCover()).placeholder(R.drawable.markerplaceholder).resize(150,150).into(target);
+                                    if(!playlist.getCover().equals("null")) {
+                                        Picasso.with(MapsActivity.this).load(playlist.getCover()).placeholder(R.drawable.markerplaceholder).resize(150, 150).into(target);
+                                    }
+                                    else{
+                                        Picasso.with(MapsActivity.this).load(R.drawable.coverplaceholder).resize(100,100).into(target);
+                                    }
                                 }
                             }
                         }.execute();
@@ -399,40 +407,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void requestUserImage() {
-        if(tries < 30) {
-            if (ME != null && ME.getUserImage() != null) {
-                loadUserIcon();
-            } else {
-                Timer timer = new Timer();
-                TimerTask timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        tries++;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                requestUserImage();
-                            }
-                        });
-                    }
-                };
-                timer.schedule(timerTask, 0, 1000);
-            }
-        }
-    }
-
     private void loadUserIcon() {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                 vUserIcon.setImageBitmap(bitmap);
-                ValueAnimator ani = ValueAnimator.ofFloat(0, 1);
+                ValueAnimator ani = ValueAnimator.ofFloat(0.3f, 1);
                 ani.setDuration(700);
                 ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
                         vUserIcon.setAlpha((float) animation.getAnimatedValue());
+                        cardView.setAlpha((float) animation.getAnimatedValue());
                     }
                 });
                 ani.start();
@@ -448,6 +434,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         };
+        vUserIcon.setTag(target);
+
         Picasso.with(this).load(ME.getUserImage()).into(target);
     }
 
@@ -476,6 +464,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
         mSignInButton = (Button) findViewById(R.id.sign_in_maps);
         cardView = (CardView) findViewById(R.id.maps_user_icon_cardview);
+        cardView.setAlpha(0.3f);
 
         if(!loggedIn){
             vUserIcon.setVisibility(View.GONE);
@@ -483,6 +472,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mSignInButton.setVisibility(View.VISIBLE);
             cardView.setVisibility(View.GONE);
         }
+
         if(loggedIn){
             vUserIcon.setVisibility(View.VISIBLE);
             fab.setVisibility(View.VISIBLE);
@@ -556,10 +546,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (lastLocation != null) {
             LatLng current = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(current)
-                    .zoom(18)
-                    .tilt(60)
-                    .build();
+                    .target(current).zoom(18).tilt(90).build();
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
@@ -607,7 +594,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     private void createLocationRequest() {
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -625,7 +611,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
-        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
@@ -635,9 +620,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-        if (geoQuery != null) {
-            geoQuery.removeAllListeners();
-        }
+//        if (geoQuery != null) {
+//            geoQuery.removeAllListeners();
+//        }
         if (mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -645,6 +630,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(mTargetList.size()>0){
                 mTargetList.clear();
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(lastLocation != null){
+            moveMapToCurrentLocation(lastLocation);
+//            createGeoQuery();
         }
     }
 

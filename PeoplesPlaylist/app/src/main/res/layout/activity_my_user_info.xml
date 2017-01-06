@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_my_user_info"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.korbkenny.peoplesplaylist.MyUserInfoActivity"
+    android:gravity="center_horizontal">
+
+    <RelativeLayout
+        android:id="@+id/top_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/my_icon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"/>
+
+    <ImageView
+        android:id="@+id/my_saved"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:layout_alignBottom="@id/my_icon"
+        android:layout_toRightOf="@id/my_icon"
+        android:layout_marginLeft="20dp"/>
+    <TextView
+        android:id="@+id/saved_text"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:text="Saved        Playlist"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:layout_above="@id/my_saved"
+        android:layout_toRightOf="@id/my_icon"
+        android:layout_marginLeft="20dp"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/my_playlists_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My Playlists"
+        android:layout_below="@id/top_row"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="26sp"
+        android:layout_centerHorizontal="true"
+        />
+
+    <LinearLayout
+        android:id="@+id/my_playlists_row_top"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_playlists_text"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/my_1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            />
+        <ImageView
+            android:id="@+id/my_2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:id="@+id/my_3"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:id="@+id/my_4"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/playlists_row_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_playlists_row_top"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal">
+        <ImageView
+            android:id="@+id/my_5"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:id="@+id/my_6"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:id="@+id/my_7"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:id="@+id/my_8"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</RelativeLayout>

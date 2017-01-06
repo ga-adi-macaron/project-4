@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.korbkenny.peoplesplaylist.BitmapManipulation;
 import com.korbkenny.peoplesplaylist.R;
 import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.User;
@@ -43,6 +45,7 @@ import java.io.OutputStream;
 
 public class ColoringActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "Coloring Activity: ";
+    public static final String FILE_NAME = "usericon.png";
     private DrawingView drawView;
     private ImageButton currPaint;
     private float smallBrush, mediumBrush, largeBrush;
@@ -68,7 +71,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         ME = sSingleton.getUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseUserReference = mFirebaseDatabase.getReference("Users");
-        mStorageRef = FirebaseStorage.getInstance().getReference("usericons/");
+        mStorageRef = FirebaseStorage.getInstance().getReference("usericons").child(ME.getId()).child(FILE_NAME);
 
         smallBrush = getResources().getInteger(R.integer.small_size);
         mediumBrush = getResources().getInteger(R.integer.medium_size);
@@ -188,8 +191,11 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         }
 
         else if(view.getId()==R.id.save){
+            myIcon = null;
             drawView.setDrawingCacheEnabled(true);
             myIcon = drawView.getDrawingCache();
+
+
             new AsyncTask<Void,Void,String>(){
                 @Override
                 protected void onPreExecute() {
@@ -205,50 +211,35 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
                 @Override
                 protected void onPostExecute(String iconPath) {
-                    mIconPath = iconPath;
-                    mFile = Uri.fromFile(new File(mIconPath + "/" + ME.getId() + "profileimage.png"));
-
-                    new AsyncTask<Void,Void,Void>(){
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            StorageReference profileRef = mStorageRef.child(ME.getId()+"profileimage.png");
-                            profileRef.putFile(mFile)
-                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
-                                            if(taskSnapshot.getDownloadUrl()!=null) {
-                                                new AsyncTask<Void,Void,Void>(){
-                                                    @Override
-                                                    protected Void doInBackground(Void... voids) {
-                                                        ME.setUserImage(taskSnapshot.getDownloadUrl().toString());
-                                                        return null;
-                                                    }
-                                                    @Override
-                                                    protected void onPostExecute(Void aVoid) {
-                                                        sSingleton.setUser(ME);
-                                                        mDatabaseUserReference.child(ME.getId()).setValue(ME);
-                                                        Log.d(TAG, "onSuccess: " + ME.getId() + "   " + ME.getUserImage());
-                                                        finish();
-                                                    }
-                                                }.execute();
-                                            }
-                                        }
-                                    })
-                            .addOnFailureListener(new OnFailureListener() {
+                    Uri selectedImage = Uri.fromFile(new File(iconPath + "/" + FILE_NAME));
+                    mStorageRef.putFile(selectedImage)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    e.printStackTrace();
+                                public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
+                                    if(taskSnapshot.getDownloadUrl()!=null) {
+                                        new AsyncTask<Void,Void,Void>(){
+                                            @Override
+                                            protected Void doInBackground(Void... voids) {
+                                                ME.setUserImage(taskSnapshot.getDownloadUrl().toString());
+                                                return null;
+                                            }
+                                            @Override
+                                            protected void onPostExecute(Void aVoid) {
+                                                sSingleton.setUser(ME);
+                                                mDatabaseUserReference.child(ME.getId()).setValue(ME);
+                                                Log.d(TAG, "onSuccess: " + ME.getId() + "   " + ME.getUserImage());
+                                                finish();
+                                            }
+                                        }.execute();
+                                    }
                                 }
-                            });
-                            return null;
-                        }
-
+                            })
+                    .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        protected void onPostExecute(Void aVoid) {
-
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
                         }
-                    }.execute();
-
+                    });
                 }
             }.execute();
             }
@@ -256,15 +247,18 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
 
     private String saveImageToDisk(Bitmap bitmap){
+        Bitmap resizedBitmap = BitmapManipulation.resizeForCover(bitmap,200);
+        Bitmap circleBitmap = BitmapManipulation.cropToCircle(resizedBitmap);
+
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir",MODE_PRIVATE);
-        File imagePath = new File(directory,ME.getId()+"profileimage.png");
+        File imagePath = new File(directory,FILE_NAME);
 
         FileOutputStream fos = null;
 
         try {
             fos = new FileOutputStream(imagePath);
-            bitmap.compress(Bitmap.CompressFormat.PNG,0,fos);
+            circleBitmap.compress(Bitmap.CompressFormat.PNG,0,fos);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -280,7 +274,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
 
     private void loadImageFromDisk(String path){
         try {
-            File file = new File(path, ME.getId()+"profileimage.png");
+            File file = new File(path,FILE_NAME);
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
         }
         catch (FileNotFoundException e) {

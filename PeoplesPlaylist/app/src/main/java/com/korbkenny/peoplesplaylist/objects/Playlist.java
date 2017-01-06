@@ -9,7 +9,7 @@ import java.util.List;
 public class Playlist {
 
     private double mLatitude, mLongitude;
-    private String mTitle, mDescription, mId, mUserId, mCover, mIcon;
+    private String mTitle, mDescription, mId, mUserId, mUserIcon, mCover, mIcon;
 
     //  If you use an empty constructor and push a playlist to the database,
     //  you can get that entire playlist back with a single query.
@@ -77,5 +77,13 @@ public class Playlist {
 
     public void setIcon(String icon) {
         mIcon = icon;
+    }
+
+    public String getUserIcon() {
+        return mUserIcon;
+    }
+
+    public void setUserIcon(String userIcon) {
+        mUserIcon = userIcon;
     }
 }

@@ -20,14 +20,12 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder {
     ImageView mUserIcon;
     RelativeLayout mLayout;
 
-
     public PlaylistViewHolder(View itemView) {
         super(itemView);
         mSongTitle = (TextView)itemView.findViewById(R.id.vh_song_title);
         mUserIcon = (ImageView)itemView.findViewById(R.id.song_user_image);
         mSongNumber = (TextView)itemView.findViewById(R.id.vh_song_number);
         mLayout = (RelativeLayout)itemView.findViewById(R.id.vh_layout);
-
     }
 
     public void bind(final Song song, final PlaylistRecyclerAdapter.RecyclerItemClickListener listener){
@@ -38,4 +36,10 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder {
             }
         });
     }
+
+//    public void bind2(final Song song, final Song song2, final PlaylistRecyclerAdapter.RecyclerNextTrackListener listener){
+//        listener.onSongCompleted(song, song2, getLayoutPosition(), getLayoutPosition()+1);
+//    }
+
+
 }

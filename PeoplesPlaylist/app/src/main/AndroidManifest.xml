@@ -20,7 +20,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
-        <activity android:name=".SplashActivity"
+
+        <activity
+            android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -33,14 +35,18 @@
             android:label="@string/title_activity_maps"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".playlist.PlaylistActivity"
+        <activity
+            android:name=".playlist.PlaylistActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".LoginActivity">
         </activity>
         <activity android:name=".coloring.ColoringActivity">
         </activity>
-
+        <activity android:name=".RecordingActivity">
+        </activity>
+        <activity android:name=".MyUserInfoActivity">
+        </activity>
     </application>
 
 </manifest>

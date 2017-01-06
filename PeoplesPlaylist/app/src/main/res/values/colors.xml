@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="grey">#888888</color>
+
+    <color name="water">#b681b3</color>
+    <color name="road">#304a7d</color>
+    <color name="natural">#8c9fbc</color>
+    <color name="park">#67a485</color>
 </resources>

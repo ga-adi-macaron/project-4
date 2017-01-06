@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="40dp"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
                 android:id="@+id/vh_layout">
+
     <TextView
         android:id="@+id/vh_song_number"
         android:layout_width="20dp"
         android:layout_height="30dp"
         android:gravity="center_vertical"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
         android:text="1."/>
 
     <TextView
@@ -18,18 +25,18 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
+        android:fontFamily="sans-serif-condensed"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:layout_toRightOf="@id/vh_song_number"
         android:text="Name of song"/>
 
-    <android.support.v7.widget.CardView
+    <ImageView
+        android:id="@+id/song_user_image"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        app:cardCornerRadius="15dp"
-        android:layout_alignParentRight="true">
-        <ImageView
-            android:id="@+id/song_user_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </android.support.v7.widget.CardView>
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"/>
 
 </RelativeLayout>
