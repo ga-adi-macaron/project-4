@@ -17,14 +17,12 @@ import org.json.JSONException;
 import java.util.concurrent.TimeUnit;
 
 public class SoloPuzzleActivity extends BasePuzzleActivity {
-    private static final String TAG = "SoloPuzzleActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
         getSupportActionBar().hide();
-
 
         mDBHelper = DBHelper.getInstance(this);
 
@@ -184,4 +182,5 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
         prefsEdit.commit();
         super.onDestroy();
     }
+
 }

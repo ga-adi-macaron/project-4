@@ -124,14 +124,14 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
 
             view.getLocationOnScreen(startXY);
             purchaseImage.setX(startXY[0]);
-            purchaseImage.setY(startXY[1]-72);
+            purchaseImage.setY(startXY[1]);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(80, 80);
             purchaseImage.setLayoutParams(params);
             ((RelativeLayout)findViewById(R.id.activity_armory)).addView(purchaseImage);
 
             ArcMotion arcMotion = new ArcMotion();
             arcMotion.setMinimumVerticalAngle(70f);
-            Path path = arcMotion.getPath(startXY[0], startXY[1]-72, endXY[0], endXY[1]-72);
+            Path path = arcMotion.getPath(startXY[0], startXY[1]-70, endXY[0], endXY[1]-70);
             Animator positionAnimator =
                     ObjectAnimator.ofFloat(purchaseImage, View.TRANSLATION_X, View.TRANSLATION_Y, path).setDuration(750);
             positionAnimator.addListener(new Animator.AnimatorListener() {
@@ -171,7 +171,6 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
     public void onBackPressed() {
         findViewById(R.id.coins_card).setVisibility(View.INVISIBLE);
         findViewById(R.id.inventory_card).setVisibility(View.INVISIBLE);
-
         finishAfterTransition();
         super.onBackPressed();
     }

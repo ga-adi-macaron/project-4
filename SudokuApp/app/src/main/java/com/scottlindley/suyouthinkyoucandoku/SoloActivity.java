@@ -10,8 +10,10 @@ import android.view.Window;
 import android.widget.TextView;
 
 public class SoloActivity extends AppCompatActivity implements View.OnClickListener{
+    private static final String TAG = "SoloActivity";
     public static final String DIFFICULTY_INTENT_KEY = "difficulty";
     public static final String PUZZLE_KEY_INTENT_KEY = "puzzle key";
+    public static final int SOLO_PUZZLE_REQUEST_CODE = 5667;
 
     private TextView mEasyText, mMediumText, mHardText, mExpertText;
 
@@ -80,7 +82,7 @@ public class SoloActivity extends AppCompatActivity implements View.OnClickListe
         ActivityOptions options =
                 ActivityOptions.makeSceneTransitionAnimation(
                         SoloActivity.this, pair1, pair2, pair3, pair4, pair5, backgroundPair);
-        startActivity(intent, options.toBundle());
+        startActivityForResult(intent, SOLO_PUZZLE_REQUEST_CODE, options.toBundle());
     }
 
     @Override
