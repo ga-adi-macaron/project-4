@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#bdbdbd"
-    tools:context="com.example.jon.eventmeets.BaseLoginActivity"
+    tools:context="com.lieblich.jon.playme.BaseLoginActivity"
     android:nestedScrollingEnabled="true"
     android:isScrollContainer="true"
     android:scrollbars="vertical">

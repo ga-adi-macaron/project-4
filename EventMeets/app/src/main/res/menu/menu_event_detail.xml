@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.example.jon.eventmeets.event_detail_components.EventDetailActivity">
+      tools:context="com.lieblich.jon.playme.event_detail_components.EventDetailActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="0"

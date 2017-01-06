@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.jon.eventmeets.event_detail_components.EventDetailActivity">
+    tools:context="com.lieblich.jon.playme.event_detail_components.EventDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#cdcdcd"
-    tools:context="com.example.jon.eventmeets.event_detail_components.VideoGameEventsActivity">
+    tools:context="com.lieblich.jon.playme.event_detail_components.VideoGameEventsActivity">
 
     <RelativeLayout
         android:id="@+id/not_list_items"

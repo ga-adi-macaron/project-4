@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.jon.eventmeets">
+          package="com.lieblich.jon.playme">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BaseLoginActivity">
+        <activity android:name="com.lieblich.jon.playme.BaseLoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -19,19 +19,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".main_menu.MainMenuView"
+            android:name="com.lieblich.jon.playme.main_menu.MainMenuView"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"/>
         <activity
-            android:name=".event_detail_components.EventDetailActivity"
+            android:name="com.lieblich.jon.playme.event_detail_components.EventDetailActivity"
             android:label="@string/title_activity_event_detail"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".event_detail_components.find_players_components.EventMessageActivity">
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.find_players_components.EventMessageActivity">
         </activity>
-        <activity android:name=".event_detail_components.VideoGameEventsActivity">
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.VideoGameEventsActivity">
         </activity>
-        <activity android:name=".event_detail_components.message_components.ChatGroupActivity">
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.message_components.ChatGroupActivity">
         </activity>
     </application>
 

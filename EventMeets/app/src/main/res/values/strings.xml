@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EventMeets</string>
+    <string name="app_name">Play Me</string>
     <string name="login">Log me in</string>
     <string name="login_prompt">Username/Email</string>
     <string name="user">Username</string>
