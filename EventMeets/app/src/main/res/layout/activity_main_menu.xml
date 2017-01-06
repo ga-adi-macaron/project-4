@@ -2,10 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp">
-
+    android:layout_height="match_parent">
+<LinearLayout
+    android:orientation="vertical"
+    android:elevation="6dp"
+    android:background="#fff"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <Button
         android:id="@+id/main_browse_btn"
         android:layout_marginTop="8dp"
@@ -25,16 +28,11 @@
         android:layout_marginBottom="8dp"
         android:textColor="#000"
         android:layout_height="wrap_content"/>
+</LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_menu_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <ImageView
-        android:id="@+id/empty_events_placeholder"
-        android:src="#f0f"
-        android:visibility="gone"
+        android:background="#cdcdcd"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

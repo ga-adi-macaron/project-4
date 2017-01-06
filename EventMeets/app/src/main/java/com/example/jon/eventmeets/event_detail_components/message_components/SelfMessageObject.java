@@ -22,6 +22,12 @@ public class SelfMessageObject {
         type = "message";
     }
 
+    public SelfMessageObject(String content, String creator) {
+        this.content = creator+" "+content;
+        this.sender = "system";
+        this.type = "start";
+    }
+
     public SelfMessageObject() {
     }
 

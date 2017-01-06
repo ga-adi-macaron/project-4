@@ -14,7 +14,6 @@ import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.event_detail_components.message_components.ChatGroupActivity;
 import com.example.jon.eventmeets.event_detail_components.message_components.MessageGroup;
 import com.example.jon.eventmeets.model.AvailablePlayer;
-import com.example.jon.eventmeets.model.BaseUser;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,34 +48,14 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
         String key = mPlayers.get(position).getUser();
 
         if(!key.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-//            mDatabase.getReference("users").child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    String firstName = (String)dataSnapshot.child("firstName").getValue();
-////                    String picture = (String)dataSnapshot.child("thumb").getValue();
-//                    String key = dataSnapshot.getKey();
-//                    mPlayers.add(new AvailablePlayer(key, firstName));
-//
-//                    holder.mDisplayName.setText(firstName);
-////                    if(picture.equals("none")) {
-//                        holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
-////                    } else {
-////                        Picasso.with(holder.mContext).load(picture).into(holder.mThumbnail);
-////                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                    Log.d("HERE", "onCancelled: "+databaseError);
-//                }
-//            });
+
             holder.mDisplayName.setText(mPlayers.get(position).getFirstName());
             holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
 
             holder.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String added = mPlayers.get(holder.getAdapterPosition()).getUser();
+                    final String added = mPlayers.get(holder.getAdapterPosition()).getUser();
                     final String name = mPlayers.get(holder.getAdapterPosition()).getFirstName();
                     final String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     final String chatKey = current.substring(0, 6) + added.substring(0, 6);
@@ -87,7 +66,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                             mGroup = new MessageGroup();
                             mGroup.addUsers(mPlayers.get(holder.getAdapterPosition()),
                                     new AvailablePlayer(current, myName));
-                            confirmPlayerSelection(myName, name, chatKey, holder.mContext);
+                            confirmPlayerSelection(myName, name, chatKey, holder.mContext, added, current);
                         }
 
                         @Override
@@ -109,7 +88,8 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
         return mPlayers.size();
     }
 
-    private void confirmPlayerSelection(final String me, final String name, final String chatKey, final Context context) {
+    private void confirmPlayerSelection(final String me, final String name, final String chatKey,
+                                        final Context context, final String id, final String myId) {
         mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,38 +99,30 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                            mGroup.addCreateMessage(me);
-//                            mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    mGroup.addCreateMessage(me);
+
                                     Intent intent = new Intent(context, ChatGroupActivity.class);
                                     intent.putExtra("chatKey", chatKey);
-//
-//                                    if (!dataSnapshot.hasChild("users")) {
-                                        mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
-//                                    }
-//
+
+                                    mDatabase.getReference("users").child(id).child("chats").child(chatKey).setValue(me);
+                                    mDatabase.getReference("users").child(myId).child("chats").child(chatKey).setValue(name);
+                                    mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
+
                                     context.startActivity(intent);
                                 }
-
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//
-//                                }
-
                             })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-            } else {
-                Intent intent = new Intent(context, ChatGroupActivity.class);
-                intent.putExtra("chatKey", chatKey);
-                context.startActivity(intent);
-            }
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    Intent intent = new Intent(context, ChatGroupActivity.class);
+                    intent.putExtra("chatKey", chatKey);
+                    context.startActivity(intent);
+                }
             }
 
             @Override
@@ -158,44 +130,5 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
 
             }
         });
-//        if(mDatabase.getReference("chats").child(chatKey).child("users") == null) {
-//            AlertDialog.Builder dialog = new AlertDialog.Builder(context)
-//                    .setTitle("Start a new chat with " + name + "?")
-//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-////                            mGroup.addCreateMessage(me);
-////                            mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
-////                                @Override
-////                                public void onDataChange(DataSnapshot dataSnapshot) {
-////                                    Intent intent = new Intent(context, ChatGroupActivity.class);
-////                                    intent.putExtra("chatKey", chatKey);
-////
-////                                    if (!dataSnapshot.hasChild("users")) {
-////                                        mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
-////                                    }
-////
-////                                    context.startActivity(intent);
-////                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//
-//                                }
-//                            });
-//                        }
-//                    })
-//                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            dialog.dismiss();
-//                        }
-//                    });
-//            dialog.show();
-//        } else {
-//            Intent intent = new Intent(context, ChatGroupActivity.class);
-//            intent.putExtra("chatKey", chatKey);
-//            context.startActivity(intent);
-//        }
     }
 }

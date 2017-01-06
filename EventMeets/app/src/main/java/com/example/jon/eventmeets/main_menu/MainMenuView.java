@@ -7,21 +7,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.event_detail_components.VideoGameEventsActivity;
-import com.example.jon.eventmeets.model.GameResultObject;
 
-import java.util.List;
+import java.util.Map;
 
 public class MainMenuView extends AppCompatActivity implements MainMenuContract.View, View.OnClickListener{
     private MainMenuPresenter mPresenter;
     private Button mBrowseButton;
     private RecyclerView mMainEventsRecycler;
     private MainMenuRecyclerAdapter mAdapter;
-    private ImageView mEventsPlaceholder;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,15 +29,14 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
 
         mMainEventsRecycler = (RecyclerView)findViewById(R.id.main_menu_recycler);
 
-        mEventsPlaceholder = (ImageView)findViewById(R.id.empty_events_placeholder);
-
         mBrowseButton.setOnClickListener(this);
 
         mPresenter = new MainMenuPresenter(this);
+        mPresenter.onNewEventsNeeded();
     }
 
     @Override
-    public void setupRecyclerView(List<GameResultObject> list) {
+    public void setupRecyclerView(Map<String, String> list) {
         if(list != null && list.size() > 0) {
             mAdapter = new MainMenuRecyclerAdapter(list);
             LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -48,12 +44,11 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
             mMainEventsRecycler.setAdapter(mAdapter);
         } else {
             mMainEventsRecycler.setVisibility(View.GONE);
-            mEventsPlaceholder.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void openEventDetail(GameResultObject event) {
+    public void openEventDetail(String chatId) {
 
     }
 

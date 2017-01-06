@@ -43,6 +43,8 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
             String cover = "https://images.igdb.com/igdb/image/upload/t_cover_small/"
                     +game.getCover().getCloudinary_id()+".jpg";
             Picasso.with(holder.mContext).load(cover).fit().centerInside().into(holder.mCoverArt);
+        } else {
+            holder.mCoverArt.setImageResource(R.drawable.ic_broken_image_black_24dp);
         }
         holder.mGameTitle.setText(game.getName());
 
@@ -127,6 +129,9 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
         }
         if(mPc) {
             consoles.add("PC");
+        }
+        if(!mNintendo&&!mPlaystation&&!mXbox&&!mPc) {
+            consoles.add("Other");
         }
         intent.putExtra("platforms", consoles);
     }

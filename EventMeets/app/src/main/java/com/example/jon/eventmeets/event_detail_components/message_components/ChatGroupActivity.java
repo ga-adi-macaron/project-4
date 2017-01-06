@@ -67,7 +67,11 @@ public class ChatGroupActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
                 mMessages = mGroup.getMessages();
-                mContent = new ArrayList<>(mMessages.values());
+                mContent = new ArrayList<>();
+                if(mGroup.getMessages()==null||mGroup.getMessages().size()==0) {
+                    mReference.child("messages").push().setValue(new SelfMessageObject("started a new chat", mGroup.getCreator()));
+                }
+                mContent.addAll(mMessages.values());
                 mAdapter = new MessageRecyclerAdapter(mContent);
                 mMessageRecycler.setAdapter(mAdapter);
                 hasMessages = true;
@@ -78,7 +82,6 @@ public class ChatGroupActivity extends AppCompatActivity {
 
             }
         });
-
 
         mMessageText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -128,9 +131,9 @@ public class ChatGroupActivity extends AppCompatActivity {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(hasMessages) {
+                if(mContent.size() < mMessages.size()) {
                     mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
-                    mAdapter.notifyItemInserted(mContent.size()+1);
+                    mAdapter.notifyItemInserted(mContent.size()-1);
                 }
             }
 

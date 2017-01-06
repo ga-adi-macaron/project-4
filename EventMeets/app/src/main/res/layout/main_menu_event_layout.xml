@@ -2,30 +2,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:padding="8dp"
-                android:background="#9e9e9e"
+                android:background="#fff"
+                android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
+<FrameLayout
+    android:id="@+id/user_main"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
     <ImageView
-        android:id="@+id/category_icon"
-        android:src="#e0e0e0"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="8dp"/>
-
-    <TextView
-        android:id="@+id/event_item_title"
-        android:text="title goes here"
-        android:layout_centerHorizontal="true"
+        android:src="@drawable/message_user_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/event_item_location"
+        android:id="@+id/user_initial_main"
+        android:text="J"
+        android:layout_gravity="center"
+        android:textSize="24sp"
+        android:textColor="#fff"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignBottom="@id/category_icon"
-        android:text="location here"/>
+        android:layout_height="wrap_content"/>
+</FrameLayout>
+
+    <TextView
+        android:id="@+id/event_item_title"
+        android:text="title goes here"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

@@ -61,13 +61,13 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
 
         mId = intent.getIntExtra("id", -1);
 
-        if(intent.getStringExtra("image").length() > 0) {
+        if(intent.getStringExtra("image") != null&&intent.getStringExtra("image").length() > 0) {
             mImage = IMAGE_URL+intent.getStringExtra("image")+".jpg";
             Picasso.with(this).load(mImage).fit().into((ImageView)findViewById(R.id.screen_image));
         }
 
         mPlatforms = intent.getStringArrayListExtra("platforms");
-        if(mPlatforms != null) {
+        if(!mPlatforms.contains("Other")) {
             if (mPlatforms.contains("XBox")) {
                 mPlatform1.setVisibility(View.VISIBLE);
                 mPlatform1.setText("XBox");
@@ -86,7 +86,7 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
             }
         } else {
             mPlatform1.setVisibility(View.VISIBLE);
-            mPlatform1.setText("No Platforms Found");
+            mPlatform1.setText("No Major Platforms Found");
         }
 
         mFab.setOnClickListener(this);
@@ -108,7 +108,7 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-        if(mPlatforms != null) {
+        if(!mPlatforms.contains("Other")) {
             if (mPlatforms.contains("XBox")) {
                 adapter.add("XBox");
             }

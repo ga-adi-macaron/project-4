@@ -9,12 +9,17 @@ import java.util.Map;
 
 
 public class MessageGroup {
+    private String creator;
     private Map<String, SelfMessageObject> messages;
     private List<AvailablePlayer> users;
 
     public MessageGroup() {
         messages = new HashMap<>();
         users = new ArrayList<>();
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public Map<String,SelfMessageObject> getMessages() {
@@ -31,15 +36,8 @@ public class MessageGroup {
         }
     }
 
-    /**
-     * Called to add the 'created by' message when a new chat is started
-     * @param creatorName the first name of the {@link AvailablePlayer} that started the room
-     */
-    public void addCreateMessage(String creatorName) {
-        if(messages.size() == 0) {
-            SystemMessageObject start = new SystemMessageObject(creatorName);
-            messages.put("create", start);
-        }
+    public void addCreateMessage(String creator) {
+        this.creator = creator;
     }
 
     public void addMessage(String key, SelfMessageObject message) {

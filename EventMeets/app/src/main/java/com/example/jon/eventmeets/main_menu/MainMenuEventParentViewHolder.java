@@ -12,15 +12,12 @@ import com.example.jon.eventmeets.R;
  */
 
 class MainMenuEventParentViewHolder extends RecyclerView.ViewHolder {
-    public ImageView mParentIcon;
-    public TextView mParentName, mLocationText;
+    public TextView mParentName, mUserInitial;
 
     MainMenuEventParentViewHolder(View itemView) {
         super(itemView);
 
-        mParentIcon = (ImageView)itemView.findViewById(R.id.category_icon);
-
         mParentName = (TextView)itemView.findViewById(R.id.event_item_title);
-        mLocationText = (TextView)itemView.findViewById(R.id.event_item_location);
+        mUserInitial = (TextView)itemView.findViewById(R.id.user_main).findViewById(R.id.user_initial_main);
     }
 }
