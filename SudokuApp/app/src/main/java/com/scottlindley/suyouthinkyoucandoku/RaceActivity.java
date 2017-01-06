@@ -180,7 +180,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
                 weaponImage.setImageResource(R.drawable.lightning);
                 break;
             case "none":
-                weaponImage.setImageResource(R.drawable.none);
+                weaponImage.setImageResource(R.drawable.empty);
                 break;
         }
     }

@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ArcMotion;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -41,6 +40,13 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().hide();
 
         setUpViews();
+    }
+
+    @Override
+    protected void onResume() {
+        findViewById(R.id.coins_card).setVisibility(View.VISIBLE);
+        findViewById(R.id.inventory_card).setVisibility(View.VISIBLE);
+        super.onResume();
     }
 
     private void setUpViews(){
