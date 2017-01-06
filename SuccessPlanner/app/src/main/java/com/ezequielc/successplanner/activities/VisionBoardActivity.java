@@ -1,13 +1,17 @@
 package com.ezequielc.successplanner.activities;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +38,7 @@ import java.io.IOException;
 public class VisionBoardActivity extends AppCompatActivity {
     public static final int IMAGE_REQUEST = 1;
 
+
     View.OnTouchListener mTouchListener;
     ImageView mNewImage;
     TextView mNewText;
@@ -47,6 +52,12 @@ public class VisionBoardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vision_board);
 
         getSupportActionBar().setTitle("Vision Board");
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, IMAGE_REQUEST);
+        }
 
         mViewGroup = (ViewGroup) findViewById(R.id.activity_vision_board);
 

@@ -11,7 +11,7 @@ import com.ezequielc.successplanner.R;
 
 public class SettingsActivity extends AppCompatActivity {
     public static final String PREFERENCES = "preferences";
-    public static final String GET_QUOTE_SWITCH = "getQuoteSwitch";
+    public static final String RECEIVE_QUOTE_SWITCH = "receiveQuoteSwitch";
 
     Switch mReceiveQuotes;
 
@@ -25,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
         mReceiveQuotes = (Switch) findViewById(R.id.get_quote);
 
         SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        boolean isQuoteSwitched = sharedPreferences.getBoolean(GET_QUOTE_SWITCH, true);
+        boolean isQuoteSwitched = sharedPreferences.getBoolean(RECEIVE_QUOTE_SWITCH, true);
 
         // Switch Quote
         mReceiveQuotes.setChecked(isQuoteSwitched);
@@ -34,7 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(GET_QUOTE_SWITCH, mReceiveQuotes.isChecked());
+                editor.putBoolean(RECEIVE_QUOTE_SWITCH, mReceiveQuotes.isChecked());
                 editor.commit();
             }
         });

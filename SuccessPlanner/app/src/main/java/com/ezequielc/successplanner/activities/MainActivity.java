@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSharedPreferences = getSharedPreferences(SettingsActivity.PREFERENCES, Context.MODE_PRIVATE);
 
-        if (mSharedPreferences.getBoolean(SettingsActivity.GET_QUOTE_SWITCH, true)) {
+        if (mSharedPreferences.getBoolean(SettingsActivity.RECEIVE_QUOTE_SWITCH, true)) {
             if (isConnected()) {
                 getQuote();
                 mGotQuote = true;
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (mSharedPreferences.getBoolean(SettingsActivity.GET_QUOTE_SWITCH, true)) {
+        if (mSharedPreferences.getBoolean(SettingsActivity.RECEIVE_QUOTE_SWITCH, true)) {
             mCardView.setVisibility(View.VISIBLE);
             if (!mGotQuote) {
                 getQuote();
