@@ -7,9 +7,11 @@ import android.app.ProgressDialog;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -50,6 +52,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.korbkenny.peoplesplaylist.BitmapManipulation;
+import com.korbkenny.peoplesplaylist.LoginActivity;
 import com.korbkenny.peoplesplaylist.R;
 import com.korbkenny.peoplesplaylist.RecordingActivity;
 import com.korbkenny.peoplesplaylist.UserSingleton;
@@ -69,57 +72,51 @@ import java.util.List;
 import java.util.Map;
 
 public class PlaylistActivity extends AppCompatActivity implements
-        PlaylistRecyclerAdapter.RecyclerItemClickListener,
-        MediaPlayer.OnCompletionListener{
+        PlaylistRecyclerAdapter.RecyclerItemClickListener
+{
+    public static final Integer PLAYING = 1;
+    public static final Integer PAUSED = 0;
+    public static final int PICK_IMAGE_REQUEST = 111;
     public static final int RECORDING_RESULT_CODE = 666;
+    private boolean firstTimePlaying = true;
     private static final String TAG = "Yes. ";
-
+    //db
+    private FirebaseDatabase db;
+    private DatabaseReference mSongListRef, mPlaylistRef;
+    private StorageReference mStoragePictureRef;
+    //playlist-user
+    private String PLAYLIST_ID, SONG_ID;
+    private User ME;
+    private Playlist mThisPlaylist;
+    //views
+    private CardView fabAddSong, mSaveThisPlaylist;
+    private TextView mTitle,mDescription;
+    private ImageView mCover, vUserIcon, mBigCover, mPlayPause;
     private RecyclerView mRecyclerView;
     private PlaylistRecyclerAdapter mAdapter;
-    private String PLAYLIST_ID, SONG_ID;
-    private FirebaseDatabase db;
-
-    private DatabaseReference mSongListRef, mPlaylistRef;
-
-    private Playlist mThisPlaylist;
-    private CardView mPlayPause, fabAddSong;
-    private StorageReference mStoragePictureRef;
-    private Uri downloadUrl;
-    private TextView mTitle,mDescription;
-    private ImageView mCover, vUserIcon, mBigCover;
-    private MediaPlayer mMediaPlayer;
-    private Song mSongToUpload;
-    private List<Song> mSongList;
-    private User ME;
-    private MediaRecorder mMediaRecorder;
-    private RecyclerNextTrackListener mNextTrackListener;
     private RelativeLayout mFrame;
-
+    //utility
+    public MediaPlayer mMediaPlayer;
+    private List<Song> mSongList;
+    private SharedPreferences settings;
+    //extra
     private HashMap<DatabaseReference,ValueEventListener> mDbListeners;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        PLAYLIST_ID = getIntent().getStringExtra("Playlist Id");
-        db = FirebaseDatabase.getInstance();
-        mSongListRef = db.getReference("SongLists").child(PLAYLIST_ID);
-        mStoragePictureRef = FirebaseStorage.getInstance().getReference("albumcovers").child(PLAYLIST_ID);
-        ME = UserSingleton.getInstance().getUser();
-
-        mSongList = new ArrayList<>();
-
+        //  Setup views and everything
         simpleSetup();
-
-        mMediaPlayer.setOnCompletionListener(this);
-
         mediaPlayerButtons();
-
         mDbListeners = new HashMap<>();
         syncToDatabase();
 
-        //  Choose a song to add to the playlist
+        //==============
+        //  Add a Track
+        //==============
         fabAddSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,14 +126,20 @@ public class PlaylistActivity extends AppCompatActivity implements
             }
         });
 
+        //========================================
+        //  Either upload an image to be the cover,
+        //  or if it's already there, view it large
+        //========================================
         mCover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mThisPlaylist.getCover().equals("null")){
+                //  If the cover's empty and it's your playlist, pick photo
+                if (mThisPlaylist.getCover().equals("null") && ME.getId().equals(mThisPlaylist.getUserId())){
                     Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(pickPhoto , 1);
                 }
+                //  If it's not empty, regardless of who's playlist it is, view it large
                 else {
                     mFrame.setVisibility(View.VISIBLE);
                     mBigCover.setVisibility(View.VISIBLE);
@@ -166,10 +169,11 @@ public class PlaylistActivity extends AppCompatActivity implements
 
                         }
                     };
-                    mBigCover.setTag(target);
 
+                    mBigCover.setTag(target);
                     Picasso.with(PlaylistActivity.this).load(mThisPlaylist.getCover()).into(target);
 
+                    //  If anywhere outside of the image is clicked, exit.
                     mFrame.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -178,6 +182,8 @@ public class PlaylistActivity extends AppCompatActivity implements
                         }
                     });
 
+                    //  If you click the image and it's your playlist, re-choose image
+                    //  If it's not your playlist, then just exit.
                     mBigCover.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -196,18 +202,43 @@ public class PlaylistActivity extends AppCompatActivity implements
             }
         });
 
-        mCover.setOnLongClickListener(new View.OnLongClickListener() {
+
+        //=================
+        //  Pick Image
+        //=================
+
+            mCover.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if (ME.getId().equals(mThisPlaylist.getUserId())) {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto, PICK_IMAGE_REQUEST);
+
+                    }
+                    return false;
+                }
+            });
+
+        //=================
+        //  Save Playlist
+        //=================
+        mSaveThisPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto , 1);
-                return false;
+            public void onClick(View view) {
+                settings.edit().putString("SavedPlaylistId",PLAYLIST_ID).commit();
+                Toast.makeText(PlaylistActivity.this, "Saved This Playlist", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //    On Activity Result from:
+    //              1. Recording a Track
+    //              2. Loading an image
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
@@ -242,26 +273,30 @@ public class PlaylistActivity extends AppCompatActivity implements
             });
         }
 
-        if(resultCode == RESULT_OK && requestCode == 1){
-                if(mBigCover.getVisibility()==View.VISIBLE){
+        //COMING FROM A SUCCESSFUL IMAGE-PICK SESSION
+        if(resultCode == RESULT_OK && requestCode == PICK_IMAGE_REQUEST){
+            //  If image came from the big image part, reset views
+            if(mBigCover.getVisibility()==View.VISIBLE){
                     mBigCover.setVisibility(View.GONE);
                     mFrame.setVisibility(View.GONE);
                 }
 
+                //  Get the image and crop it to a 400x400 circle
                 Uri selectedImage = imageReturnedIntent.getData();
-            Log.d(TAG, "onActivityResult: " + selectedImage.toString());
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),selectedImage);
                     final Bitmap squareBitmap = BitmapManipulation.cropToSquare(bitmap);
                     Bitmap resizedBitmap = BitmapManipulation.resizeForCover(squareBitmap,400);
                     final Bitmap circleBitmap = BitmapManipulation.cropToCircle(resizedBitmap);
 
+                    //  Save the image to your phone.
                     new AsyncTask<Void,Void,String>(){
                         @Override
                         protected String doInBackground(Void... voids) {
                             return saveImageToDisk(circleBitmap);
                         }
 
+                        //  Then upload to firebase storage
                         @Override
                         protected void onPostExecute(String coverPath) {
                             Log.d(TAG, "onPostExecute: " + coverPath);
@@ -291,6 +326,12 @@ public class PlaylistActivity extends AppCompatActivity implements
             }
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //        Remove listeners when activity stops
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
     protected void onStop() {
         super.onStop();
@@ -308,6 +349,19 @@ public class PlaylistActivity extends AppCompatActivity implements
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void simpleSetup(){
 
+        //  Get intent
+        PLAYLIST_ID = getIntent().getStringExtra("Playlist Id");
+
+        //  Setup data references
+        db = FirebaseDatabase.getInstance();
+        mSongListRef = db.getReference("SongLists").child(PLAYLIST_ID);
+        mStoragePictureRef = FirebaseStorage.getInstance().getReference("albumcovers").child(PLAYLIST_ID);
+        ME = UserSingleton.getInstance().getUser();
+        settings = getSharedPreferences(LoginActivity.SHARED_PREF,MODE_PRIVATE);
+
+        //  Instantiate Song List
+        mSongList = new ArrayList<>();
+
         //  Recycler
         mRecyclerView = (RecyclerView) findViewById(R.id.playlist_recycler);
         LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
@@ -319,15 +373,17 @@ public class PlaylistActivity extends AppCompatActivity implements
         mTitle = (TextView)findViewById(R.id.playlist_title) ;
         mDescription = (TextView)findViewById(R.id.playlist_description);
         mCover = (ImageView)findViewById(R.id.cover_image);
-        mPlayPause = (CardView)findViewById(R.id.player_play_pause);
+        mPlayPause = (ImageView)findViewById(R.id.player_play_pause);
+        mPlayPause.setTag(PAUSED);
         fabAddSong = (CardView) findViewById(R.id.add_song);
         vUserIcon = (ImageView) findViewById(R.id.playlist_user_icon);
+        mSaveThisPlaylist = (CardView) findViewById(R.id.save_this_playlist);
 
         //  Big Cover Views
         mFrame = (RelativeLayout)findViewById(R.id.big_cover_frame);
         mBigCover = (ImageView)findViewById(R.id.big_big_cover);
 
-
+        //  If you're not logged in, you can't add a song.
         if(ME.getId()==null){
             fabAddSong.setVisibility(View.GONE);
         }
@@ -337,7 +393,6 @@ public class PlaylistActivity extends AppCompatActivity implements
             mMediaPlayer = new MediaPlayer();
         }
     }
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //
@@ -438,8 +493,27 @@ public class PlaylistActivity extends AppCompatActivity implements
         return directory.getAbsolutePath();
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //
+    //  When an item is clicked in the
+    //  recyclerview, play that track
+    //
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
     public void onClickListener(Song song, final int position) {
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if(mediaPlayer != null){
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                    mPlayPause.setTag(PAUSED);
+                    mPlayPause.setImageResource(R.drawable.playbutton);
+                }
+
+            }
+        });
         if (mMediaPlayer!=null){
             if(mMediaPlayer.isPlaying()){
                 mMediaPlayer.stop();
@@ -453,32 +527,79 @@ public class PlaylistActivity extends AppCompatActivity implements
         }
             mMediaPlayer = MediaPlayer.create(this, Uri.parse(song.getStreamUrl()));
             mMediaPlayer.start();
+            firstTimePlaying = false;
+
+        if(mPlayPause.getTag() == PAUSED){
+            mPlayPause.setTag(PLAYING);
+            mPlayPause.setImageResource(R.drawable.pausebutton);
         }
-
-    @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-
-    }
-
-    public interface RecyclerNextTrackListener{
-        void onSongCompleted(int position, MediaPlayer mediaPlayer);
     }
 
     public void mediaPlayerButtons(){
         mPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                mPlayPause.setEnabled(false);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mPlayPause.setEnabled(true);
+                            }
+                        });
+                    }
+                }).start();
+
                 if(mMediaPlayer!=null) {
-                    if (mMediaPlayer.isPlaying()) {
-                        mMediaPlayer.pause();
-                    } else if (!mMediaPlayer.isPlaying()) {
-                        mMediaPlayer.start();
+                    if(firstTimePlaying){
+                        if(mSongList.size() > 0) {
+                            mMediaPlayer.reset();
+                            mMediaPlayer.release();
+                            mMediaPlayer = MediaPlayer.create(PlaylistActivity.this, Uri.parse(mSongList.get(0).getStreamUrl()));
+                            mMediaPlayer.start();
+                            if (mPlayPause.getTag() == PAUSED) {
+                                mPlayPause.setTag(PLAYING);
+                                mPlayPause.setImageResource(R.drawable.pausebutton);
+                            }
+                            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mediaPlayer) {
+                                    if(mediaPlayer != null){
+                                        mediaPlayer.release();
+                                    }
+                                    mPlayPause.setTag(PAUSED);
+                                    mPlayPause.setImageResource(R.drawable.playbutton);
+                                }
+                            });
+                        }
+                    } else {
+                        if (mMediaPlayer.isPlaying()) {
+                            mMediaPlayer.pause();
+                            if (mPlayPause.getTag() == PLAYING) {
+                                mPlayPause.setTag(PAUSED);
+                                mPlayPause.setImageResource(R.drawable.pausebutton);
+                            }
+                        } else if (!mMediaPlayer.isPlaying()) {
+                            mMediaPlayer.start();
+                            if (mPlayPause.getTag() == PAUSED) {
+                                mPlayPause.setTag(PLAYING);
+                                mPlayPause.setImageResource(R.drawable.pausebutton);
+                            }
+                            firstTimePlaying = false;
+                        }
                     }
                 }
             }
         });
     }
-
     private void loadUserIcon() {
         Target target = new Target() {
             @Override
@@ -507,6 +628,5 @@ public class PlaylistActivity extends AppCompatActivity implements
         };
         vUserIcon.setTag(target);
         Picasso.with(this).load(mThisPlaylist.getUserIcon()).into(target);
-        Log.d(TAG, "loadUserIcon: " + mThisPlaylist.getUserIcon());
     }
 }

@@ -212,6 +212,7 @@ public class LoginActivity extends AppCompatActivity{
                                     ME.setId(userId);
                                     ME.setUserName(email);
                                     ME.setUserImage("https://firebasestorage.googleapis.com/v0/b/peoplesplaylist-9c5d9.appspot.com/o/userplaceholder.png?alt=media&token=69ff913e-2eb2-46b5-a210-390e69ddac31");
+                                    ME.setPlaylistCount(0);
                                     sUserSingleton.setUser(ME);
                                     mDatabaseUserReference.child(userId).setValue(ME);
 

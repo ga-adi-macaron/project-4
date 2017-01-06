@@ -36,10 +36,4 @@ public class PlaylistViewHolder extends RecyclerView.ViewHolder {
             }
         });
     }
-
-//    public void bind2(final Song song, final Song song2, final PlaylistRecyclerAdapter.RecyclerNextTrackListener listener){
-//        listener.onSongCompleted(song, song2, getLayoutPosition(), getLayoutPosition()+1);
-//    }
-
-
 }

@@ -27,15 +27,12 @@ import static android.content.ContentValues.TAG;
 public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHolder>{
     List<Song> mSongList;
     RecyclerItemClickListener mListener;
-
-
+    int currentlyPlaying = -1;
 
     public PlaylistRecyclerAdapter(List<Song> songList, RecyclerItemClickListener listener) {
         mSongList = songList;
         mListener = listener;
     }
-
-
 
     @Override
     public PlaylistViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,7 +42,12 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
     @Override
     public void onBindViewHolder(final PlaylistViewHolder holder, final int position) {
         holder.mSongTitle.setText(mSongList.get(position).getTitle());
-        holder.mSongNumber.setText(position + 1 + ".");
+
+        if(currentlyPlaying == position){
+            holder.mSongNumber.setText("#");
+        } else{
+            holder.mSongNumber.setText(position + 1 + ".");
+        }
 
         Target target = new Target() {
             @Override
@@ -76,7 +78,6 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
         }
 
         holder.bind(mSongList.get(position),mListener);
-
     }
 
     @Override
@@ -88,6 +89,10 @@ public class PlaylistRecyclerAdapter extends RecyclerView.Adapter<PlaylistViewHo
     public interface RecyclerItemClickListener{
         void onClickListener(Song song, int position);
     }
+
+//    public interface RecyclerNextTrackListener{
+//        void playNextTrack(Song song, Song song2);
+//    }
 
 
 }

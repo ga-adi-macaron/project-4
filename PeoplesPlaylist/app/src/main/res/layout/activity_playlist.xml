@@ -66,26 +66,56 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="100dp">
 
+        <android.support.v7.widget.CardView
+            android:id="@+id/save_this_playlist"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/saveforlater"
+                android:background="@color/natural"/>
+        </android.support.v7.widget.CardView>
 
 
         <android.support.v7.widget.CardView
-            android:id="@+id/player_play_pause"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:cardCornerRadius="30dp"
-            android:layout_margin="5dp"
-            android:layout_centerHorizontal="true"/>
+            android:id="@+id/player_play_pause_card"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            android:layout_margin="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/player_play_pause"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/park"
+                android:src="@drawable/playbutton"
+                android:layout_gravity="center"/>
+        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:id="@+id/add_song"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:cardCornerRadius="30dp"
-            android:layout_margin="5dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            android:layout_margin="10dp"
+            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            />
+            >
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/addatrack"
+                android:background="@color/colorAccent"/>
+        </android.support.v7.widget.CardView>
 
     </RelativeLayout>
 

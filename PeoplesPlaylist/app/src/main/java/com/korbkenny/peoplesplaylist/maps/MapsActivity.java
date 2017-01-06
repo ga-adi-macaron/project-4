@@ -94,14 +94,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageView vUserIcon;
     private User ME;
     private UserSingleton sUserSingleton;
-    private int tries = 0;
     private int geoTries = 0;
     private boolean loggedIn;
     private Button mSignInButton;
     private CardView cardView;
-    private LocationManager mLocationManager;
     private List<Target> mTargetList;
     private SharedPreferences settings;
+    private int myPlaylistCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,6 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     @Override
                                     protected void onPostExecute(Void aVoid) {
+                                        myPlaylistCount = ME.getPlaylistCount();
                                         sUserSingleton.setUser(ME);
                                         if (ME != null && ME.getUserImage() != null) {
                                             loadUserIcon();
@@ -286,7 +286,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //  Push to the playlists branch of the database, and get the
                         //  unique, randomly generated key for use with geofire/other stuff.
                         final String playlistId = mDatabasePlaylistReference.push().getKey();
-                        settings.edit().putString("SavedPlaylistId",playlistId).commit();
+
+                        //Add to user's playlists, and increase the count of how many they have.
+                        myPlaylistCount++;
+                        DatabaseReference myPlaylistsRef = mFirebaseDatabase.getReference("UserPlaylists").child(ME.getId()).child(Integer.toString(myPlaylistCount));
+                        myPlaylistsRef.setValue(playlistId);
+                        DatabaseReference playlistCountRef = mFirebaseDatabase.getReference("Users").child(ME.getId()).child("playlistCount");
+                        playlistCountRef.setValue(myPlaylistCount);
+
                         playlist.setId(playlistId);
                         mDatabasePlaylistReference.child(playlistId).setValue(playlist);
                         geoFire.setLocation(playlistId, new GeoLocation(playlist.getLat(), playlist.getLon()));
@@ -315,7 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void createGeoQuery(){
         moveMapToCurrentLocation(lastLocation);
         Log.d(TAG, "createGeoQuery: " + lastLocation.getLatitude() + " " + lastLocation.getLongitude());
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),100);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),30);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
@@ -326,15 +333,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         new AsyncTask<Void,Void,Playlist>(){
                             @Override
                             protected Playlist doInBackground(Void... voids) {
-                                Playlist playlist = dataSnapshot.getValue(Playlist.class);
-                                return playlist;
+                                return dataSnapshot.getValue(Playlist.class);
                             }
 
                             @Override
                             protected void onPostExecute(final Playlist playlist) {
                                 if(playlist.getCover()!=null){
                                     MarkerOptions options = new MarkerOptions()
-                                            .position(new LatLng(playlist.getLat(),playlist.getLon()))
+                                            .position(new LatLng(
+                                                    playlist.getLat() + nudgeMarkerInRandomDirection(),
+                                                    playlist.getLon() + nudgeMarkerInRandomDirection()))
                                             .title(playlist.getTitle())
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.dotmarker));
                                     Marker marker = mMap.addMarker(options);
@@ -481,6 +489,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             fab.setVisibility(View.VISIBLE);
             mSignInButton.setVisibility(View.GONE);
             cardView.setVisibility(View.VISIBLE);
+        }
+
+        if(myPlaylistCount > 7){
+            fab.setVisibility(View.GONE);
         }
     }
 
@@ -662,5 +674,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double y = (lat2 - lat1);
 
         return Math.sqrt(x * x + y * y) * R;
+    }
+
+    private double nudgeMarkerInRandomDirection(){
+        return ((Math.random() * 0.001) - .0005);
     }
 }
