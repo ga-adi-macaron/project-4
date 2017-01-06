@@ -42,7 +42,8 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     @Override
     public void displayLoginDialog() {
         FragmentManager manager = getSupportFragmentManager();
-        mFragment = new BaseLoginDialogFragment(mPresenter);
+        mFragment = new BaseLoginDialogFragment();
+        mFragment.setPresenter(mPresenter);
 
         manager.beginTransaction()
                 .add(mFragment, "login")

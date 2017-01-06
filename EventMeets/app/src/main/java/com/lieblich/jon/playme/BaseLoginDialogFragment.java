@@ -26,7 +26,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private BaseLoginContract.Presenter mPresenter;
     private Dialog mDialog;
 
-    public BaseLoginDialogFragment(BaseLoginContract.Presenter presenter) {
+    public void setPresenter(BaseLoginContract.Presenter presenter) {
         mPresenter = presenter;
     }
 
