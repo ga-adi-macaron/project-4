@@ -6,10 +6,10 @@ import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ArcMotion;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -75,7 +75,7 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        SharedPreferences.Editor prefsEdit = getSharedPreferences(ARMORY_SHARED_PREFS, MODE_PRIVATE).edit();
+        final SharedPreferences.Editor prefsEdit = getSharedPreferences(ARMORY_SHARED_PREFS, MODE_PRIVATE).edit();
 
 //        mTransitionsContainer.setLayoutParams(new RelativeLayout.LayoutParams(
 //                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -86,6 +86,7 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
 
             final ImageView purchaseImage = new ImageView(ArmoryActivity.this);
             purchaseImage.setElevation(12);
+            purchaseImage.setColorFilter(ContextCompat.getColor(ArmoryActivity.this, R.color.colorAccent));
             int[] startXY = new int[2];
             int[] endXY = new int[2];
 
@@ -97,47 +98,42 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
                     mBombInventoryCount.setText(String.valueOf(bombCount));
 
                     purchaseImage.setImageResource(R.drawable.explosion);
-
-                    view.getLocationOnScreen(startXY);
-                    purchaseImage.setX(startXY[0]);
-                    purchaseImage.setY(startXY[1]-72);
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
-                    purchaseImage.setLayoutParams(params);
-                    ((RelativeLayout)findViewById(R.id.activity_armory)).addView(purchaseImage);
-
-                    int[] XYbuyButtonNEW = new int[2];
-                    purchaseImage.getLocationOnScreen(XYbuyButtonNEW);
-                    Log.d(TAG, "onClick: x,y = "+XYbuyButtonNEW[0] +", "+XYbuyButtonNEW[1]);
+                    findViewById(R.id.bomb_inventory_icon).getLocationOnScreen(endXY);
                     break;
                 case R.id.spy_buy_button:
                     int spyCount = Integer.parseInt(mSpyInventoryCount.getText().toString());
                     spyCount++;
                     prefsEdit.putInt(SPY_COUNT_KEY, spyCount);
                     mSpyInventoryCount.setText(String.valueOf(spyCount));
+
+                    purchaseImage.setImageResource(R.drawable.eye);
+                    findViewById(R.id.spy_inventory_icon).getLocationOnScreen(endXY);
                     break;
                 case R.id.interference_buy_button:
                     int interfCount = Integer.parseInt(mInterferenceInventoryCount.getText().toString());
                     interfCount++;
                     prefsEdit.putInt(INTERFERENCE_COUNT_KEY, interfCount);
                     mInterferenceInventoryCount.setText(String.valueOf(interfCount));
+
+                    purchaseImage.setImageResource(R.drawable.lightning);
+                    findViewById(R.id.interference_inventory_icon).getLocationOnScreen(endXY);
                     break;
                 default:
                     return;
             }
-            mCoinCount = mCoinCount - 3;
-            prefsEdit.putInt(COIN_COUNT_KEY, mCoinCount);
-            prefsEdit.commit();
-            mCoinCountText.setText("Coins: " + mCoinCount);
 
-
-            findViewById(R.id.bomb_inventory_icon).getLocationOnScreen(endXY);
-            Log.d(TAG, "onClick: ICON LOCATION x,y = "+endXY[0] +", "+endXY[1]);
+            view.getLocationOnScreen(startXY);
+            purchaseImage.setX(startXY[0]);
+            purchaseImage.setY(startXY[1]-72);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(80, 80);
+            purchaseImage.setLayoutParams(params);
+            ((RelativeLayout)findViewById(R.id.activity_armory)).addView(purchaseImage);
 
             ArcMotion arcMotion = new ArcMotion();
             arcMotion.setMinimumVerticalAngle(70f);
-            Path path = arcMotion.getPath(startXY[0], startXY[1]-72, endXY[0]+124, endXY[1]-78);
+            Path path = arcMotion.getPath(startXY[0], startXY[1]-72, endXY[0], endXY[1]-72);
             Animator positionAnimator =
-                    ObjectAnimator.ofFloat(purchaseImage, View.TRANSLATION_X, View.TRANSLATION_Y, path).setDuration(500);
+                    ObjectAnimator.ofFloat(purchaseImage, View.TRANSLATION_X, View.TRANSLATION_Y, path).setDuration(750);
             positionAnimator.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
@@ -147,6 +143,10 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onAnimationEnd(Animator animator) {
                     ((RelativeLayout)findViewById(R.id.activity_armory)).removeView(purchaseImage);
+                    mCoinCount = mCoinCount - 3;
+                    prefsEdit.putInt(COIN_COUNT_KEY, mCoinCount);
+                    prefsEdit.commit();
+                    mCoinCountText.setText("Coins: " + mCoinCount);
                 }
 
                 @Override
@@ -164,15 +164,14 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
             animSet.setInterpolator(AnimationUtils.loadInterpolator(ArmoryActivity.this,android.R.interpolator.fast_out_slow_in));
             animSet.play(positionAnimator);
             animSet.start();
-
-            int[] XYbuyButtonNEW = new int[2];
-            purchaseImage.getLocationOnScreen(XYbuyButtonNEW);
-            Log.d(TAG, "onClick: x,y = "+XYbuyButtonNEW[0] +", "+XYbuyButtonNEW[1]);
         }
     }
 
     @Override
     public void onBackPressed() {
+        findViewById(R.id.coins_card).setVisibility(View.INVISIBLE);
+        findViewById(R.id.inventory_card).setVisibility(View.INVISIBLE);
+
         finishAfterTransition();
         super.onBackPressed();
     }

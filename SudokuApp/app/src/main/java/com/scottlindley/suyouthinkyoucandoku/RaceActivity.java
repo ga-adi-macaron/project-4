@@ -82,7 +82,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     }
 
     /**
-     * Takes the weapons that were armed before the race from an shared preferences and assigns
+     * Takes the weapons that were armed before the race from shared preferences and assigns
      * them to the weapon
      * slots above the game board. Click listeners are then assigned to the weapons.
      */
