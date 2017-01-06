@@ -191,15 +191,11 @@ public class MainMenuActivity extends AppCompatActivity {
         dialog.setPositiveButton("okay", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                SharedPreferences.Editor prefsEditor =
-                        getSharedPreferences(ARMED_WEAPONS_PREFS, MODE_PRIVATE).edit();
 
-                prefsEditor.putString(WEAPON_SLOT1_KEY, dialog.mWeaponSlot1);
-                prefsEditor.putString(WEAPON_SLOT2_KEY, dialog.mWeaponSlot2);
-                prefsEditor.commit();
+                String[] weapons = new String[]{dialog.mWeaponSlot1, dialog.mWeaponSlot2};
 
                 Intent intent = new Intent(MainMenuActivity.this, RaceActivity.class);
-                intent.putExtra(RACE_INTENT_EXTRA, true);
+                intent.putExtra(RACE_INTENT_EXTRA, weapons);
                 startActivity(intent);
             }
         });

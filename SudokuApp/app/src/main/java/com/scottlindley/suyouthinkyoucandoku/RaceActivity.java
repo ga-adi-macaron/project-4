@@ -88,10 +88,9 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      * slots above the game board. Click listeners are then assigned to the weapons.
      */
     private void setUpWeapons(){
-        SharedPreferences prefs =
-                getSharedPreferences(MainMenuActivity.ARMED_WEAPONS_PREFS, MODE_PRIVATE);
-        mWeapon1 = prefs.getString(MainMenuActivity.WEAPON_SLOT1_KEY, "none");
-        mWeapon2 = prefs.getString(MainMenuActivity.WEAPON_SLOT2_KEY, "none");
+        String[] weaponsSent = getIntent().getStringArrayExtra(MainMenuActivity.RACE_INTENT_EXTRA);
+        mWeapon1 = weaponsSent[0];
+        mWeapon2 = weaponsSent[1];
 
         final ImageView weapon1Image = (ImageView)findViewById(R.id.weapon1_image);
         final ImageView weapon2Image = (ImageView)findViewById(R.id.weapon2_image);
