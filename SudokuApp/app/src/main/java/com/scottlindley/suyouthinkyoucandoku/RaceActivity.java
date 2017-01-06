@@ -467,6 +467,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         for (int i=0; i<boxCells.length; i++){
             if (mOpponentCellsFilled[boxCells[i]] == 1){
                 mCellViews.get(boxCells[i]).setBackgroundColor(Color.TRANSPARENT);
+                mOpponentCellsFilled[boxCells[i]] = 0;
             }
         }
         //Send a message to the opponent containing the box number whose contents will be erased
