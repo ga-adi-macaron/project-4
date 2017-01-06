@@ -56,6 +56,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.korbkenny.peoplesplaylist.LoginActivity;
+import com.korbkenny.peoplesplaylist.MyUserInfoActivity;
 import com.korbkenny.peoplesplaylist.R;
 import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
@@ -100,13 +101,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private CardView cardView;
     private LocationManager mLocationManager;
     private List<Target> mTargetList;
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        SharedPreferences settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+        settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
         loggedIn = settings.getBoolean(LOGGEDIN,false);
         buildGoogleApiClient();
 
@@ -179,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         vUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MapsActivity.this, ColoringActivity.class);
+                Intent intent = new Intent(MapsActivity.this, MyUserInfoActivity.class);
                 startActivity(intent);
             }
         });
@@ -284,6 +286,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //  Push to the playlists branch of the database, and get the
                         //  unique, randomly generated key for use with geofire/other stuff.
                         final String playlistId = mDatabasePlaylistReference.push().getKey();
+                        settings.edit().putString("SavedPlaylistId",playlistId).commit();
                         playlist.setId(playlistId);
                         mDatabasePlaylistReference.child(playlistId).setValue(playlist);
                         geoFire.setLocation(playlistId, new GeoLocation(playlist.getLat(), playlist.getLon()));

@@ -10,12 +10,13 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.korbkenny.peoplesplaylist.MyUserInfoActivity"
-    android:gravity="center_horizontal">
+    >
 
     <RelativeLayout
         android:id="@+id/top_row"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
     <ImageView
         android:id="@+id/my_icon"
         android:layout_width="150dp"
@@ -34,7 +35,7 @@
         android:layout_width="100dp"
         android:layout_height="40dp"
         android:text="Saved        Playlist"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:layout_above="@id/my_saved"
@@ -51,6 +52,7 @@
         android:fontFamily="sans-serif-condensed"
         android:textSize="26sp"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         />
 
     <LinearLayout
@@ -59,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/my_playlists_text"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:gravity="center_horizontal">
 
         <ImageView
