@@ -58,7 +58,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     private boolean mUserDisconnected;
     private String mRoomID;
     private int mNumberOfParticipants;
-    private boolean mResolvingConnectionFailure, mStillConnected;
+    private boolean mResolvingConnectionFailure, mStillConnected, mGameAlreadyEnded;
     private GoogleApiClient mGoogleApiClient;
     private String mWeapon1, mWeapon2, mWeaponSelected = "none";
     private boolean mWeapon1Clicked, mWeapon2Clicked;
@@ -215,86 +215,89 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      * @param win
      */
     @Override
-    public void endGame(boolean win){
-        for (TextView tile : mChoiceTiles){
-            ((CardView)tile.getParent()).setVisibility(View.INVISIBLE);
-        }
-
-        View dialogView = getLayoutInflater().inflate(R.layout.end_race_game_dialog, null);
-        TextView gameResultText = (TextView)dialogView.findViewById(R.id.game_result_text);
-        TextView resultDetailText = (TextView)dialogView.findViewById(R.id.lost_game_message);
-        TextView racesWon = (TextView)dialogView.findViewById(R.id.races_won);
-        TextView racesLost = (TextView)dialogView.findViewById(R.id.races_lost);
-        TextView coinsWon = (TextView)dialogView.findViewById(R.id.won_coins);
-
-        Stats stats = mDBHelper.getStats();
-        if(win) {
-            gameResultText.setText("You Win!");
-            SharedPreferences prefs = getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
-            int coins = prefs.getInt(ArmoryActivity.COIN_COUNT_KEY, 0);
-            coinsWon.setText("+5 coins for your victory!\nCoins: "+ (coins + 5));
-            coinsWon.setVisibility(View.VISIBLE);
-            prefs.edit()
-                    .putInt(ArmoryActivity.COIN_COUNT_KEY, coins + 5)
-                    .commit();
-
-            if(isCorrect) {
-                resultDetailText.setText("You completed the puzzle before the enemy");
-                byte[] data = OPPONENT_FINISHED_MESSAGE.getBytes();
-                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
-            } else if (mOpponentTooManyGuesses){
-                resultDetailText.setText("Your opponent guessed made too many incorrect guesses");
-            } else if (mOpponentQuit){
-                resultDetailText.setText("Your opponent quit");
-            } else if (mOpponentDisconnected){
-                resultDetailText.setText("Your opponent was disconnected");
+    public void endGame(boolean win) {
+        if (!mGameAlreadyEnded) {
+            mGameAlreadyEnded = true;
+            for (TextView tile : mChoiceTiles) {
+                ((CardView) tile.getParent()).setVisibility(View.INVISIBLE);
             }
-            resultDetailText.setVisibility(View.VISIBLE);
-            mDBHelper.updateRacesWon(stats.getRacesWon() + 1);
-            stats = mDBHelper.getStats();
-        } else {
-            //The game was lost
-            gameResultText.setText("You Lose");
-            mDBHelper.updateRacesLost(stats.getRacesLost()+1);
-            stats = mDBHelper.getStats();
-            if (mStrikes > 2){
-                resultDetailText.setText("Three incorrect answers");
-                byte[] data = "too many guesses".getBytes();
-                Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient,data,mRoomID);
-            } else if (mOpponentFinished){
-                resultDetailText.setText("Your opponent has finished the puzzle");
-            } else if (mUserDisconnected){
-                resultDetailText.setText("You have disconnected from the game");
+
+            View dialogView = getLayoutInflater().inflate(R.layout.end_race_game_dialog, null);
+            TextView gameResultText = (TextView) dialogView.findViewById(R.id.game_result_text);
+            TextView resultDetailText = (TextView) dialogView.findViewById(R.id.lost_game_message);
+            TextView racesWon = (TextView) dialogView.findViewById(R.id.races_won);
+            TextView racesLost = (TextView) dialogView.findViewById(R.id.races_lost);
+            TextView coinsWon = (TextView) dialogView.findViewById(R.id.won_coins);
+
+            Stats stats = mDBHelper.getStats();
+            if (win) {
+                gameResultText.setText("You Win!");
+                SharedPreferences prefs = getSharedPreferences(ArmoryActivity.ARMORY_SHARED_PREFS, MODE_PRIVATE);
+                int coins = prefs.getInt(ArmoryActivity.COIN_COUNT_KEY, 0);
+                coinsWon.setText("+5 coins for your victory!\nCoins: " + (coins + 5));
+                coinsWon.setVisibility(View.VISIBLE);
+                prefs.edit()
+                        .putInt(ArmoryActivity.COIN_COUNT_KEY, coins + 5)
+                        .commit();
+
+                if (isCorrect) {
+                    resultDetailText.setText("You completed the puzzle before the enemy");
+                    byte[] data = OPPONENT_FINISHED_MESSAGE.getBytes();
+                    Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+                } else if (mOpponentTooManyGuesses) {
+                    resultDetailText.setText("Your opponent guessed made too many incorrect guesses");
+                } else if (mOpponentQuit) {
+                    resultDetailText.setText("Your opponent quit");
+                } else if (mOpponentDisconnected) {
+                    resultDetailText.setText("Your opponent was disconnected");
+                }
+                resultDetailText.setVisibility(View.VISIBLE);
+                mDBHelper.updateRacesWon(stats.getRacesWon() + 1);
+                stats = mDBHelper.getStats();
+            } else {
+                //The game was lost
+                gameResultText.setText("You Lose");
+                mDBHelper.updateRacesLost(stats.getRacesLost() + 1);
+                stats = mDBHelper.getStats();
+                if (mStrikes > 2) {
+                    resultDetailText.setText("Three incorrect answers");
+                    byte[] data = "too many guesses".getBytes();
+                    Games.RealTimeMultiplayer.sendUnreliableMessageToOthers(mGoogleApiClient, data, mRoomID);
+                } else if (mOpponentFinished) {
+                    resultDetailText.setText("Your opponent has finished the puzzle");
+                } else if (mUserDisconnected) {
+                    resultDetailText.setText("You have disconnected from the game");
+                }
+                resultDetailText.setVisibility(View.VISIBLE);
             }
-            resultDetailText.setVisibility(View.VISIBLE);
+            mTimer.cancel();
+
+            racesWon.setText("Races Won: " + stats.getRacesWon());
+            racesLost.setText("Races Lost: " + stats.getRacesLost());
+
+            checkForAcheivementUnlock(stats);
+
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setPositiveButton("okay", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            RaceActivity.this.finish();
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            RaceActivity.this.finish();
+                        }
+                    })
+                    .setView(dialogView)
+                    .create();
+            if (!RaceActivity.this.isFinishing() && !RaceActivity.this.isDestroyed()) {
+                dialog.show();
+            }
+
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
-        mTimer.cancel();
-
-        racesWon.setText("Races Won: "+ stats.getRacesWon());
-        racesLost.setText("Races Lost: "+ stats.getRacesLost());
-
-        checkForAcheivementUnlock(stats);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setPositiveButton("okay", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        RaceActivity.this.finish();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        RaceActivity.this.finish();
-                    }
-                })
-                .setView(dialogView)
-                .create();
-        if(!RaceActivity.this.isFinishing() && !RaceActivity.this.isDestroyed()) {
-            dialog.show();
-        }
-
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**

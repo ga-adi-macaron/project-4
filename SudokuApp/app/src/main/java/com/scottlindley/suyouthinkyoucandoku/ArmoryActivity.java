@@ -29,7 +29,6 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
     private CardView mBuyBombBtn, mBuySpyBtn, mBuyInterferenceBtn;
     private TextView mBombInventoryCount, mSpyInventoryCount, mInterferenceInventoryCount;
     private TextView mCoinCountText;
-    private ViewGroup mTransitionsContainer = null;
     private int mCoinCount;
 
     @Override
@@ -40,8 +39,6 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_armory);
 
         getSupportActionBar().hide();
-
-        mTransitionsContainer = (RelativeLayout)findViewById(R.id.activity_armory);
 
         setUpViews();
     }
@@ -76,9 +73,6 @@ public class ArmoryActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         final SharedPreferences.Editor prefsEdit = getSharedPreferences(ARMORY_SHARED_PREFS, MODE_PRIVATE).edit();
-
-//        mTransitionsContainer.setLayoutParams(new RelativeLayout.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         if (mCoinCount < 3){
             Toast.makeText(this, "Not enough coins! Win races to collect more.", Toast.LENGTH_SHORT).show();
