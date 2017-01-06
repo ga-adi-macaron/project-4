@@ -9,7 +9,7 @@
 
     <item android:id="@+id/action_text"
         android:icon="@android:drawable/ic_menu_edit"
-        android:title="Add Text"
+        android:title="Text"
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_delete"

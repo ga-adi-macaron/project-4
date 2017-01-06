@@ -4,7 +4,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import android.widget.Toast;
 
 import com.ezequielc.successplanner.R;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class VisionBoardActivity extends AppCompatActivity {
@@ -81,6 +85,69 @@ public class VisionBoardActivity extends AppCompatActivity {
                 return true;
             }
         };
+    }
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(VisionBoardActivity.this)
+                .setMessage("Are you sure you want to exit?" +
+                "\nYou will lose your Vision Board")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    VisionBoardActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .create().show();
+    }
+
+    public void takeScreenshot(){
+        try {
+            String path = "/Pictures/Screenshots/VisionBoard.jpg";
+            String pathName = Environment.getExternalStorageDirectory().toString() + path;
+
+            View screenshot = getWindow().getDecorView().getRootView();
+            screenshot.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(screenshot.getDrawingCache());
+            screenshot.setDrawingCacheEnabled(false);
+
+            final File imageFile = new File(pathName);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+            MediaScannerConnection.scanFile(this,
+                    new String[]{imageFile.toString()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+
+                        }
+                    });
+
+            new AlertDialog.Builder(VisionBoardActivity.this)
+                    .setMessage("Do you want to open Vision Board?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            openScreenShoot(imageFile);
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .create().show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openScreenShoot(File file){
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(file);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
     }
 
     public void textOptions(){
@@ -431,7 +498,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_save:
-                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+                takeScreenshot();
                 return true;
 
             case R.id.action_change_background:
