@@ -37,7 +37,6 @@ public class ChatGroupActivity extends AppCompatActivity {
     private MessageRecyclerAdapter mAdapter;
     private DatabaseReference mReference;
     private ChildEventListener mListener;
-    private Map<String,SelfMessageObject> mMessages;
     private List<SelfMessageObject> mContent;
     private boolean hasMessages;
 
@@ -59,7 +58,6 @@ public class ChatGroupActivity extends AppCompatActivity {
         mSendMessage = (Button)findViewById(R.id.send_message);
 
         mGroup = new MessageGroup();
-        mMessages = new HashMap<>();
         mContent = new ArrayList<>();
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mAdapter = new MessageRecyclerAdapter(mContent);
@@ -69,7 +67,6 @@ public class ChatGroupActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
-                mMessages = mGroup.getMessages();
                 if(mGroup.getMessages()==null||mGroup.getMessages().size()==0) {
                     mReference.child("messages").push().setValue(new SelfMessageObject("started a new chat", mGroup.getCreator()));
                 }
@@ -84,7 +81,6 @@ public class ChatGroupActivity extends AppCompatActivity {
         mMessageText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -111,6 +107,20 @@ public class ChatGroupActivity extends AppCompatActivity {
 
             }
         });
+
+        mMessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if(bottom < oldBottom) {
+                    mMessageRecycler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMessageRecycler.scrollToPosition(mContent.size()-1);
+                        }
+                    }, 100);
+                }
+            }
+        });
     }
 
     @Override
@@ -131,6 +141,7 @@ public class ChatGroupActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
                     mAdapter.notifyItemInserted(mContent.size()-1);
+                mMessageRecycler.scrollToPosition(mContent.size()-1);
             }
 
             @Override

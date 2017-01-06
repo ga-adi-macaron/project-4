@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.jon.eventmeets.R;
 import com.example.jon.eventmeets.model.GameResultObject;
@@ -31,6 +33,9 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
         mQueryText = (EditText)findViewById(R.id.video_game_search);
 
         mPresenter = new Presenter(this);
+
+        TextView link = (TextView)findViewById(R.id.igdb);
+        link.setMovementMethod(LinkMovementMethod.getInstance());
 
         mGameSearch.setOnClickListener(new View.OnClickListener() {
             @Override

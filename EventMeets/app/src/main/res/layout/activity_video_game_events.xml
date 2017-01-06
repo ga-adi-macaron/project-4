@@ -22,12 +22,20 @@
             android:layout_height="wrap_content"
             android:inputType="textCapWords"/>
 
+        <TextView
+            android:id="@+id/igdb"
+            android:textSize="12sp"
+            android:text="@string/igdb_credit"
+            android:layout_below="@id/video_game_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <Button
             android:id="@+id/search_games"
             android:elevation="12dp"
             android:layout_margin="4dp"
             android:background="@drawable/button_shape"
-            android:layout_below="@id/video_game_search"
+            android:layout_below="@id/igdb"
             android:text="serach"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

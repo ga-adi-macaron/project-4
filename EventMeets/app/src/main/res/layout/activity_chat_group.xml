@@ -8,6 +8,12 @@
     android:background="#eeeeee"
     tools:context="com.example.jon.eventmeets.event_detail_components.message_components.ChatGroupActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_message_recycler"
+        android:layout_above="@+id/chat_function_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <RelativeLayout
         android:id="@+id/chat_function_bar"
         android:background="#fff"
@@ -31,7 +37,7 @@
             android:id="@+id/message_edit"
             android:textSize="18sp"
             android:padding="4dp"
-            android:inputType="textCapSentences"
+            android:inputType="textCapSentences|textMultiLine"
             android:background="#fff"
             android:layout_toStartOf="@id/send_message"
             android:layout_centerVertical="true"
@@ -41,10 +47,5 @@
 
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chat_message_recycler"
-        android:layout_above="@id/chat_function_bar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 </RelativeLayout>
