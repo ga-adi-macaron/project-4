@@ -37,8 +37,6 @@ Download the app [here](https://play.google.com/store/apps/details?id=com.scottl
 
 <p align="center">
   <img src="screenshots/one.png" height="300px" /> <img src="screenshots/two.png" height="300px" />
-</p>
-<p align="center">
   <img src="screenshots/three.png" height="300px" /> <img src="screenshots/four.png" height="300px" />
 </p>
 
