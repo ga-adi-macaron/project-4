@@ -108,17 +108,21 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
 
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-        if(mPlatforms.contains("XBox")) {
-            adapter.add("XBox");
-        }
-        if(mPlatforms.contains("Nintendo")) {
-            adapter.add("Nintendo");
-        }
-        if(mPlatforms.contains("PlayStation")) {
-            adapter.add("PlayStation");
-        }
-        if(mPlatforms.contains("PC")) {
-            adapter.add("PC");
+        if(mPlatforms != null) {
+            if (mPlatforms.contains("XBox")) {
+                adapter.add("XBox");
+            }
+            if (mPlatforms.contains("Nintendo")) {
+                adapter.add("Nintendo");
+            }
+            if (mPlatforms.contains("PlayStation")) {
+                adapter.add("PlayStation");
+            }
+            if (mPlatforms.contains("PC")) {
+                adapter.add("PC");
+            }
+        } else {
+            adapter.add("Other Platform");
         }
 
         builder.setAdapter(adapter, new DialogInterface.OnClickListener() {

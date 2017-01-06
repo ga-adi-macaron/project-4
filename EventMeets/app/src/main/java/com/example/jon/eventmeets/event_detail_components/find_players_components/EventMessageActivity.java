@@ -45,7 +45,7 @@ public class EventMessageActivity extends AppCompatActivity {
         mCover = intent.getStringExtra("cover");
         mScreenshot = intent.getStringExtra("screencap");
 
-        setTitle(mName);
+        setTitle(mName+" ("+mPlatform+")");
         mPlayerRecycler = (RecyclerView)findViewById(R.id.player_recycler);
         mTotalPlayers = (TextView)findViewById(R.id.total_players);
 

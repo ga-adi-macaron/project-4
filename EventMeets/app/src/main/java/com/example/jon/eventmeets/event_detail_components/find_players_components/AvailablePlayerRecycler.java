@@ -109,39 +109,93 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
         return mPlayers.size();
     }
 
-    private void confirmPlayerSelection(final String me, String name, final String chatKey, final Context context) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(context)
-                .setTitle("Start a new chat with "+name+"?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mGroup.addCreateMessage(me);
-                        mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Intent intent = new Intent(context, ChatGroupActivity.class);
-                                intent.putExtra("chatKey", chatKey);
-
-                                if(!dataSnapshot.hasChild("users")) {
-                                    mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
+    private void confirmPlayerSelection(final String me, final String name, final String chatKey, final Context context) {
+        mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.hasChild("users")) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(context)
+                            .setTitle("Start a new chat with " + name + "?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                            mGroup.addCreateMessage(me);
+//                            mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Intent intent = new Intent(context, ChatGroupActivity.class);
+                                    intent.putExtra("chatKey", chatKey);
+//
+//                                    if (!dataSnapshot.hasChild("users")) {
+                                        mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
+//                                    }
+//
+                                    context.startActivity(intent);
                                 }
 
-                                context.startActivity(intent);
-                            }
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//
+//                                }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                })
+                            })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        dialog.show();
+                dialog.show();
+            } else {
+                Intent intent = new Intent(context, ChatGroupActivity.class);
+                intent.putExtra("chatKey", chatKey);
+                context.startActivity(intent);
+            }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+//        if(mDatabase.getReference("chats").child(chatKey).child("users") == null) {
+//            AlertDialog.Builder dialog = new AlertDialog.Builder(context)
+//                    .setTitle("Start a new chat with " + name + "?")
+//                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+////                            mGroup.addCreateMessage(me);
+////                            mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
+////                                @Override
+////                                public void onDataChange(DataSnapshot dataSnapshot) {
+////                                    Intent intent = new Intent(context, ChatGroupActivity.class);
+////                                    intent.putExtra("chatKey", chatKey);
+////
+////                                    if (!dataSnapshot.hasChild("users")) {
+////                                        mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
+////                                    }
+////
+////                                    context.startActivity(intent);
+////                                }
+//
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//
+//                                }
+//                            });
+//                        }
+//                    })
+//                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.dismiss();
+//                        }
+//                    });
+//            dialog.show();
+//        } else {
+//            Intent intent = new Intent(context, ChatGroupActivity.class);
+//            intent.putExtra("chatKey", chatKey);
+//            context.startActivity(intent);
+//        }
     }
 }
