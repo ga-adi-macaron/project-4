@@ -39,11 +39,14 @@ public class ChatGroupActivity extends AppCompatActivity {
     private ChildEventListener mListener;
     private Map<String,SelfMessageObject> mMessages;
     private List<SelfMessageObject> mContent;
+    private boolean hasMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_group);
+
+        hasMessages = false;
 
         Intent intent = getIntent();
         String chatKey = intent.getStringExtra("chatKey");
@@ -51,8 +54,14 @@ public class ChatGroupActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         mReference = database.getReference("chats").child(chatKey);
 
-        mMessages = new HashMap<>();
+        mMessageRecycler = (RecyclerView)findViewById(R.id.chat_message_recycler);
+        mMessageText = (EditText)findViewById(R.id.message_edit);
+        mSendMessage = (Button)findViewById(R.id.send_message);
 
+        mGroup = new MessageGroup();
+        mMessages = new HashMap<>();
+        mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -60,10 +69,8 @@ public class ChatGroupActivity extends AppCompatActivity {
                 mMessages = mGroup.getMessages();
                 mContent = new ArrayList<>(mMessages.values());
                 mAdapter = new MessageRecyclerAdapter(mContent);
-                mMessageRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext(),
-                        LinearLayoutManager.VERTICAL, false));
                 mMessageRecycler.setAdapter(mAdapter);
-                setListener();
+                hasMessages = true;
             }
 
             @Override
@@ -72,9 +79,6 @@ public class ChatGroupActivity extends AppCompatActivity {
             }
         });
 
-        mMessageRecycler = (RecyclerView)findViewById(R.id.chat_message_recycler);
-        mMessageText = (EditText)findViewById(R.id.message_edit);
-        mSendMessage = (Button)findViewById(R.id.send_message);
 
         mMessageText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -111,6 +115,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        setListener();
     }
 
     @Override
@@ -123,9 +128,10 @@ public class ChatGroupActivity extends AppCompatActivity {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mGroup.addMessage(dataSnapshot.getKey(),dataSnapshot.getValue(MessageObject.class));
-                mContent.add(dataSnapshot.getValue(MessageObject.class));
-                mAdapter.notifyItemInserted(mContent.size());
+                if(hasMessages) {
+                    mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
+                    mAdapter.notifyItemInserted(mContent.size()+1);
+                }
             }
 
             @Override

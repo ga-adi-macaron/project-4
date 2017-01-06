@@ -31,6 +31,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
     private FirebaseDatabase mDatabase;
     private List<AvailablePlayer> mPlayers;
     private AvailablePlayer mPlayer;
+    private MessageGroup mGroup;
 
     AvailablePlayerRecycler(List<AvailablePlayer> list) {
         mPlayers = list;
@@ -76,10 +77,24 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                 @Override
                 public void onClick(View v) {
                     String added = mPlayers.get(holder.getAdapterPosition()).getUser();
-                    String name = mPlayers.get(holder.getAdapterPosition()).getFirstName();
-                    String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    String chatKey = current.substring(0, 6) + added.substring(0, 6);
-                    confirmPlayerSelection(mPlayers.get(holder.getAdapterPosition()), name, chatKey, holder.mContext);
+                    final String name = mPlayers.get(holder.getAdapterPosition()).getFirstName();
+                    final String current = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    final String chatKey = current.substring(0, 6) + added.substring(0, 6);
+                    mDatabase.getReference("users").child(current).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String myName = dataSnapshot.child("firstName").getValue(String.class);
+                            mGroup = new MessageGroup();
+                            mGroup.addUsers(mPlayers.get(holder.getAdapterPosition()),
+                                    new AvailablePlayer(current, myName));
+                            confirmPlayerSelection(myName, name, chatKey, holder.mContext);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             });
         } else {
@@ -94,16 +109,13 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
         return mPlayers.size();
     }
 
-    private void confirmPlayerSelection(final AvailablePlayer player, String name, final String chatKey, final Context context) {
+    private void confirmPlayerSelection(final String me, String name, final String chatKey, final Context context) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context)
                 .setTitle("Start a new chat with "+name+"?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        final MessageGroup group = new MessageGroup();
-                        group.addUsers(getSelf(), player);
-                        group.addCreateMessage(BaseUser.getInstance().getFirstName());
-
+                        mGroup.addCreateMessage(me);
                         mDatabase.getReference("chats").child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -111,7 +123,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                                 intent.putExtra("chatKey", chatKey);
 
                                 if(!dataSnapshot.hasChild("users")) {
-                                    mDatabase.getReference("chats").child(chatKey).setValue(group);
+                                    mDatabase.getReference("chats").child(chatKey).setValue(mGroup);
                                 }
 
                                 context.startActivity(intent);
@@ -131,22 +143,5 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
                     }
                 });
         dialog.show();
-    }
-
-    private AvailablePlayer getSelf() {
-        String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        mDatabase.getReference("users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mPlayer = new AvailablePlayer(dataSnapshot.child("username").getValue(String.class),
-                        dataSnapshot.child("firstName").getValue(String.class));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        return mPlayer;
     }
 }

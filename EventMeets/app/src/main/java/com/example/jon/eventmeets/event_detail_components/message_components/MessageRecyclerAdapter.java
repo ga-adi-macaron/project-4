@@ -42,7 +42,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             case 0:
                 ((MessageViewHolder)holder).mMessageText.setText(message.getContent());
                 ((MessageViewHolder)holder).mSenderName.setText(message.getSender());
-                ((MessageViewHolder)holder).mSenderIcon.setText(""+message.getSender().charAt(0));
+                ((MessageViewHolder)holder).mSenderIcon.setText(""+message.getSender().toUpperCase().charAt(0));
                 break;
             case 1:
                 ((SystemMessageViewHolder)holder).mMessage.setText(message.getContent());

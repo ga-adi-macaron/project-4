@@ -19,4 +19,14 @@ public class SystemMessageObject extends SelfMessageObject {
     public String getSender() {
         return sender;
     }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getContent() {
+        return content;
+    }
 }

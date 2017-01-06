@@ -28,7 +28,7 @@
 
         <EditText
             android:id="@+id/message_edit"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:padding="4dp"
             android:inputType="textCapSentences"
             android:background="#f0f0f0"
