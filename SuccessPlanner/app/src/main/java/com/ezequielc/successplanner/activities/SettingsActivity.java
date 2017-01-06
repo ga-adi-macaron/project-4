@@ -1,15 +1,19 @@
 package com.ezequielc.successplanner.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Switch;
 
 import com.ezequielc.successplanner.R;
 
 public class SettingsActivity extends AppCompatActivity {
-    TextView mChangeVisionBoardColor;
+    public static final String PREFERENCES = "preferences";
+    public static final String GET_QUOTE_SWITCH = "getQuoteSwitch";
+
+    Switch mReceiveQuotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +22,20 @@ public class SettingsActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Settings");
 
-        mChangeVisionBoardColor = (TextView) findViewById(R.id.change_vision_board_background_color);
-        mChangeVisionBoardColor.setOnClickListener(new View.OnClickListener() {
+        mReceiveQuotes = (Switch) findViewById(R.id.get_quote);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        boolean isQuoteSwitched = sharedPreferences.getBoolean(GET_QUOTE_SWITCH, true);
+
+        // Switch Quote
+        mReceiveQuotes.setChecked(isQuoteSwitched);
+        mReceiveQuotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "Change Vision Board Background Color", Toast.LENGTH_SHORT).show();
+                SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(GET_QUOTE_SWITCH, mReceiveQuotes.isChecked());
+                editor.commit();
             }
         });
     }

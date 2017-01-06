@@ -23,7 +23,6 @@
         app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_change_background"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="Change Background"
-        app:showAsAction="ifRoom"/>
+        android:title="Change Background Color"
+        app:showAsAction="never"/>
 </menu>

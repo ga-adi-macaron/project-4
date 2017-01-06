@@ -315,7 +315,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         // TODO: ADD MORE COLORS
         CharSequence[] colors = {"Green", "Red", "Blue", "Black"};
         AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
-                .setTitle("Pick Color to Change BackGround:")
+                .setTitle("Pick Color:")
                 .setItems(colors, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

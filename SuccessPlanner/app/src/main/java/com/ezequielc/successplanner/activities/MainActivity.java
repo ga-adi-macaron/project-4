@@ -2,13 +2,16 @@ package com.ezequielc.successplanner.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,109 +37,144 @@ public class MainActivity extends AppCompatActivity {
     public static final String DAY_OF_WEEK = "dayOfWeek";
 
     TextView mQuote;
+    CardView mCardView;
     CalendarView mCalendarView;
+    SharedPreferences mSharedPreferences;
+    boolean mGotQuote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mCalendarView = (CalendarView) findViewById(R.id.calendar_view);
         mQuote = (TextView) findViewById(R.id.quote_text);
+        mCardView = (CardView) findViewById(R.id.card_view);
+        mCalendarView = (CalendarView) findViewById(R.id.calendar_view);
 
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-//            getQuote();
-            mQuote.setText("Testing...");
+        mSharedPreferences = getSharedPreferences(SettingsActivity.PREFERENCES, Context.MODE_PRIVATE);
+
+        if (mSharedPreferences.getBoolean(SettingsActivity.GET_QUOTE_SWITCH, true)) {
+            if (isConnected()) {
+                getQuote();
+                mGotQuote = true;
+            } else {
+                Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_LONG).show();
+                mQuote.setText("Unable to Receive Quotes...");
+                mGotQuote = false;
+            }
         } else {
-            Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_SHORT).show();
-            mQuote.setText("Unable to Receive Quotes...");
+            mCardView.setVisibility(View.GONE);
+            mGotQuote = false;
         }
 
         mCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int year, int month, int dayOfMonth) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, dayOfMonth);
-
-                String dayOfWeek = "";
-                String monthString = "";
-
-                switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                    case Calendar.MONDAY:
-                        dayOfWeek = "Monday";
-                        break;
-                    case Calendar.TUESDAY:
-                        dayOfWeek = "Tuesday";
-                        break;
-                    case Calendar.WEDNESDAY:
-                        dayOfWeek = "Wednesday";
-                        break;
-                    case Calendar.THURSDAY:
-                        dayOfWeek = "Thursday";
-                        break;
-                    case Calendar.FRIDAY:
-                        dayOfWeek = "Friday";
-                        break;
-                    case Calendar.SATURDAY:
-                        dayOfWeek = "Saturday";
-                        break;
-                    case Calendar.SUNDAY:
-                        dayOfWeek = "Sunday";
-                        break;
-                    default:
-                        break;
-                }
-
-                switch (calendar.get(Calendar.MONTH)) {
-                    case Calendar.JANUARY:
-                        monthString = "January";
-                        break;
-                    case Calendar.FEBRUARY:
-                        monthString = "February";
-                        break;
-                    case Calendar.MARCH:
-                        monthString = "March";
-                        break;
-                    case Calendar.APRIL:
-                        monthString = "April";
-                        break;
-                    case Calendar.MAY:
-                        monthString = "May";
-                        break;
-                    case Calendar.JUNE:
-                        monthString = "June";
-                        break;
-                    case Calendar.JULY:
-                        monthString = "July";
-                        break;
-                    case Calendar.AUGUST:
-                        monthString = "August";
-                        break;
-                    case Calendar.SEPTEMBER:
-                        monthString = "September";
-                        break;
-                    case Calendar.OCTOBER:
-                        monthString = "October";
-                        break;
-                    case Calendar.NOVEMBER:
-                        monthString = "November";
-                        break;
-                    case Calendar.DECEMBER:
-                        monthString = "December";
-                        break;
-                    default:
-                        break;
-                }
-
-                Intent intent = new Intent(MainActivity.this, DailyActivity.class);
-                intent.putExtra(DAY_OF_WEEK, dayOfWeek + ": " + monthString + " " + dayOfMonth + ", " + year);
-                intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
-                startActivity(intent);
+                intentData(year, month, dayOfMonth);
             }
         });
     }
+
+    public void intentData(int year, int month, int dayOfMonth){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, dayOfMonth);
+
+        String dayOfWeek = "";
+        String monthString = "";
+
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:
+                dayOfWeek = "Monday";
+                break;
+            case Calendar.TUESDAY:
+                dayOfWeek = "Tuesday";
+                break;
+            case Calendar.WEDNESDAY:
+                dayOfWeek = "Wednesday";
+                break;
+            case Calendar.THURSDAY:
+                dayOfWeek = "Thursday";
+                break;
+            case Calendar.FRIDAY:
+                dayOfWeek = "Friday";
+                break;
+            case Calendar.SATURDAY:
+                dayOfWeek = "Saturday";
+                break;
+            case Calendar.SUNDAY:
+                dayOfWeek = "Sunday";
+                break;
+            default:
+                break;
+        }
+
+        switch (calendar.get(Calendar.MONTH)) {
+            case Calendar.JANUARY:
+                monthString = "January";
+                break;
+            case Calendar.FEBRUARY:
+                monthString = "February";
+                break;
+            case Calendar.MARCH:
+                monthString = "March";
+                break;
+            case Calendar.APRIL:
+                monthString = "April";
+                break;
+            case Calendar.MAY:
+                monthString = "May";
+                break;
+            case Calendar.JUNE:
+                monthString = "June";
+                break;
+            case Calendar.JULY:
+                monthString = "July";
+                break;
+            case Calendar.AUGUST:
+                monthString = "August";
+                break;
+            case Calendar.SEPTEMBER:
+                monthString = "September";
+                break;
+            case Calendar.OCTOBER:
+                monthString = "October";
+                break;
+            case Calendar.NOVEMBER:
+                monthString = "November";
+                break;
+            case Calendar.DECEMBER:
+                monthString = "December";
+                break;
+            default:
+                break;
+        }
+
+        Intent intent = new Intent(MainActivity.this, DailyActivity.class);
+        intent.putExtra(DAY_OF_WEEK, dayOfWeek + ": " + monthString + " " + dayOfMonth + ", " + year);
+        intent.putExtra(DATE_FORMATTED, month + 1 + "/" + dayOfMonth + "/" + year);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mSharedPreferences.getBoolean(SettingsActivity.GET_QUOTE_SWITCH, true)) {
+            mCardView.setVisibility(View.VISIBLE);
+            if (!mGotQuote) {
+                getQuote();
+                mGotQuote = true;
+            }
+            if (!isConnected()) {
+                Toast.makeText(this, "No Internet Connection!", Toast.LENGTH_LONG).show();
+                mQuote.setText("Unable to Receive Quotes...");
+                mGotQuote = false;
+            }
+        } else {
+            mCardView.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -163,6 +201,15 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean isConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 
     public void getQuote(){
