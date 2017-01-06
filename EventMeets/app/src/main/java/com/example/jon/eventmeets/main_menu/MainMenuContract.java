@@ -14,10 +14,8 @@ interface MainMenuContract {
 
     interface View {
         void setupRecyclerView(List<GameResultObject> list);
-        void hideLoginButton();
         void openEventDetail(GameResultObject event);
         void openBrowseActivity();
-        void displayLoginButton();
         void openSettingsActivity();
     }
 }

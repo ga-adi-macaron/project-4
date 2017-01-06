@@ -80,7 +80,7 @@
 
     <Button
         android:height="6dp"
-        android:background="#00c853"
+        android:background="@drawable/login_button_shape"
         android:id="@+id/login_prompt_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,20 +89,11 @@
 
     <Button
         android:height="6dp"
-        android:background="#E0E0E0"
+        android:background="@drawable/account_button_shape"
         android:id="@+id/create_account_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/create_account"/>
-
-    <Button
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/skip_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Skip_login"
-        style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:textSize="12sp"/>
 
 </LinearLayout>
 </ScrollView>

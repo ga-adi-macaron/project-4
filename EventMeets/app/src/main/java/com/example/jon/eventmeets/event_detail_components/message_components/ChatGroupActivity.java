@@ -61,7 +61,7 @@ public class ChatGroupActivity extends AppCompatActivity {
         mGroup = new MessageGroup();
         mMessages = new HashMap<>();
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        
+
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
