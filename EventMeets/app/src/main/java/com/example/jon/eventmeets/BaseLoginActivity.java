@@ -34,7 +34,6 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         setContentView(R.layout.activity_base_login);
 
         findViewById(R.id.login_main_btn).setOnClickListener(this);
-        findViewById(R.id.skip_login_btn).setOnClickListener(this);
 
         mPresenter = new BaseLoginPresenter(this);
 
@@ -57,13 +56,6 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         intent.putExtra("logged in", true);
         startActivity(intent);
         ActivityCompat.finishAffinity(this);
-    }
-
-    @Override
-    public void skipLogin() {
-        Intent intent = new Intent(this, MainMenuView.class);
-        intent.putExtra("logged in", false);
-        startActivity(intent);
     }
 
     @Override
@@ -101,9 +93,6 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
         switch(id) {
             case R.id.login_main_btn:
                 mPresenter.onLoginPressed();
-                break;
-            case R.id.skip_login_btn:
-                mPresenter.onLoginSkipped();
                 break;
             default:
                 Log.d("BaseLoginActivity", "onClick: extra listener: "+view.getId());

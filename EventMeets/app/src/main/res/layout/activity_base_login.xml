@@ -21,14 +21,4 @@
         android:elevation="6dp"
         android:text="@string/login"/>
 
-    <Button
-        android:id="@+id/skip_login_btn"
-        android:text="@string/Skip_login"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/login_main_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:textSize="12sp"/>
-
 </RelativeLayout>

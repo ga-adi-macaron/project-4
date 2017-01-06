@@ -20,7 +20,7 @@ import android.widget.Toast;
  */
 
 public class BaseLoginDialogFragment extends DialogFragment implements View.OnClickListener{
-    private Button mLoginButton, mCreateAccount, mSkipLogin;
+    private Button mLoginButton, mCreateAccount;
     private EditText mAccountName, mPassword, mHiddenConfirm, mFirstName, mLastName;
     private TextView mHiddenConfirmPassword, mFirst, mLast;
     private BaseLoginContract.Presenter mPresenter;
@@ -38,7 +38,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         View view =  inflater.inflate(R.layout.not_logged_in_dialog, container, true);
         mLoginButton = (Button)view.findViewById(R.id.login_prompt_button);
         mCreateAccount = (Button)view.findViewById(R.id.create_account_btn);
-        mSkipLogin = (Button)view.findViewById(R.id.skip_login);
 
         mAccountName = (EditText)view.findViewById(R.id.username_edit);
         mPassword = (EditText)view.findViewById(R.id.password_edit);
@@ -52,7 +51,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
 
         mLoginButton.setOnClickListener(this);
         mCreateAccount.setOnClickListener(this);
-        mSkipLogin.setOnClickListener(this);
 
         return view;
     }
@@ -101,9 +99,6 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                         mPresenter.onNewAccountRequested(username, password, confirm,firstName ,lastName);
                     }
                 });
-                break;
-            case R.id.skip_login:
-                mPresenter.onLoginSkipped();
                 break;
             default:
                 Toast.makeText(getActivity(), "Extra listener", Toast.LENGTH_SHORT).show();

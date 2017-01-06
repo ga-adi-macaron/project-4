@@ -11,8 +11,6 @@ public interface BaseLoginContract {
 
         void startMainMenuActivity();
 
-        void skipLogin();
-
         void notifyFragmentSuccess();
 
         void notifyFragmentFailure(String reason);
@@ -28,8 +26,6 @@ public interface BaseLoginContract {
         void onLoginPressed();
 
         void notifyLoginSuccess(boolean wasSuccessful);
-
-        void onLoginSkipped();
 
         void checkLoginDetails(String username, String password);
 

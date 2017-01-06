@@ -58,11 +58,6 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     }
 
     @Override
-    public void onLoginSkipped() {
-        mView.skipLogin();
-    }
-
-    @Override
     public void checkLoginDetails(final String username, final String password) {
         if(username != null&&username.length() > 0&&password != null&&password.length() > 0) {
             mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(

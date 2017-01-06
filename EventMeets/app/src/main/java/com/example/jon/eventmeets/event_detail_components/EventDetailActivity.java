@@ -45,7 +45,7 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
 
         Intent intent = getIntent();
 
-        if(intent.getStringExtra("cover").length() > 0) {
+        if(intent.getStringExtra("cover") != null) {
             mCover = COVER_URL + intent.getStringExtra("cover") + ".jpg";
         }
 
@@ -67,21 +67,26 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         }
 
         mPlatforms = intent.getStringArrayListExtra("platforms");
-        if(mPlatforms.contains("XBox")) {
+        if(mPlatforms != null) {
+            if (mPlatforms.contains("XBox")) {
+                mPlatform1.setVisibility(View.VISIBLE);
+                mPlatform1.setText("XBox");
+            }
+            if (mPlatforms.contains("Nintendo")) {
+                mPlatform4.setVisibility(View.VISIBLE);
+                mPlatform4.setText("Nintendo");
+            }
+            if (mPlatforms.contains("PlayStation")) {
+                mPlatform3.setVisibility(View.VISIBLE);
+                mPlatform3.setText("PlayStation");
+            }
+            if (mPlatforms.contains("PC")) {
+                mPlatform2.setVisibility(View.VISIBLE);
+                mPlatform2.setText("PC");
+            }
+        } else {
             mPlatform1.setVisibility(View.VISIBLE);
-            mPlatform1.setText("XBox");
-        }
-        if(mPlatforms.contains("Nintendo")) {
-            mPlatform4.setVisibility(View.VISIBLE);
-            mPlatform4.setText("Nintendo");
-        }
-        if(mPlatforms.contains("PlayStation")) {
-            mPlatform3.setVisibility(View.VISIBLE);
-            mPlatform3.setText("PlayStation");
-        }
-        if(mPlatforms.contains("PC")) {
-            mPlatform2.setVisibility(View.VISIBLE);
-            mPlatform2.setText("PC");
+            mPlatform1.setText("No Platforms Found");
         }
 
         mFab.setOnClickListener(this);

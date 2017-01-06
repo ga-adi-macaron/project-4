@@ -42,7 +42,7 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
         if(game.getCover() != null&&game.getCover().getUrl().length() > 0) {
             String cover = "https://images.igdb.com/igdb/image/upload/t_cover_small/"
                     +game.getCover().getCloudinary_id()+".jpg";
-            Picasso.with(holder.mContext).load(cover).into(holder.mCoverArt);
+            Picasso.with(holder.mContext).load(cover).fit().centerInside().into(holder.mCoverArt);
         }
         holder.mGameTitle.setText(game.getName());
 
@@ -50,14 +50,19 @@ public class VideoGamesRecyclerAdapter extends RecyclerView.Adapter<VideoGameVie
             @Override
             public void onClick(View v) {
                 mIntent= new Intent(holder.mContext, EventDetailActivity.class);
-                String image = game.getScreenshots().get(0).getCloudinary_id();
+
+                if(game.getScreenshots() != null) {
+                    String image = game.getScreenshots().get(0).getCloudinary_id();
+                    mIntent.putExtra("image", image);
+                }
 
                 consoleAssignments(mIntent, holder.getAdapterPosition());
                 mIntent.putExtra("summary", game.getSummary());
                 mIntent.putExtra("name", game.getName());
                 mIntent.putExtra("id", game.getId());
-                mIntent.putExtra("image", image);
-                mIntent.putExtra("cover", game.getCover().getCloudinary_id());
+                if(game.getCover() != null) {
+                    mIntent.putExtra("cover", game.getCover().getCloudinary_id());
+                }
                 holder.mContext.startActivity(mIntent);
             }
         });

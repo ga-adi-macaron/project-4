@@ -5,7 +5,7 @@
     android:id="@+id/activity_video_game_events"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#e0e0e0"
+    android:background="#cdcdcd"
     tools:context="com.example.jon.eventmeets.event_detail_components.VideoGameEventsActivity">
 
     <RelativeLayout
