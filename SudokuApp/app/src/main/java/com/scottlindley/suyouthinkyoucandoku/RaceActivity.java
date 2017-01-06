@@ -68,6 +68,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race);
+        getSupportActionBar().hide();
 
         mDBHelper = DBHelper.getInstance(this);
 

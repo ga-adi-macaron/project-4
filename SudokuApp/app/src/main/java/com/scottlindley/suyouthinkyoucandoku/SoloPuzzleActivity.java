@@ -23,6 +23,8 @@ public class SoloPuzzleActivity extends BasePuzzleActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_puzzle);
+        getSupportActionBar().hide();
+
 
         mDBHelper = DBHelper.getInstance(this);
 
