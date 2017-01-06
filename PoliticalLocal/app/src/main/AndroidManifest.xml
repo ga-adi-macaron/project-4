@@ -18,10 +18,10 @@
             android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".reps.detail.DetailRepsActivity"
             android:parentActivityName=".main.MainActivity"
@@ -45,8 +45,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.joelimyx.politicallocal.main.MainActivity"/>
         </activity>
-
-        <activity android:name=".welcome.LoginActivity"
+        <activity
+            android:name=".welcome.LoginActivity"
             android:label="Sign In">
         </activity>
     </application>

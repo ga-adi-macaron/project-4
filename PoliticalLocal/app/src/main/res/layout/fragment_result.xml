@@ -1,0 +1,69 @@
+<android.support.v4.widget.NestedScrollView android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+                  tools:context="com.joelimyx.politicallocal.search.ResultFragment"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical"
+                  android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:id="@+id/result_representatives"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:padding="6dp"
+            android:layout_margin="16dp">
+            <TextView
+                android:text="Representatives"
+                android:textSize="26sp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/result_representatives_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/result_news"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#66BB6A"
+            android:padding="6dp"
+            android:layout_margin="16dp">
+            <TextView
+                android:text="News"
+                android:textSize="26sp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/result_news_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/result_bills"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFB74D"
+            android:padding="6dp"
+            android:layout_margin="16dp">
+            <TextView
+                android:text="Bills"
+                android:textSize="26sp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/result_bills_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -26,11 +26,13 @@ import android.widget.Toast;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.arlib.floatingsearchview.FloatingSearchView;
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.joelimyx.politicallocal.search.ResultFragment;
 import com.joelimyx.politicallocal.welcome.LoginActivity;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.BillFragment;
@@ -40,7 +42,7 @@ import com.joelimyx.politicallocal.news.NewsFragment;
 import com.joelimyx.politicallocal.reps.RepsFragment;
 import com.joelimyx.politicallocal.reps.gson.congress.RepsList;
 import com.joelimyx.politicallocal.reps.gson.congress.Result;
-import com.joelimyx.politicallocal.reps.service.CongressService;
+import com.joelimyx.politicallocal.reps.service.SunlightService;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -86,7 +88,7 @@ public class MainActivity extends AppCompatActivity
     private OnBottomMenuItemSelectedListener mListener;
     private OnBillFabClickedListener mBillFabClickedListener;
 
-    public static final String district_base_URL = "https://congress.api.sunlightfoundation.com/";
+    public static final String sunlight_base_URL = "https://congress.api.sunlightfoundation.com/";
 
     public interface OnBillFabClickedListener{
         void OnBillFabClicked();
@@ -154,6 +156,34 @@ public class MainActivity extends AppCompatActivity
         AppBarLayout appBar = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
         appBar.addOnOffsetChangedListener(this);
         mSearchView = (FloatingSearchView) findViewById(R.id.search_view);
+        mSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+            @Override
+            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
+
+            }
+
+            @Override
+            public void onSearchAction(String currentQuery) {
+                mBottomNavigationView.setVisibility(View.GONE);
+                mSearchView.setLeftActionMode(FloatingSearchView.LEFT_ACTION_MODE_SHOW_HOME);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_container,ResultFragment.newInstance(currentQuery))
+                        .addToBackStack("Search")
+                        .commit();
+            }
+        });
+
+        mSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
+
+        });
+
+        mSearchView.setOnHomeActionClickListener( () -> {
+            getSupportFragmentManager().popBackStack();
+            mSearchView.clearQuery();
+            mSearchView.setLeftActionMode(FloatingSearchView.LEFT_ACTION_MODE_SHOW_SEARCH);
+            mBottomNavigationView.setVisibility(View.VISIBLE);
+        });
 
         /*---------------------------------------------------------------------------------
         // Bottom Nav Bar
@@ -273,11 +303,22 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, "No Network Available", Toast.LENGTH_SHORT).show();
     }
 
+    /*---------------------------------------------------------------------------------
+    // Main Activity Override
+    ---------------------------------------------------------------------------------*/
     @Override
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
         mAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mSearchView.clearQuery();
+        mSearchView.setLeftActionMode(FloatingSearchView.LEFT_ACTION_MODE_SHOW_SEARCH);
+        mBottomNavigationView.setVisibility(View.VISIBLE);
     }
 
     //For hiding and showing the search view relative to the scroll
@@ -305,10 +346,10 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences preference = getSharedPreferences(getString(R.string.district_file),MODE_PRIVATE);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(district_base_URL)
+                .baseUrl(sunlight_base_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<RepsList> call = retrofit.create(CongressService.class).getLegislatures(latitude,longitude);
+        Call<RepsList> call = retrofit.create(SunlightService.class).getLegislatures(latitude,longitude);
         if (preference.getBoolean(getString(R.string.is_first),true)) {
             call.enqueue(new Callback<RepsList>() {
                 @Override

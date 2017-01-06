@@ -19,7 +19,7 @@ import java.util.List;
  * Created by Joe on 12/13/16.
  */
 
-class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
     private List<Value> mNewsList;
     private Context mContext;
     private OnNewsItemSelectedListener mListener;
@@ -27,11 +27,11 @@ class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
     /**
      * Callback to the NewsFragment to instantiate a Custom Chrome Tab
      */
-    interface OnNewsItemSelectedListener{
+    public interface OnNewsItemSelectedListener{
         void onNewsItemSelected(String url);
     }
 
-    NewsAdapter(List<Value> newsList, Context context, OnNewsItemSelectedListener listener) {
+    public NewsAdapter(List<Value> newsList, Context context, OnNewsItemSelectedListener listener) {
         mNewsList = newsList;
         mContext = context;
         mListener = listener;

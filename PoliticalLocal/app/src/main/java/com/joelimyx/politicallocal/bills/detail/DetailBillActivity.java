@@ -45,7 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailBillActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private Result mDetailBill;
-    private String mBillNumber,mCoSponsor;
+    private String mBillNumber,mCoSponsor,mSession;
 
     private TextView mDetailBillNumber, mDetailBillTitle, mDetailBillPDF;
     private ActionBar mActionBar;
@@ -95,6 +95,8 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                     //Toolbar titles
                     mBillNumber = mDetailBill.getBill();
                     mCoSponsor = mDetailBill.getCosponsors();
+
+                    mSession = mDetailBill.getCongress();
 
                     mDetailBillNumber.setText(mBillNumber);
                     mDetailBillTitle.setText(Html.fromHtml(mDetailBill.getTitle()));
@@ -174,7 +176,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
             String billId = getIntent().getStringExtra("id");
             switch (position){
                 case 0:
-                    return SummaryFragment.newInstance(billId);
+                    return SummaryFragment.newInstance(billId,mSession);
                 case 1:
                     return SponsorsFragment.newInstance(billId);
                 case 2:

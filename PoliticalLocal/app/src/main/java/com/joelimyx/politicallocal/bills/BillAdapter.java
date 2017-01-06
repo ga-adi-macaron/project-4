@@ -31,7 +31,7 @@ import java.util.List;
  * Created by Joe on 12/20/16.
  */
 
-class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
+public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
     private Context mContext;
     private List<Bill> mBillList;
     private VotersAdapter mVotersAdapter;
@@ -48,7 +48,7 @@ class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
         void onBillItemSelected(String billId);
     }
 
-    BillAdapter(List<Bill> billList, Context context, OnBillItemSelectedListener listener, String filter) {
+    public BillAdapter(List<Bill> billList, Context context, OnBillItemSelectedListener listener, String filter) {
         mBillList = billList;
         mListener = listener;
         mContext = context;
@@ -76,6 +76,7 @@ class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
             holder.mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
             mVotersAdapter = new VotersAdapter(new ArrayList<>(), mContext);
             holder.mRecyclerView.setAdapter(mVotersAdapter);
+            // TODO: 1/5/17 Work on votes once there is more bills passed
 //            getVotes("house",billId.toLowerCase());
 //            getVotes("senate",billId.toLowerCase());
         }
