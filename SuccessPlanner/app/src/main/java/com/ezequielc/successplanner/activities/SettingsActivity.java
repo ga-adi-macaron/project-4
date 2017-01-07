@@ -27,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         boolean isQuoteSwitched = sharedPreferences.getBoolean(RECEIVE_QUOTE_SWITCH, true);
 
-        // Switch Quote
+        // Switch for Receiving Quote
         mReceiveQuotes.setChecked(isQuoteSwitched);
         mReceiveQuotes.setOnClickListener(new View.OnClickListener() {
             @Override

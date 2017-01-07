@@ -38,7 +38,6 @@ import java.io.IOException;
 public class VisionBoardActivity extends AppCompatActivity {
     public static final int IMAGE_REQUEST = 1;
 
-
     View.OnTouchListener mTouchListener;
     ImageView mNewImage;
     TextView mNewText;
@@ -114,6 +113,12 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void takeScreenshot(){
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Do not have Storage Permission", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         try {
             String path = "/Pictures/Screenshots/VisionBoard.jpg";
             String pathName = Environment.getExternalStorageDirectory().toString() + path;
