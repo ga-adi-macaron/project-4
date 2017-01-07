@@ -34,14 +34,11 @@ public class ChatGroupActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     private ChildEventListener mListener;
     private List<SelfMessageObject> mContent;
-    private boolean hasMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_group);
-
-        hasMessages = false;
 
         Intent intent = getIntent();
         String chatKey = intent.getStringExtra("chatKey");

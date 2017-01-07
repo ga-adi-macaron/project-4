@@ -1,6 +1,7 @@
 package com.lieblich.jon.playme.main_menu;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -13,10 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.lieblich.jon.playme.BaseLoginActivity;
 import com.lieblich.jon.playme.R;
 import com.lieblich.jon.playme.event_detail_components.VideoGameEventsActivity;
 
@@ -63,7 +66,11 @@ public class MainMenuView extends AppCompatActivity implements MainMenuContract.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.action_signout:
+                SharedPreferences pref = getSharedPreferences("account", MODE_PRIVATE);
+                pref.edit().clear().apply();
 
+                Intent intent = new Intent(this, BaseLoginActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
