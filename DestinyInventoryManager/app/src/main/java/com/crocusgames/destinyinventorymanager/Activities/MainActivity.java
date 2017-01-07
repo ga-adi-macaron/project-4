@@ -190,9 +190,6 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject refreshTokenObject = responseObject.getJSONObject("refreshToken");
                     String refreshTokenValue = refreshTokenObject.getString("value");
 
-                    Log.d(AppConstants.TAG, "ACCESS_TOKEN_NAME " + accessTokenValue);
-                    Log.d(AppConstants.TAG, "REFRESH_TOKEN_NAME  " + refreshTokenValue);
-
                     //Save Access Token to SharedPreferences:
                     SharedPreferences sharedPreferences =  getSharedPreferences(USER_PREFERENCES,
                             Context.MODE_PRIVATE);

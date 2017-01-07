@@ -298,7 +298,11 @@ public class CharInvActivity extends AppCompatActivity {
             apiCallObject.setDestinyApiResponseListener(new DestinyApiCallObject.DestinyApiResponseListener() {
                 @Override
                 public void onObjectReady() {
-                    adapter.notifyDataSetChanged();
+                    try {
+                        adapter.notifyDataSetChanged();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     progressBar.setVisibility(View.GONE);
                     adapter.setEmblemEquippedListener(new CharViewPagerAdapter.EmblemEquippedListener() {
                         @Override
@@ -360,7 +364,7 @@ public class CharInvActivity extends AppCompatActivity {
         String membershipType = characterInfo.getMembershipType().toString();
 
         //trial
-        Log.d(AppConstants.TAG, "onResume: " + secondsPassed(appPauseTime));
+        Log.d(AppConstants.TAG, "onResume seconds passed: " + secondsPassed(appPauseTime));
         if (membershipType.equals("-5")) {
             Log.d(AppConstants.TAG, "CharacterList: 0");
             Intent intent = new Intent(CharInvActivity.this, MainActivity.class);
@@ -374,6 +378,7 @@ public class CharInvActivity extends AppCompatActivity {
                 startActivity(intent);
             } else if (secondsPassed(appPauseTime) > 60 && secondsPassed(accessTokenSaveTime) > 1900) {
                 refreshAccessToken(refreshToken, true);
+                //burayı condition'a bağla. true iken refresh should not be working.
             } else if (secondsPassed(appPauseTime) <= 60 && secondsPassed(accessTokenSaveTime) > 1900) {
                 refreshAccessToken(refreshToken, false);
             }
@@ -411,8 +416,6 @@ public class CharInvActivity extends AppCompatActivity {
                     String refreshTokenValue = refreshTokenObject.getString("value");
 
                     Log.d(AppConstants.TAG, "onResponse: 30 mins passed, requesting new token on resume");
-                    Log.d(AppConstants.TAG, "ACCESS_TOKEN_NAME " + accessTokenValue);
-                    Log.d(AppConstants.TAG, "REFRESH_TOKEN_NAME  " + refreshTokenValue);
 
                     //Save Access Token to SharedPreferences:
                     SharedPreferences sharedPreferences =  getSharedPreferences(USER_PREFERENCES,

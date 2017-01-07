@@ -288,8 +288,6 @@ public class VaultActivity extends AppCompatActivity {
                     String refreshTokenValue = refreshTokenObject.getString("value");
 
                     Log.d(AppConstants.TAG, "onResponse: 30 mins passed, requesting new token on resume");
-                    Log.d(AppConstants.TAG, "ACCESS_TOKEN_NAME " + accessTokenValue);
-                    Log.d(AppConstants.TAG, "REFRESH_TOKEN_NAME  " + refreshTokenValue);
 
                     //Save Access Token to SharedPreferences:
                     SharedPreferences sharedPreferences =  getSharedPreferences(USER_PREFERENCES,

@@ -103,9 +103,6 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject refreshTokenObject = responseObject.getJSONObject("refreshToken");
                     String refreshTokenValue = refreshTokenObject.getString("value");
 
-                    Log.d(AppConstants.TAG, "ACCESS_TOKEN_NAME " + accessTokenValue);
-                    Log.d(AppConstants.TAG, "REFRESH_TOKEN_NAME  " + refreshTokenValue);
-
                     //Save Access Token to SharedPreferences:
                     SharedPreferences sharedPreferences =  getSharedPreferences(USER_PREFERENCES,
                             Context.MODE_PRIVATE);
@@ -118,11 +115,8 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putLong(LOGIN_SAVE_TIME, currentDate);
                     editor.commit();
 
-                    //
                     getAccountDetails(accessTokenValue);
 
-//                    Intent intent = new Intent(LoginActivity.this, CharacterSelectionActivity.class);
-//                    startActivity(intent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
