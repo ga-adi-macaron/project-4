@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -147,70 +148,67 @@ public class LoginActivity extends AppCompatActivity {
                 AccountMainObject mainObject = gson.fromJson(response, AccountMainObject.class);
 
                 CharacterInfoSingleton characterInfo = CharacterInfoSingleton.getInstance();
-                String membershipTypeName = characterInfo.getMembershipType().toString();
-
-                String membershipId = mainObject.getResponse().getDestinyAccounts().get(0).
-                        getUserInfo().getMembershipId();
-                Long membershipType = mainObject.getResponse().getDestinyAccounts().get(0).
-                        getUserInfo().getMembershipType();
-
-                characterInfo.setMembershipId(membershipId);
-                characterInfo.setMembershipType(membershipType);
-
-//                if (membershipTypeName.equals("-5")) {
-//                    //Either the API is under maintenance; or the user has no characters.
-//                    //Need to display some kind of warning here
-//                    Intent intent = new Intent(CharacterSelectionActivity.this, MainActivity.class);
-//                    startActivity(intent);
-//                }
 
                 List<Character> characters = mainObject.getResponse().getDestinyAccounts().get(0).getCharacters();
-                Log.d(AppConstants.TAG, "Character Quantity " + characters.size());
+                
+                if (characters == null || characters.size() == 0) {
+                    Toast.makeText(LoginActivity.this, "Unable to get account information. Please try again later.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d(AppConstants.TAG, "Character Quantity " + characters.size());
+                    String membershipId = mainObject.getResponse().getDestinyAccounts().get(0).
+                            getUserInfo().getMembershipId();
+                    Long membershipType = mainObject.getResponse().getDestinyAccounts().get(0).
+                            getUserInfo().getMembershipType();
 
-                SharedPreferences sharedPreferences =  getSharedPreferences(USER_PREFERENCES,
-                        Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(AppConstants.MEMBERSHIP_ID, membershipId);
-                editor.putLong(AppConstants.MEMBERSHIP_TYPE, membershipType);
-                editor.putInt(AppConstants.NUMBER_OF_CHARS, characters.size());
-                switch (characters.size()) {
-                    case 1:
-                        editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
-                        break;
-                    case 2:
-                        editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
-                        editor.putString(AppConstants.CHAR1_ID, characters.get(1).getCharacterId());
-                        break;
-                    case 3:
-                        editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
-                        editor.putString(AppConstants.CHAR1_ID, characters.get(1).getCharacterId());
-                        editor.putString(AppConstants.CHAR2_ID, characters.get(2).getCharacterId());
-                        break;
-                    default:
-                        break;
+                    characterInfo.setMembershipId(membershipId);
+                    characterInfo.setMembershipType(membershipType);
+
+
+                    SharedPreferences sharedPreferences = getSharedPreferences(USER_PREFERENCES,
+                            Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(AppConstants.MEMBERSHIP_ID, membershipId);
+                    editor.putLong(AppConstants.MEMBERSHIP_TYPE, membershipType);
+                    editor.putInt(AppConstants.NUMBER_OF_CHARS, characters.size());
+                    switch (characters.size()) {
+                        case 1:
+                            editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
+                            break;
+                        case 2:
+                            editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
+                            editor.putString(AppConstants.CHAR1_ID, characters.get(1).getCharacterId());
+                            break;
+                        case 3:
+                            editor.putString(AppConstants.CHAR0_ID, characters.get(0).getCharacterId());
+                            editor.putString(AppConstants.CHAR1_ID, characters.get(1).getCharacterId());
+                            editor.putString(AppConstants.CHAR2_ID, characters.get(2).getCharacterId());
+                            break;
+                        default:
+                            break;
+                    }
+                    editor.commit();
+
+                    //BİRŞEYLER PATLARSA AŞAĞIDAKİNİ UNCOMMENTLE
+                    characterInfo.clearAllCharacterList();
+
+                    for (int i = 0; i < characters.size(); i++) {
+                        String className = characters.get(i).getCharacterClass().getClassName();
+                        String backgroundUrl = characters.get(i).getBackgroundPath();
+                        String emblemUrl = characters.get(i).getEmblemPath();
+                        String characterId = characters.get(i).getCharacterId();
+                        String genderName = characters.get(i).getGender().getGenderName();
+                        String raceName = characters.get(i).getRace().getRaceName();
+                        String lightLevel = characters.get(i).getPowerLevel().toString();
+                        String normalLevel = characters.get(i).getLevel().toString();
+
+                        characterInfo.addToCharacterList(new CharacterInfoObject(backgroundUrl, characterId,
+                                className, emblemUrl, genderName, lightLevel, normalLevel, raceName));
+                    }
+
+                    characterInfo.setSelectedCharacter(0);
+                    Intent intent = new Intent(LoginActivity.this, CharInvActivity.class);
+                    startActivity(intent);
                 }
-                editor.commit();
-
-                //BİRŞEYLER PATLARSA AŞAĞIDAKİNİ UNCOMMENTLE
-                characterInfo.clearAllCharacterList();
-
-                for (int i = 0; i < characters.size(); i++) {
-                    String className = characters.get(i).getCharacterClass().getClassName();
-                    String backgroundUrl = characters.get(i).getBackgroundPath();
-                    String emblemUrl = characters.get(i).getEmblemPath();
-                    String characterId = characters.get(i).getCharacterId();
-                    String genderName = characters.get(i).getGender().getGenderName();
-                    String raceName = characters.get(i).getRace().getRaceName();
-                    String lightLevel = characters.get(i).getPowerLevel().toString();
-                    String normalLevel = characters.get(i).getLevel().toString();
-
-                    characterInfo.addToCharacterList(new CharacterInfoObject(backgroundUrl, characterId,
-                            className, emblemUrl, genderName, lightLevel, normalLevel, raceName));
-                }
-
-                characterInfo.setSelectedCharacter(0);
-                Intent intent = new Intent(LoginActivity.this, CharInvActivity.class);
-                startActivity(intent);
             }
         }, new Response.ErrorListener() {
             @Override

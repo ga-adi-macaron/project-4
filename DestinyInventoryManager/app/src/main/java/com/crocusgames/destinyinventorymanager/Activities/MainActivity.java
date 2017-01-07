@@ -238,27 +238,20 @@ public class MainActivity extends AppCompatActivity {
 
                 CharacterInfoSingleton characterInfo = CharacterInfoSingleton.getInstance();
 
-                String membershipId = mainObject.getResponse().getDestinyAccounts().get(0).
-                        getUserInfo().getMembershipId();
-                Long membershipType = mainObject.getResponse().getDestinyAccounts().get(0).
-                        getUserInfo().getMembershipType();
-
-                characterInfo.setMembershipId(membershipId);
-                characterInfo.setMembershipType(membershipType);
-
-//                if (membershipTypeName.equals("-5")) {
-//                    //Either the API is under maintenance; or the user has no characters.
-//                    //Need to display some kind of warning here
-//                    Intent intent = new Intent(CharacterSelectionActivity.this, MainActivity.class);
-//                    startActivity(intent);
-//                }
-
                 List<Character> characters = mainObject.getResponse().getDestinyAccounts().get(0).getCharacters();
 
                 if (characters == null || characters.size() == 0) {
-                    Toast.makeText(MainActivity.this, "Unable to get character information. Please try again later.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Unable to get account information. Please try again later.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d(AppConstants.TAG, "Character Quantity " + characters.size());
+
+                    String membershipId = mainObject.getResponse().getDestinyAccounts().get(0).
+                            getUserInfo().getMembershipId();
+                    Long membershipType = mainObject.getResponse().getDestinyAccounts().get(0).
+                            getUserInfo().getMembershipType();
+
+                    characterInfo.setMembershipId(membershipId);
+                    characterInfo.setMembershipType(membershipType);
 
                     SharedPreferences sharedPreferences = getSharedPreferences(USER_PREFERENCES,
                             Context.MODE_PRIVATE);
@@ -299,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
 
                         characterInfo.addToCharacterList(new CharacterInfoObject(backgroundUrl, characterId,
                                 className, emblemUrl, genderName, lightLevel, normalLevel, raceName));
-
                     }
 
                     characterInfo.setSelectedCharacter(0);
