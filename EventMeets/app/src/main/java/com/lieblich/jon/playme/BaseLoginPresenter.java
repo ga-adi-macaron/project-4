@@ -21,7 +21,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     private BaseLoginContract.View mView;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private String mFirst, mLast, mToken;
+    private String mFirst, mLast;
     private FirebaseUser mUser;
 
     public BaseLoginPresenter(BaseLoginContract.View view) {

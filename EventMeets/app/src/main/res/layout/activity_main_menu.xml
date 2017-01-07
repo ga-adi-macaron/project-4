@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              tools:context=".main_menu.MainMenuView"
+              android:orientation="vertical"
+              android:background="#cdcdcd"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_menu_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="8dp"
+        app:theme="@style/AppTheme.AppBarOverlay"
+        android:theme="@style/MainMenuStuff"/>
+    <LinearLayout
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<LinearLayout
-    android:orientation="vertical"
-    android:elevation="6dp"
+    android:elevation="4dp"
     android:background="#fff"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -29,6 +40,12 @@
         android:textColor="#000"
         android:layout_height="wrap_content"/>
 </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_main"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="48dp"
+        android:layout_height="48dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/main_menu_recycler"

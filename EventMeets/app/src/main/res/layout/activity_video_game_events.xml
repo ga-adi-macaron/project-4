@@ -42,6 +42,14 @@
 
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/loading_search"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/not_list_items"
+        android:layout_width="48dp"
+        android:layout_height="48dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/game_search_results"
         android:layout_width="match_parent"

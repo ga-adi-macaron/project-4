@@ -25,6 +25,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private TextView mHiddenConfirmPassword, mFirst, mLast;
     private BaseLoginContract.Presenter mPresenter;
     private Dialog mDialog;
+    private View mLayout;
 
     public void setPresenter(BaseLoginContract.Presenter presenter) {
         mPresenter = presenter;
@@ -35,24 +36,24 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.not_logged_in_dialog, container, true);
-        mLoginButton = (Button)view.findViewById(R.id.login_prompt_button);
-        mCreateAccount = (Button)view.findViewById(R.id.create_account_btn);
+        mLayout =  inflater.inflate(R.layout.not_logged_in_dialog, container, true);
+        mLoginButton = (Button)mLayout.findViewById(R.id.login_prompt_button);
+        mCreateAccount = (Button)mLayout.findViewById(R.id.create_account_btn);
 
-        mAccountName = (EditText)view.findViewById(R.id.username_edit);
-        mPassword = (EditText)view.findViewById(R.id.password_edit);
+        mAccountName = (EditText)mLayout.findViewById(R.id.username_edit);
+        mPassword = (EditText)mLayout.findViewById(R.id.password_edit);
 
-        mFirst = (TextView)view.findViewById(R.id.first_name_text);
-        mLast = (TextView)view.findViewById(R.id.last_name_text);
-        mHiddenConfirmPassword = (TextView)view.findViewById(R.id.hidden_confirm_new_password);
-        mHiddenConfirm = (EditText)view.findViewById(R.id.hidden_confirm_edit);
-        mFirstName = (EditText)view.findViewById(R.id.first_name);
-        mLastName = (EditText)view.findViewById(R.id.last_name);
+        mFirst = (TextView)mLayout.findViewById(R.id.first_name_text);
+        mLast = (TextView)mLayout.findViewById(R.id.last_name_text);
+        mHiddenConfirmPassword = (TextView)mLayout.findViewById(R.id.hidden_confirm_new_password);
+        mHiddenConfirm = (EditText)mLayout.findViewById(R.id.hidden_confirm_edit);
+        mFirstName = (EditText)mLayout.findViewById(R.id.first_name);
+        mLastName = (EditText)mLayout.findViewById(R.id.last_name);
 
         mLoginButton.setOnClickListener(this);
         mCreateAccount.setOnClickListener(this);
 
-        return view;
+        return mLayout;
     }
 
     @NonNull
@@ -78,6 +79,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         int id = view.getId();
         switch(id) {
             case R.id.login_prompt_button:
+                mDialog.setContentView(R.layout.logging_in_progress);
                 mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString());
                 break;
             case R.id.create_account_btn:
@@ -96,6 +98,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
                         String confirm = mHiddenConfirm.getText().toString();
                         String firstName = mFirstName.getText().toString();
                         String lastName = mLastName.getText().toString();
+                        mDialog.setContentView(R.layout.logging_in_progress);
                         mPresenter.onNewAccountRequested(username, password, confirm,firstName ,lastName);
                     }
                 });
@@ -116,6 +119,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
             revertOnClickListener(mCreateAccount);
         } else {
             mHiddenConfirm.setError(result);
+            mDialog.setContentView(mLayout);
         }
     }
 
@@ -123,14 +127,18 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         switch(error) {
             case "passwords":
                 mPassword.setError("Passwords Must Match");
+                mDialog.setContentView(mLayout);
                 break;
             case "empty":
                 mAccountName.setError("All Fields Required");
+                mDialog.setContentView(mLayout);
                 break;
             case "invalid":
                 mAccountName.setError("Invalid Username and/or Password");
+                mDialog.setContentView(mLayout);
                 break;
             default:
+                mDialog.setContentView(mLayout);
                 Toast.makeText(getContext(), "Whoops", Toast.LENGTH_SHORT).show();
         }
     }

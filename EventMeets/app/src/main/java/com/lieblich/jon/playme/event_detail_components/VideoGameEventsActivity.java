@@ -8,6 +8,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lieblich.jon.playme.R;
@@ -22,6 +23,7 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
     private RecyclerView mRecyclerView;
     private Button mGameSearch;
     private EditText mQueryText;
+    private ProgressBar mBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
         mRecyclerView = (RecyclerView)findViewById(R.id.game_search_results);
         mGameSearch = (Button)findViewById(R.id.search_games);
         mQueryText = (EditText)findViewById(R.id.video_game_search);
+        mBar = (ProgressBar)findViewById(R.id.loading_search);
 
         mPresenter = new Presenter(this);
 
@@ -44,6 +47,7 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
                 if(query.length() < 1) {
                     mQueryText.setError("Search cannot be blank");
                 } else {
+                    mBar.setVisibility(View.VISIBLE);
                     mPresenter.onSearchRequested(query);
                 }
             }
@@ -52,6 +56,7 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
 
     @Override
     public void displaySearchResults(List<GameResultObject> games) {
+        mBar.setVisibility(View.GONE);
         mGameList = games;
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mAdapter = new VideoGamesRecyclerAdapter(mGameList);
