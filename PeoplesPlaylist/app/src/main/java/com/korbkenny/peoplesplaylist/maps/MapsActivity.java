@@ -2,6 +2,7 @@ package com.korbkenny.peoplesplaylist.maps;
 
 import android.animation.ValueAnimator;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -101,6 +103,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Target> mTargetList;
     private SharedPreferences settings;
     private int myPlaylistCount;
+    private LocationManager lm;
+    private android.location.LocationListener ll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,11 +139,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        getLastLocation();
         stylizeMap();
         setUpMap();
         createAuthListener();
         setViewsIfLoggedIn();
-        keepRequestingGeoQueries();
+
 
         //  FAB to create new playlist. Opens a dialog to do this.
         fab.setOnClickListener(new View.OnClickListener() {
@@ -223,7 +228,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
                                 }.execute();
                             }
-
                         }
 
                         @Override
@@ -235,7 +239,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         mAuth.addAuthStateListener(mAuthListener);
-
     }
 
     private void stylizeMap() {
@@ -289,8 +292,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         //Add to user's playlists, and increase the count of how many they have.
                         myPlaylistCount++;
-                        DatabaseReference myPlaylistsRef = mFirebaseDatabase.getReference("UserPlaylists").child(ME.getId()).child(Integer.toString(myPlaylistCount));
-                        myPlaylistsRef.setValue(playlistId);
+
+                        DatabaseReference myPlaylistsRef = mFirebaseDatabase.getReference("UserPlaylists").child(ME.getId()).child(playlistId);
+                        myPlaylistsRef.setValue(playlist.getCover());
+
                         DatabaseReference playlistCountRef = mFirebaseDatabase.getReference("Users").child(ME.getId()).child("playlistCount");
                         playlistCountRef.setValue(myPlaylistCount);
 
@@ -333,27 +338,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         new AsyncTask<Void,Void,Playlist>(){
                             @Override
                             protected Playlist doInBackground(Void... voids) {
-                                return dataSnapshot.getValue(Playlist.class);
+                                if(dataSnapshot!=null) {
+                                    return dataSnapshot.getValue(Playlist.class);
+                                }
+                                return null;
                             }
 
                             @Override
                             protected void onPostExecute(final Playlist playlist) {
-                                if(playlist.getCover()!=null){
-                                    MarkerOptions options = new MarkerOptions()
-                                            .position(new LatLng(
-                                                    playlist.getLat() + nudgeMarkerInRandomDirection(),
-                                                    playlist.getLon() + nudgeMarkerInRandomDirection()))
-                                            .title(playlist.getTitle())
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.dotmarker));
-                                    Marker marker = mMap.addMarker(options);
-                                    marker.setTag(playlist.getId());
-                                    Target target = new PicassoMarker(marker);
-                                    mTargetList.add(target);
-                                    if(!playlist.getCover().equals("null")) {
-                                        Picasso.with(MapsActivity.this).load(playlist.getCover()).placeholder(R.drawable.markerplaceholder).resize(150, 150).into(target);
-                                    }
-                                    else{
-                                        Picasso.with(MapsActivity.this).load(R.drawable.coverplaceholder).resize(100,100).into(target);
+                                if (playlist!=null){
+                                    if (playlist.getCover() != null) {
+                                        MarkerOptions options = new MarkerOptions()
+                                                .position(new LatLng(
+                                                        playlist.getLat() + nudgeMarkerInRandomDirection(),
+                                                        playlist.getLon() + nudgeMarkerInRandomDirection()))
+                                                .title(playlist.getTitle())
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.dotmarker));
+                                        Marker marker = mMap.addMarker(options);
+                                        marker.setTag(playlist.getId());
+
+                                        Target target = new PicassoMarker(marker);
+                                        mTargetList.add(target);
+                                        if (!playlist.getCover().equals("null")) {
+                                            Picasso.with(MapsActivity.this).load(playlist.getCover()).placeholder(R.drawable.markerplaceholder).resize(150, 150).into(target);
+                                        } else {
+                                            Picasso.with(MapsActivity.this).load(R.drawable.coverplaceholder).resize(100, 100).into(target);
+                                        }
                                     }
                                 }
                             }
@@ -387,34 +397,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-    }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //
-    //      Request User Icon and GeoQuery
-    //
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    private void keepRequestingGeoQueries() {
-        if(lastLocation!=null && geoQuery == null) {
-            moveMapToCurrentLocation(lastLocation);
-            createGeoQuery();
+        if(checkPermission()) {
+            lm.removeUpdates(ll);
+        }else {
+            requestPermission();
         }
-        else if (lastLocation == null && geoQuery == null && geoTries < 30){
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
+
+        final CardView loadingCard = (CardView) findViewById(R.id.loading_card);
+        final TextView loadingText = (TextView) findViewById(R.id.loading_screen);
+
+        if(loadingCard.getVisibility()==View.VISIBLE) {
+            ValueAnimator ani = ValueAnimator.ofFloat(1f, 0f);
+            ani.setDuration(700);
+            ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            keepRequestingGeoQueries();
-                            geoTries++;
-                        }
-                    });
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    loadingCard.setAlpha((float) animation.getAnimatedValue());
+                    loadingText.setAlpha((float) animation.getAnimatedValue());
+                    if (loadingCard.getAlpha() == 0f || loadingText.getAlpha() == 0f) {
+                        loadingCard.setVisibility(View.GONE);
+                        loadingText.setVisibility(View.GONE);
+                    }
                 }
-            };
-            timer.schedule(timerTask, 0, 1000);
+            });
+            ani.start();
         }
     }
 
@@ -578,11 +585,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (checkPermission()) {
+            anotherAttemptAtLocation();
             getLastLocation();
             if (lastLocation == null) {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             }
             createLocationRequest();
+            getLastLocation();
             mMap.setMyLocationEnabled(true);
         }
         else{
@@ -604,8 +613,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location) {
         lastLocation = location;
         if(lastLocation != null) {
-            createGeoQuery();
-            moveMapToCurrentLocation(lastLocation);
+            if (geoQuery==null) {
+                createGeoQuery();
+                moveMapToCurrentLocation(lastLocation);
+            }
         }
     }
 
@@ -613,7 +624,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 3000)        // 30 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+                .setFastestInterval(1 * 1000); // 5 second, in milliseconds
+    }
+
+    private void anotherAttemptAtLocation(){
+        lm = (LocationManager)MapsActivity.this.getSystemService(Context.LOCATION_SERVICE);
+        ll = new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if(location!=null){
+                    lastLocation = location;
+                    if (geoQuery==null) {
+                        createGeoQuery();
+                        moveMapToCurrentLocation(lastLocation);
+
+                        if(checkPermission()) {
+
+                        } else {
+                            requestPermission();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+        if(checkPermission()) {
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ll);
+        } else {
+            requestPermission();
+        }
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -629,15 +682,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    protected void onPause() {
+        if(mMap!=null) {
+            mMap.clear();
+        }
+//        if (geoQuery != null) {
+//            geoQuery.removeAllListeners();
+//        }
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         if(mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
-//        if (geoQuery != null) {
-//            geoQuery.removeAllListeners();
-//        }
+
         if (mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -653,7 +715,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onResume();
         if(lastLocation != null){
             moveMapToCurrentLocation(lastLocation);
-//            createGeoQuery();
+
+                createGeoQuery();
+
         }
     }
 

@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
 import com.korbkenny.peoplesplaylist.objects.User;
 import com.korbkenny.peoplesplaylist.playlist.PlaylistActivity;
@@ -38,7 +42,9 @@ public class MyUserInfoActivity extends AppCompatActivity {
     private Context context;
     private List<String> pList, myPlaylistsNumbers;
     private int count = 0;
+    private List<String> pListIds, pListCovers;
 
+    private FirebaseDatabase db;
     private List<ImageView> mMyPlaylistsList;
 
     @Override
@@ -47,6 +53,8 @@ public class MyUserInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_user_info);
 
         context = this;
+
+        db = FirebaseDatabase.getInstance();
 
         setupViews();
         SharedPreferences settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
@@ -102,31 +110,6 @@ public class MyUserInfoActivity extends AppCompatActivity {
             }
         });
 
-        for (ImageView i:mMyPlaylistsList) {
-            i.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    new AlertDialog.Builder(MyUserInfoActivity.this)
-                            .setTitle("Delete Playlist")
-                            .setMessage("Are you sure you want to delete this playlist? Everybody's tracks will be erased.")
-                            .setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                }
-                            })
-                            .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                    return false;
-                }
-            });
-        }
 
         mSavedPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,78 +132,124 @@ public class MyUserInfoActivity extends AppCompatActivity {
     }
 
     public void loadMyPlaylists(){
-        final FirebaseDatabase db = FirebaseDatabase.getInstance();
         final DatabaseReference getPlaylists = db.getReference("UserPlaylists").child(ME.getId());
+        getPlaylists.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                new AsyncTask<Void,Void,Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        if(dataSnapshot!=null){
+                            for (DataSnapshot ds:dataSnapshot.getChildren()) {
+                                pListIds.add(ds.getKey());
+                                pListCovers.add(ds.getValue(String.class));
+                            }
+                        }
+                        return null;
+                    }
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        for (int i = 0; i < pListIds.size(); i++) {
+                            Picasso.with(context).load(pListCovers.get(i)).into(mMyPlaylistsList.get(i));
+                            final int finalI = i;
+                            mMyPlaylistsList.get(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(MyUserInfoActivity.this,PlaylistActivity.class);
+                                    intent.putExtra("Playlist Id",pListIds.get(finalI));
+                                    startActivity(intent);
+                                }
+                            });
+                            final int finalI1 = i;
+                            mMyPlaylistsList.get(i).setOnLongClickListener(new View.OnLongClickListener() {
+                                @Override
+                                public boolean onLongClick(View view) {
+                                    deletePlaylist(pListIds.get(finalI1));
+                                    return false;
+                                }
+                            });
+                        }
+                    }
+                }.execute();
+            }
 
-        //  First, get your playlist ids from the database
-         getPlaylists.addListenerForSingleValueEvent(new ValueEventListener() {
-             @Override
-             public void onDataChange(final DataSnapshot dataSnapshot) {
-                 if(dataSnapshot!=null){
-                     new AsyncTask<Void,Void,List<String>>(){
-                         @Override
-                         protected List<String> doInBackground(Void... voids) {
-                             pList = new ArrayList<>();
-                             for (DataSnapshot ds:dataSnapshot.getChildren()) {
-                                 pList.add(ds.getValue(String.class));
-                             }
-                             return pList;
-                         }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                         @Override
-                         protected void onPostExecute(final List<String> strings) {
-                             for (final String s:strings) {
-                                 DatabaseReference playlistCoverRef = db.getReference("Playlists").child(s).child("cover");
-                                 playlistCoverRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                     @Override
-                                     public void onDataChange(final DataSnapshot dataSnapshot) {
-                                         new AsyncTask<Void,Void,String>(){
-                                             @Override
-                                             protected String doInBackground(Void... voids) {
-                                                 return dataSnapshot.getValue(String.class);
+            }
+        });
 
-                                             }
-
-                                             @Override
-                                             protected void onPostExecute(String string) {
-                                                 Picasso.with(MyUserInfoActivity.this)
-                                                             .load(string)
-                                                             .into(mMyPlaylistsList.get(count));
-                                                 mMyPlaylistsList.get(count).setOnClickListener(new View.OnClickListener() {
-                                                     @Override
-                                                     public void onClick(View view) {
-                                                         Intent intent = new Intent(MyUserInfoActivity.this,PlaylistActivity.class);
-                                                         intent.putExtra("Playlist Id",s);
-                                                         startActivity(intent);
-                                                         finish();
-                                                     }
-                                                 });
-                                                 count++;
-                                                 }
-
-                                         }.execute();
-
-
-                                     }
-
-                                     @Override
-                                     public void onCancelled(DatabaseError databaseError) {
-
-                                     }
-                                 });
-                             }
-
-
-                         }
-                     }.execute();
-                 }
-             }
-
-             @Override
-             public void onCancelled(DatabaseError databaseError) {
-
-             }
-         });
+//
+//        //  First, get your playlist ids from the database
+//         getPlaylists.addListenerForSingleValueEvent(new ValueEventListener() {
+//             @Override
+//             public void onDataChange(final DataSnapshot dataSnapshot) {
+//                 if(dataSnapshot!=null){
+//                     new AsyncTask<Void,Void,List<String>>(){
+//                         @Override
+//                         protected List<String> doInBackground(Void... voids) {
+//                             pList = new ArrayList<>();
+//                             for (DataSnapshot ds:dataSnapshot.getChildren()) {
+//                                 pList.add(ds.getValue(String.class));
+//                             }
+//                             return pList;
+//                         }
+//
+//                         @Override
+//                         protected void onPostExecute(final List<String> strings) {
+////                             deletePlaylist();
+//                             for (final String s:strings) {
+//                                 DatabaseReference playlistCoverRef = db.getReference("Playlists").child(s).child("cover");
+//                                 playlistCoverRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                     @Override
+//                                     public void onDataChange(final DataSnapshot dataSnapshot) {
+//                                         new AsyncTask<Void,Void,String>(){
+//                                             @Override
+//                                             protected String doInBackground(Void... voids) {
+//                                                 return dataSnapshot.getValue(String.class);
+//
+//                                             }
+//
+//                                             @Override
+//                                             protected void onPostExecute(String string) {
+//                                                 Picasso.with(MyUserInfoActivity.this)
+//                                                             .load(string)
+//                                                             .into(mMyPlaylistsList.get(count));
+//                                                 mMyPlaylistsList.get(count).setOnClickListener(new View.OnClickListener() {
+//                                                     @Override
+//                                                     public void onClick(View view) {
+//                                                         Intent intent = new Intent(MyUserInfoActivity.this,PlaylistActivity.class);
+//                                                         intent.putExtra("Playlist Id",s);
+//                                                         startActivity(intent);
+//                                                         finish();
+//                                                     }
+//                                                 });
+//                                                 count++;
+//                                                 }
+//
+//                                         }.execute();
+//
+//
+//                                     }
+//
+//                                     @Override
+//                                     public void onCancelled(DatabaseError databaseError) {
+//
+//                                     }
+//                                 });
+//                             }
+//
+//
+//                         }
+//                     }.execute();
+//                 }
+//             }
+//
+//             @Override
+//             public void onCancelled(DatabaseError databaseError) {
+//
+//             }
+//         });
 
 
     }
@@ -230,6 +259,9 @@ public class MyUserInfoActivity extends AppCompatActivity {
         mSavedPlaylist = (ImageView)findViewById(R.id.my_saved);
 
         mMyPlaylistsList = new ArrayList<>();
+
+        pListIds = new ArrayList<>();
+        pListCovers = new ArrayList<>();
 
         my1 = (ImageView)findViewById(R.id.my_1);
         my2 = (ImageView)findViewById(R.id.my_2);
@@ -251,7 +283,52 @@ public class MyUserInfoActivity extends AppCompatActivity {
 
     }
 
-    public void deletePlaylist(){
+    public void deletePlaylist(final String playlistId){
+        new AlertDialog.Builder(MyUserInfoActivity.this)
+                .setTitle("Delete Playlist")
+                .setMessage("Are you sure you want to delete this playlist? Everybody's tracks will be erased.")
+                .setPositiveButton("Yes, Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        new AsyncTask<Void,Void,Void>(){
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                DatabaseReference removePlaylistRef = db.getReference("Playlists").child(playlistId);
+                                removePlaylistRef.removeValue();
 
+                                DatabaseReference removeUserPlaylistRef = db.getReference("UserPlaylists").child(ME.getId()).child(playlistId);
+                                removeUserPlaylistRef.removeValue();
+
+                                ME.setPlaylistCount(ME.getPlaylistCount() - 1);
+                                DatabaseReference setNewCountRef = db.getReference("Users").child(ME.getId()).child("playlistCount");
+                                setNewCountRef.setValue(ME.getPlaylistCount());
+
+                                StorageReference playlistCoverRef = FirebaseStorage.getInstance().getReference("albumcovers").child(playlistId).child("playlistcover.png");
+                                playlistCoverRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                Intent intent = new Intent(MyUserInfoActivity.this, MyUserInfoActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }.execute();
+                    }
+                })
+                .setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

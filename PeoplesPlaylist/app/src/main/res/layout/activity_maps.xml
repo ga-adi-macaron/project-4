@@ -57,4 +57,22 @@
         android:text="Sign In!"
         />
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/loading_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/loading_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Loading World..."
+        android:textSize="30sp"
+        android:fontFamily="sans-serif-condensed"
+        android:background="@color/water"
+        android:textColor="@color/road"/>
+
+    </android.support.v7.widget.CardView>
+
 </FrameLayout>

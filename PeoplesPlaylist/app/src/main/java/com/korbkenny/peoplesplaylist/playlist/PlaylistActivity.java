@@ -137,7 +137,7 @@ public class PlaylistActivity extends AppCompatActivity implements
                 if (mThisPlaylist.getCover().equals("null") && ME.getId().equals(mThisPlaylist.getUserId())){
                     Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto , 1);
+                    startActivityForResult(pickPhoto , PICK_IMAGE_REQUEST);
                 }
                 //  If it's not empty, regardless of who's playlist it is, view it large
                 else {
@@ -190,9 +190,9 @@ public class PlaylistActivity extends AppCompatActivity implements
                             if(mThisPlaylist.getUserId().equals(ME.getId())){
                                 Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(pickPhoto , 1);
+                                startActivityForResult(pickPhoto , PICK_IMAGE_REQUEST);
                             }
-                            else{
+                            else {
                                 mFrame.setVisibility(View.GONE);
                                 mBigCover.setVisibility(View.GONE);
                             }
@@ -309,13 +309,15 @@ public class PlaylistActivity extends AppCompatActivity implements
                                             if(taskSnapshot.getDownloadUrl()!=null) {
                                                 mThisPlaylist.setCover(taskSnapshot.getDownloadUrl().toString());
                                                 mPlaylistRef.setValue(mThisPlaylist);
+                                                DatabaseReference myPlaylistsRef = db.getReference("UserPlaylists").child(ME.getId()).child(PLAYLIST_ID);
+                                                myPlaylistsRef.setValue(taskSnapshot.getDownloadUrl().toString());
                                             }
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-
+                                            Toast.makeText(PlaylistActivity.this, "Failed to upload", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                         }
@@ -501,111 +503,144 @@ public class PlaylistActivity extends AppCompatActivity implements
     //
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public void onClickListener(Song song, final int position) {
-        if (mPlayPause.getTag() == PAUSED){
-            mPlayPause.setTag(PLAYING);
-            mPlayPause.setImageResource(R.drawable.pausebutton);
-        }
-        if (mMediaPlayer!=null){
-            if(mMediaPlayer.isPlaying()){
-                mMediaPlayer.stop();
-                mMediaPlayer.reset();
-                mMediaPlayer.release();
-                mMediaPlayer = null;
-            } else {
-                mMediaPlayer.reset();
-                mMediaPlayer.release();
+    public void onClickListener(final Song song, final int position) {
+        try {
+            if (mMediaPlayer == null){
+                mMediaPlayer = new MediaPlayer();
             }
-        }
-        firstTimePlaying = false;
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(song.getStreamUrl());
 
+            if (mPlayPause.getTag()==PAUSED){
+                mPlayPause.setTag(PLAYING);
+                mPlayPause.setImageResource(R.drawable.pausebutton);
+            }
 
-            mMediaPlayer = MediaPlayer.create(this, Uri.parse(song.getStreamUrl()));
-            mMediaPlayer.start();
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                Log.d(TAG, "onCompletion: ");
-                if(mediaPlayer != null){
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
-                    mediaPlayer.release();
-                    mPlayPause.setTag(PAUSED);
-                    mPlayPause.setImageResource(R.drawable.playbutton);
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    firstTimePlaying = false;
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            Log.d(TAG, "onCompletion: " + song.getTitle());
+                            if (position < mSongList.size() - 1) {
+                                playNextTrack(mSongList.get(position + 1));
+                            } else {
+                                firstTimePlaying = true;
+                                togglePlayPauseButton();
+                                mMediaPlayer.stop();
+                                mMediaPlayer.reset();
+                                mMediaPlayer.release();
+                            }
+                        }
+                    });
                 }
-
-            }
-        });
-
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void mediaPlayerButtons(){
         mPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-//                mPlayPause.setEnabled(false);
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try{
-//                            Thread.sleep(1000);
-//                        } catch (InterruptedException e){
-//                            e.printStackTrace();
-//                        }
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                mPlayPause.setEnabled(true);
-//                            }
-//                        });
-//                    }
-//                }).start();
-
-                if(mMediaPlayer!=null) {
-                    if(firstTimePlaying){
-                        if(mSongList.size() > 0) {
-                            mPlayPause.setTag(PLAYING);
-                            mPlayPause.setImageResource(R.drawable.pausebutton);
-                            mMediaPlayer.reset();
-                            mMediaPlayer.release();
-                            mMediaPlayer = MediaPlayer.create(PlaylistActivity.this, Uri.parse(mSongList.get(0).getStreamUrl()));
-                            mMediaPlayer.start();
-                            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                if(firstTimePlaying){
+                    if (mSongList.size() > 0){
+                        try {
+                            mMediaPlayer = new MediaPlayer();
+                            mMediaPlayer.setDataSource(mSongList.get(0).getStreamUrl());
+                            togglePlayPauseButton();
+                            mMediaPlayer.prepareAsync();
+                            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                 @Override
-                                public void onCompletion(MediaPlayer mediaPlayer) {
-                                    Log.d(TAG, "onCompletion: ");
-                                    if(mediaPlayer != null){
-                                        mediaPlayer.stop();
-                                        mediaPlayer.reset();
-                                        mediaPlayer.release();
-                                    }
-
+                                public void onPrepared(MediaPlayer mediaPlayer) {
+                                    firstTimePlaying = false;
+                                    mMediaPlayer.start();
+                                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                        @Override
+                                        public void onCompletion(MediaPlayer mediaPlayer) {
+                                            if (mSongList.indexOf(mSongList.get(0)) + 1 < mSongList.size()) {
+                                                playNextTrack(mSongList.get(mSongList.indexOf(mSongList.get(1))));
+                                            } else {
+                                                togglePlayPauseButton();
+                                                mMediaPlayer.stop();
+                                                mMediaPlayer.reset();
+                                                mMediaPlayer.release();
+                                                firstTimePlaying = true;
+                                            }
+                                        }
+                                    });
                                 }
                             });
-//                            if (mPlayPause.getTag() == PAUSED) {
-//                                mPlayPause.setTag(PLAYING);
-//                                mPlayPause.setImageResource(R.drawable.pausebutton);
-//                            }
-
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } else {
+                    }
+                } else {
+                    try {
                         if (mMediaPlayer.isPlaying()) {
-                            mPlayPause.setTag(PAUSED);
-                            mPlayPause.setImageResource(R.drawable.playbutton);
+                            togglePlayPauseButton();
                             mMediaPlayer.pause();
-                        }
-                        else if (!mMediaPlayer.isPlaying()) {
-                            mPlayPause.setTag(PLAYING);
-                            mPlayPause.setImageResource(R.drawable.pausebutton);
+                        } else {
+                            togglePlayPauseButton();
                             mMediaPlayer.start();
                         }
-                            firstTimePlaying = false;
+                    } catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }
         });
     }
+
+    private void playNextTrack(final Song song) {
+        try {
+            mMediaPlayer.stop();
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(song.getStreamUrl());
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            Log.d(TAG, "onCompletion: " + song.getTitle());
+                            if (mSongList.indexOf(song) < mSongList.size() - 1) {
+                                playNextTrack(mSongList.get(mSongList.indexOf(song) + 1));
+                            } else {
+                                togglePlayPauseButton();
+                                mMediaPlayer.stop();
+                                mMediaPlayer.reset();
+                                mMediaPlayer.release();
+                                firstTimePlaying = true;
+                            }
+                        }
+                    });
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void togglePlayPauseButton(){
+        if(mPlayPause.getTag() == PAUSED) {
+            mPlayPause.setTag(PLAYING);
+            mPlayPause.setImageResource(R.drawable.pausebutton);
+        } else{
+            mPlayPause.setTag(PAUSED);
+            mPlayPause.setImageResource(R.drawable.playbutton);
+        }
+    }
+
+
     private void loadUserIcon() {
         Target target = new Target() {
             @Override
