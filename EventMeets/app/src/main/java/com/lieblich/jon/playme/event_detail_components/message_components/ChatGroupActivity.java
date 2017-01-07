@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.lieblich.jon.playme.main_menu.MainMenuView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,5 +153,13 @@ public class ChatGroupActivity extends AppCompatActivity {
             }
         };
         mReference.child("messages").addChildEventListener(mListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainMenuView.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }
