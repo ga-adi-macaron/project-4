@@ -27,6 +27,8 @@ The most frustrating thing when you are in a great fire team and completing cons
 ### Android Technologies Used:
  - Sync Adapter (Chosen for backwards compatibility)
  - Oath Authentication
+ - Broadcast Manager
+ - Detail Fragments
  - View Pager Adapter
  - Gson/JSON
  - Notifications
