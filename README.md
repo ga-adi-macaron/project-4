@@ -38,7 +38,7 @@ The most frustrating thing when you are in a great fire team and completing cons
 ### Research & Proposal Documents:
  - [Destiny Item Manager - Research Plan](https://docs.google.com/document/d/11aUGUM8KTE3C7SqByC450IG8Fh931FOnXxrsVdZ8iSA/edit?usp=sharing)
  - [Research Highlights](https://docs.google.com/document/d/11EvSyXtI64p5rG5loaGDQDZaGFvWAIDIaTVni_5XK50/edit?usp=sharing)
- - [Problem Statment](https://docs.google.com/document/d/1GqekcCC3T7ydm-tjsWuPrrVPAJluH--Fi0JHNal7j_o/edit?usp=sharing)
+ - [Problem Statement](https://docs.google.com/document/d/1GqekcCC3T7ydm-tjsWuPrrVPAJluH--Fi0JHNal7j_o/edit?usp=sharing)
  - [User Persona](https://docs.google.com/document/d/1wJpeRsb56YgfMtktrpfDeiqlzJ-tvBr_cbHRDV-hT0A/edit?usp=sharing)
  - [Project Proposal](https://docs.google.com/presentation/d/1dNNo7gtm4c-i-i_u4YwfUKoUVgM8-XkpIZpzMuf_SXY/edit?usp=sharing)
 
