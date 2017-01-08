@@ -52,7 +52,7 @@ The most frustrating thing when you are in a great fire team and completing cons
  - The espresso test is not applicable for this application as the application needs the oath authentication at launch. The espresso test is unable to follow the steps that happen in the web view.
  - There are no non-android methods used in the application; therefore there are no unit tests.
  
- ### Note:
+### Note:
  - A Playstation account is needed to test the app. I will share my account credentials with Charlie & Drew via Slack.
 
 ---
