@@ -86,6 +86,11 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.clear();
                 editor.commit();
                 ContentResolver.removePeriodicSync(mAccount, AppConstants.AUTHORITY, Bundle.EMPTY);
+                try {
+                    cancelGrindNotification();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 finish();
                 Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
                 startActivity(intent);

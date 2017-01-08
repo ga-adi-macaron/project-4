@@ -25,7 +25,7 @@ public class AppConstants {
     public static final String VAULT_ICON_URL = "https://www.dropbox.com/s/jieyz4qm4lw2he5/vault_icon.png?dl=1";
     public static final String TAB_NUMBER = "tab_number";
     public static final String TIME_APP_PAUSED = "time_app_paused";
-    public static final String ACCOUNT_TYPE = "example.com";
+    public static final String ACCOUNT_TYPE = "com.crocusgames.destinyinventorymanager";
     public static final String ACCOUNT = "default_account";
     public static final String AUTHORITY = "com.crocusgames.destinyinventorymanager.StubProvider";
     public static final String MEMBERSHIP_ID = "membershipId";

@@ -65,7 +65,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle bundle, String s,
                               ContentProviderClient contentProviderClient, SyncResult syncResult) {
 
-        Log.d(TAG, "onPerformSync: SYNCHING");
+        Log.d(TAG, "onPerformSync: SYNCHING trial");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(USER_PREFERENCES,
                 Context.MODE_PRIVATE);
@@ -91,6 +91,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.d(TAG, "SYNC: First refreshing the access token then continuing synching.");
             } else {
                 moveEngrams(accessToken, membershipId, membershipType, char0Id, char1Id, char2Id);
+                Log.d(TAG, "onPerformSync: sync successfully started");
             }
         }
     }
@@ -156,9 +157,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
                     JSONObject refreshTokenObject = responseObject.getJSONObject("refreshToken");
                     String refreshTokenValue = refreshTokenObject.getString("value");
-
-                    Log.d(AppConstants.TAG, "ACCESS_TOKEN_NAME " + accessTokenValue);
-                    Log.d(AppConstants.TAG, "REFRESH_TOKEN_NAME  " + refreshTokenValue);
 
                     //Save Access Token to SharedPreferences:
                     SharedPreferences sharedPreferences =  getContext().getSharedPreferences(USER_PREFERENCES,
