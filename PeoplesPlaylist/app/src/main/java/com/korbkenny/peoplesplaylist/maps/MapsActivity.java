@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -79,6 +80,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
     private static final String TAG = "MapsActivity: ";
     private static final int REQUEST_CODE_LOCATION = 505;
+    public static final int REQUEST_CODE_LOGOUT = 909;
     public static final String SHARED_PREF = "MySettings";
     public static final String LOGGEDIN = "LoggedIn";
 
@@ -111,13 +113,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        if(!checkPermission()){
+            requestPermission();
+        }
+
         settings = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+        settings.edit().putBoolean(LOGGEDIN,false).commit();
         loggedIn = settings.getBoolean(LOGGEDIN,false);
         buildGoogleApiClient();
 
         mTargetList = new ArrayList<>();
 
         sUserSingleton = UserSingleton.getInstance();
+        ME = sUserSingleton.getUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabasePlaylistReference = mFirebaseDatabase.getReference("Playlists");
         mGeofireRef = FirebaseDatabase.getInstance().getReference("geofire");
@@ -140,10 +148,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         getLastLocation();
+        anotherAttemptAtLocation();
         stylizeMap();
         setUpMap();
-        createAuthListener();
-        setViewsIfLoggedIn();
+//        createAuthListener();
+        setViews();
+        loadUserIcon();
+
+//        setViewsIfLoggedIn();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(geoQuery==null && lastLocation!=null){
+                    createGeoQuery();
+                    Log.d(TAG, "run: QUERY WAS RUN!");
+                }
+                geoTries++;
+                Log.d(TAG, "run: "+geoTries);
+            }
+        }, 10000);
 
 
         //  FAB to create new playlist. Opens a dialog to do this.
@@ -151,7 +175,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 if (lastLocation!=null && ME != null) {
-                    onCreateDialog(lastLocation).show();
+                    if(ME.getPlaylistCount() < 8) {
+                        onCreateDialog(lastLocation).show();
+                    } else {
+                        Toast.makeText(MapsActivity.this, "Too Many Playlists, Max 8", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(MapsActivity.this, "Can't seem to make a new playlist...", Toast.LENGTH_SHORT).show();
                 }
@@ -174,6 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Intent intent = new Intent(MapsActivity.this, PlaylistActivity.class);
                         intent.putExtra("Playlist Id", marker.getTag().toString());
                         startActivity(intent);
+                        mMap.clear();
                     } else {
                         Toast.makeText(MapsActivity.this, "Get a bit closer, wouldja?", Toast.LENGTH_SHORT).show();
                     }
@@ -186,59 +215,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MapsActivity.this, MyUserInfoActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MapsActivity.this, LoginActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_CODE_LOGOUT);
             }
         });
     }
 
-    private void createAuthListener() {
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if(user != null){
-                    mUserRef = mFirebaseDatabase.getReference("Users").child(user.getUid());
-                    mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(final DataSnapshot dataSnapshot) {
-                            if(dataSnapshot!=null){
-                                new AsyncTask<Void,Void,Void>(){
-                                    @Override
-                                    protected Void doInBackground(Void... voids) {
-                                        ME = dataSnapshot.getValue(User.class);
-                                        return null;
-                                    }
+    private void setViews() {
+        fab = (CardView)findViewById(R.id.fab);
+        vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
+        cardView = (CardView) findViewById(R.id.maps_user_icon_cardview);
+        cardView.setAlpha(0.3f);
 
-                                    @Override
-                                    protected void onPostExecute(Void aVoid) {
-                                        myPlaylistCount = ME.getPlaylistCount();
-                                        sUserSingleton.setUser(ME);
-                                        if (ME != null && ME.getUserImage() != null) {
-                                            loadUserIcon();
-                                        }
-                                    }
-                                }.execute();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-        };
-        mAuth.addAuthStateListener(mAuthListener);
+        if(ME.getPlaylistCount() > 7){
+            fab.setVisibility(View.GONE);
+        }
     }
 
     private void stylizeMap() {
@@ -291,7 +281,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         final String playlistId = mDatabasePlaylistReference.push().getKey();
 
                         //Add to user's playlists, and increase the count of how many they have.
-                        myPlaylistCount++;
+                        myPlaylistCount = ME.getPlaylistCount() + 1;
 
                         DatabaseReference myPlaylistsRef = mFirebaseDatabase.getReference("UserPlaylists").child(ME.getId()).child(playlistId);
                         myPlaylistsRef.setValue(playlist.getCover());
@@ -325,6 +315,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void createGeoQuery(){
+        if(mMap!=null){
+            mMap.clear();
+        }
+        if(geoQuery!=null) {
+            geoQuery.removeAllListeners();
+        }
         moveMapToCurrentLocation(lastLocation);
         Log.d(TAG, "createGeoQuery: " + lastLocation.getLatitude() + " " + lastLocation.getLongitude());
         geoQuery = geoFire.queryAtLocation(new GeoLocation(lastLocation.getLatitude(),lastLocation.getLongitude()),30);
@@ -478,11 +474,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void setViewsIfLoggedIn(){
-        fab = (CardView)findViewById(R.id.fab);
-        vUserIcon = (ImageView) findViewById(R.id.maps_user_icon);
-        mSignInButton = (Button) findViewById(R.id.sign_in_maps);
-        cardView = (CardView) findViewById(R.id.maps_user_icon_cardview);
-        cardView.setAlpha(0.3f);
 
         if(!loggedIn){
             vUserIcon.setVisibility(View.GONE);
@@ -496,10 +487,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             fab.setVisibility(View.VISIBLE);
             mSignInButton.setVisibility(View.GONE);
             cardView.setVisibility(View.VISIBLE);
-        }
-
-        if(myPlaylistCount > 7){
-            fab.setVisibility(View.GONE);
         }
     }
 
@@ -539,7 +526,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     if (FinePermission || CoarsePermission) {
                         Toast.makeText(MapsActivity.this, "Permission Granted",
-                                Toast.LENGTH_LONG).show();
+                                Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MapsActivity.this,MapsActivity.class);
+                        startActivity(intent);
+                        finish();
                     } else {
                         Toast.makeText(MapsActivity.this,"Permission Denied",
                                 Toast.LENGTH_LONG).show();
@@ -628,44 +618,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void anotherAttemptAtLocation(){
-        lm = (LocationManager)MapsActivity.this.getSystemService(Context.LOCATION_SERVICE);
-        ll = new android.location.LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if(location!=null){
-                    lastLocation = location;
-                    if (geoQuery==null) {
-                        createGeoQuery();
-                        moveMapToCurrentLocation(lastLocation);
-
-                        if(checkPermission()) {
-
-                        } else {
-                            requestPermission();
+        if(lastLocation==null) {
+            lm = (LocationManager) MapsActivity.this.getSystemService(Context.LOCATION_SERVICE);
+            ll = new android.location.LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        lastLocation = location;
+                        if (geoQuery == null) {
+                            createGeoQuery();
+                            moveMapToCurrentLocation(lastLocation);
                         }
                     }
                 }
+
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String s) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String s) {
+
+                }
+            };
+            if (checkPermission()) {
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ll);
+            } else {
+                requestPermission();
             }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-        if(checkPermission()) {
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, ll);
-        } else {
-            requestPermission();
         }
     }
 
@@ -683,9 +669,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onPause() {
-        if(mMap!=null) {
-            mMap.clear();
-        }
+//        if(mMap!=null) {
+//            mMap.clear();
+//        }
 //        if (geoQuery != null) {
 //            geoQuery.removeAllListeners();
 //        }
@@ -693,8 +679,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if(mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
@@ -713,11 +699,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if(lastLocation != null){
-            moveMapToCurrentLocation(lastLocation);
-
+//        if(mMap!=null){
+//            mMap.clear();
+//        }
+        if(lastLocation != null) {
                 createGeoQuery();
+        }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK && requestCode == REQUEST_CODE_LOGOUT){
+            Intent intent = new Intent(MapsActivity.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 

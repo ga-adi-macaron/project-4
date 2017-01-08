@@ -1,4 +1,4 @@
-package com.korbkenny.peoplesplaylist;
+package com.korbkenny.peoplesplaylist.playlist;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,17 +23,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.korbkenny.peoplesplaylist.R;
+import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.Song;
-import com.korbkenny.peoplesplaylist.playlist.PlaylistActivity;
 
 import java.io.File;
 import java.io.IOException;

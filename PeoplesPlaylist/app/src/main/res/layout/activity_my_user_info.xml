@@ -119,4 +119,31 @@
             android:layout_weight="1"/>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/log_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Log Out?"
+        android:textColor="@color/road"/>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/deleting_loading_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/deleting_loading_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Deleting..."
+            android:gravity="center"
+            android:textSize="30sp"
+            android:fontFamily="sans-serif-condensed"
+            android:background="@color/water"
+            android:textColor="@color/road"
+            android:visibility="gone"
+            />
+    </android.support.v7.widget.CardView>
+
 </RelativeLayout>

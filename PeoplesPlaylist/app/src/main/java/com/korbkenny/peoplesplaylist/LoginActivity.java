@@ -1,18 +1,23 @@
 package com.korbkenny.peoplesplaylist;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.korbkenny.peoplesplaylist.coloring.ColoringActivity;
+import com.korbkenny.peoplesplaylist.maps.MapsActivity;
 import com.korbkenny.peoplesplaylist.objects.User;
 
 public class LoginActivity extends AppCompatActivity{
@@ -37,12 +43,16 @@ public class LoginActivity extends AppCompatActivity{
 
     private EditText signupEmail, signupPassword, loginEmail, loginPassword;
     private RelativeLayout layoutSignup, layoutLogin, layoutAlready;
+    private CardView loadingCard;
+    private TextView loadingText;
+    private int signUp = 0;
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDatabaseUserReference;
+    private DatabaseReference mDatabaseUserReference, mUserRef;
 
     private UserSingleton sUserSingleton;
     private User ME;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,20 +67,20 @@ public class LoginActivity extends AppCompatActivity{
 
         sUserSingleton = UserSingleton.getInstance();
         ME = new User();
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    finish();
-                }
-            }
-        };
-
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        loadingCard = (CardView) findViewById(R.id.loading_login_card);
+        loadingText = (TextView) findViewById(R.id.loading_login_text);
+
+        createAuthListener();
+
         mDatabaseUserReference = mFirebaseDatabase.getReference("Users");
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getRidOfLoadingScreen();
+            }
+        }, 3000);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //
@@ -137,8 +147,8 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         if(mAuthListener != null){
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -167,15 +177,23 @@ public class LoginActivity extends AppCompatActivity{
                             String userId = task.getResult().getUser().getUid();
                             mDatabaseUserReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    sUserSingleton.setUser(dataSnapshot.getValue(User.class));
+                                public void onDataChange(final DataSnapshot dataSnapshot) {
+                                    new AsyncTask<Void,Void,Void>(){
 
-                                    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putBoolean(LOGGEDIN,true);
-                                    editor.commit();
+                                        @Override
+                                        protected Void doInBackground(Void... voids) {
+                                            sUserSingleton.setUser(dataSnapshot.getValue(User.class));
+                                            return null;
+                                        }
 
-                                    finish();
+                                        @Override
+                                        protected void onPostExecute(Void aVoid) {
+                                            SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREF,MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                            editor.putBoolean(LOGGEDIN,true);
+                                            editor.commit();
+                                        }
+                                    }.execute();
                                 }
 
                                 @Override
@@ -211,7 +229,7 @@ public class LoginActivity extends AppCompatActivity{
                                 protected void onPostExecute(String userId) {
                                     ME.setId(userId);
                                     ME.setUserName(email);
-                                    ME.setUserImage("https://firebasestorage.googleapis.com/v0/b/peoplesplaylist-9c5d9.appspot.com/o/userplaceholder.png?alt=media&token=69ff913e-2eb2-46b5-a210-390e69ddac31");
+                                    ME.setUserImage("null");
                                     ME.setPlaylistCount(0);
                                     sUserSingleton.setUser(ME);
                                     mDatabaseUserReference.child(userId).setValue(ME);
@@ -220,11 +238,6 @@ public class LoginActivity extends AppCompatActivity{
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putBoolean(LOGGEDIN,true);
                                     editor.commit();
-
-                                    finish();
-                                    Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
-                                    startActivity(intent);
-                                    finish();
                                 }
                             }.execute();
                         }
@@ -247,6 +260,9 @@ public class LoginActivity extends AppCompatActivity{
         if (TextUtils.isEmpty(email)) {
             signupEmail.setError("Required.");
             valid = false;
+        } else if (!isEmailValid(email)){
+            signupEmail.setError("Not a Valid Email.");
+            valid = false;
         } else {
             signupEmail.setError(null);
         }
@@ -254,6 +270,9 @@ public class LoginActivity extends AppCompatActivity{
         String password = signupPassword.getText().toString();
         if (TextUtils.isEmpty(password)) {
             signupPassword.setError("Required.");
+            valid = false;
+        } else if (!isPasswordValid(password)) {
+            signupPassword.setError("Too Short.");
             valid = false;
         } else {
             signupPassword.setError(null);
@@ -268,6 +287,9 @@ public class LoginActivity extends AppCompatActivity{
         if (TextUtils.isEmpty(email)) {
             loginEmail.setError("Required.");
             valid = false;
+        } else if (!isEmailValid(email)){
+            loginEmail.setError("Not a Valid Email.");
+            valid = false;
         } else {
             loginEmail.setError(null);
         }
@@ -276,10 +298,84 @@ public class LoginActivity extends AppCompatActivity{
         if (TextUtils.isEmpty(password)) {
             loginPassword.setError("Required.");
             valid = false;
+        } else if (!isPasswordValid(password)) {
+            loginPassword.setError("Too Short.");
+            valid = false;
         } else {
             loginPassword.setError(null);
         }
         return valid;
     }
+
+    private boolean isEmailValid(String email) {
+        return email.contains("@");
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
+    }
+
+    private void createAuthListener() {
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user != null){
+                    mUserRef = mFirebaseDatabase.getReference("Users").child(user.getUid());
+                    mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                            if(dataSnapshot!=null){
+                                new AsyncTask<Void,Void,Void>(){
+                                    @Override
+                                    protected Void doInBackground(Void... voids) {
+                                        ME = dataSnapshot.getValue(User.class);
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void aVoid) {
+                                        sUserSingleton.setUser(ME);
+                                            Intent intent = new Intent(LoginActivity.this, ColoringActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                    }
+                                }.execute();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    getRidOfLoadingScreen();
+                }
+            }
+        };
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    private void getRidOfLoadingScreen(){
+        if(loadingCard.getVisibility()==View.VISIBLE) {
+            ValueAnimator ani = ValueAnimator.ofFloat(1f, 0f);
+            ani.setDuration(700);
+            ani.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    loadingCard.setAlpha((float) animation.getAnimatedValue());
+                    loadingText.setAlpha((float) animation.getAnimatedValue());
+                    if (loadingCard.getAlpha() == 0f || loadingText.getAlpha() == 0f) {
+                        loadingCard.setVisibility(View.GONE);
+                        loadingText.setVisibility(View.GONE);
+                    }
+                }
+            });
+            ani.start();
+        }
+    }
 }
+
 

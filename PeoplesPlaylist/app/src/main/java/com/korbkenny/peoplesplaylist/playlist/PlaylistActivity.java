@@ -1,40 +1,23 @@
 package com.korbkenny.peoplesplaylist.playlist;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -48,13 +31,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.korbkenny.peoplesplaylist.BitmapManipulation;
 import com.korbkenny.peoplesplaylist.LoginActivity;
 import com.korbkenny.peoplesplaylist.R;
-import com.korbkenny.peoplesplaylist.RecordingActivity;
 import com.korbkenny.peoplesplaylist.UserSingleton;
 import com.korbkenny.peoplesplaylist.objects.Playlist;
 import com.korbkenny.peoplesplaylist.objects.Song;
@@ -226,8 +207,13 @@ public class PlaylistActivity extends AppCompatActivity implements
         mSaveThisPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                settings.edit().putString("SavedPlaylistId",PLAYLIST_ID).commit();
-                Toast.makeText(PlaylistActivity.this, "Saved This Playlist", Toast.LENGTH_SHORT).show();
+                if(ME.getId().equals(mThisPlaylist.getUserId())) {
+                    Toast.makeText(PlaylistActivity.this, "Don't Need To Save", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    settings.edit().putString("SavedPlaylistId", PLAYLIST_ID).commit();
+                    Toast.makeText(PlaylistActivity.this, "Saved This Playlist", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -259,6 +245,8 @@ public class PlaylistActivity extends AppCompatActivity implements
 
                             @Override
                             protected void onPostExecute(Void aVoid) {
+                                mPlayPause.setTag(PAUSED);
+                                mPlayPause.setImageResource(R.drawable.playbutton);
                                 mAdapter.notifyDataSetChanged();
 
                             }

@@ -3,6 +3,7 @@ package com.korbkenny.peoplesplaylist.coloring;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,8 +33,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.korbkenny.peoplesplaylist.BitmapManipulation;
+import com.korbkenny.peoplesplaylist.LoginActivity;
 import com.korbkenny.peoplesplaylist.R;
 import com.korbkenny.peoplesplaylist.UserSingleton;
+import com.korbkenny.peoplesplaylist.maps.MapsActivity;
 import com.korbkenny.peoplesplaylist.objects.User;
 
 import java.io.ByteArrayOutputStream;
@@ -54,12 +57,7 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
     private StorageReference mStorageRef;
     private UserSingleton sSingleton;
     private User ME;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    FirebaseUser fbUser;
     private Bitmap myIcon;
-    private String mIconPath;
-    private Uri mFile;
     private TextView drawButton, eraseButton, saveButton;
 
     @Override
@@ -67,8 +65,20 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coloring);
 
+
+
         sSingleton = UserSingleton.getInstance();
         ME = sSingleton.getUser();
+
+        boolean fromMyUserInfo = getIntent().getBooleanExtra("FromMyUserInfo",false);
+        if(!fromMyUserInfo) {
+            if (!ME.getUserImage().equals("null")) {
+                Intent intent = new Intent(ColoringActivity.this, MapsActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseUserReference = mFirebaseDatabase.getReference("Users");
         mStorageRef = FirebaseStorage.getInstance().getReference("usericons").child(ME.getId()).child(FILE_NAME);
@@ -270,15 +280,5 @@ public class ColoringActivity extends AppCompatActivity implements View.OnClickL
         }
         Log.d(TAG, "saveImageToDisk: " + directory.getAbsolutePath());
         return directory.getAbsolutePath();
-    }
-
-    private void loadImageFromDisk(String path){
-        try {
-            File file = new File(path,FILE_NAME);
-            Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }
