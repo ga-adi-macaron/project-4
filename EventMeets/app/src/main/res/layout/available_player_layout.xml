@@ -7,15 +7,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/player_thumb"
-        android:layout_width="56dp"
-        android:layout_height="56dp"/>
+    <FrameLayout
+        android:id="@+id/available_player_icon"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:textAlignment="center"
+            android:background="@drawable/message_user_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/available_player_letter"
+            android:text="J"
+            android:layout_gravity="center"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/player_display_name"
-        android:layout_toEndOf="@id/player_thumb"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
+        android:textSize="18sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

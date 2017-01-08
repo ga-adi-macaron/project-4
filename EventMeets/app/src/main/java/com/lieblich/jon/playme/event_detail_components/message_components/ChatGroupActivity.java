@@ -35,6 +35,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     private ChildEventListener mListener;
     private List<SelfMessageObject> mContent;
+    private boolean hasMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +127,8 @@ public class ChatGroupActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         mReference.child("messages").removeEventListener(mListener);
+        mContent.clear();
+        mAdapter.notifyDataSetChanged();
         super.onStop();
     }
 
@@ -133,9 +136,9 @@ public class ChatGroupActivity extends AppCompatActivity {
         mListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
-                    mAdapter.notifyItemInserted(mContent.size()-1);
-                mMessageRecycler.scrollToPosition(mContent.size()-1);
+                mContent.add(dataSnapshot.getValue(SelfMessageObject.class));
+                mAdapter.notifyItemInserted(mContent.size() - 1);
+                mMessageRecycler.scrollToPosition(mContent.size() - 1);
             }
 
             @Override

@@ -50,7 +50,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
         if(!key.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 
             holder.mDisplayName.setText(mPlayers.get(position).getFirstName());
-            holder.mThumbnail.setImageResource(R.drawable.ic_account_circle_black_48dp);
+            holder.mPlayerInitial.setText(""+mPlayers.get(position).getFirstName().charAt(0));
 
             holder.mLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,6 +78,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
             });
         } else {
             holder.mDisplayName.setText("(YOU)");
+            holder.mIcon.setVisibility(View.GONE);
             mPlayers.add(new AvailablePlayer("you", "you"));
             holder.mLayout.setBackgroundColor(Color.BLUE);
         }
