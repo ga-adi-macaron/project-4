@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SqlLiteOpenHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "destinydb";
     public static final String ITEM_DEFINITIONS_TABLE_NAME = "DestinyInventoryItemDefinition";
     public static final String ITEM_BUCKET_DEFINITIONS_TABLE_NAME = "DestinyInventoryBucketDefinition";
@@ -140,8 +140,16 @@ public class SqlLiteOpenHelper extends SQLiteOpenHelper {
 
         HashMap<Long, JSONObject> requestedObjects = new HashMap<>();
 
-        String query = "SELECT " + COLUMN_JSON + "," + COLUMN_ID + " FROM " + ITEM_DEFINITIONS_TABLE_NAME + " WHERE "
-                + COLUMN_ID + " & 0xFFFFFFFF" + " IN (" + itemHashesCombined + ")";
+//        String query = "SELECT " + COLUMN_JSON + "," + COLUMN_ID + " FROM " + ITEM_DEFINITIONS_TABLE_NAME + " WHERE "
+//                + COLUMN_ID + " & 0xFFFFFFFF" + " IN (" + itemHashesCombined + ")";
+
+//        String query = "SELECT CASE WHEN " + COLUMN_ID + "<0 THEN " + COLUMN_ID +
+//                "+4294967296 ELSE " + COLUMN_ID + " END AS " + COLUMN_ID +", " + COLUMN_JSON +
+//                " FROM " + ITEM_DEFINITIONS_TABLE_NAME + " WHERE "
+//                + COLUMN_ID + " IN (" + itemHashesCombined + ")";
+
+        String query = "SELECT " + COLUMN_ID + ", " + COLUMN_JSON + " FROM " + ITEM_DEFINITIONS_TABLE_NAME +
+                " WHERE " + COLUMN_ID + " IN (" + itemHashesCombined + ")";
 
             Cursor cursor = db.rawQuery(query, null);
             if (cursor.moveToFirst()) {
@@ -166,8 +174,16 @@ public class SqlLiteOpenHelper extends SQLiteOpenHelper {
 
         HashMap<Long, JSONObject> requestedObjects = new HashMap<>();
 
-        String query = "SELECT " + COLUMN_JSON +"," + COLUMN_ID + " FROM " + ITEM_BUCKET_DEFINITIONS_TABLE_NAME + " WHERE "
-                + COLUMN_ID + " & 0xFFFFFFFF" + " IN (" + bucketHashesCombined + ")";
+//        String query = "SELECT " + COLUMN_JSON +"," + COLUMN_ID + " FROM " + ITEM_BUCKET_DEFINITIONS_TABLE_NAME + " WHERE "
+//                + COLUMN_ID + " & 0xFFFFFFFF" + " IN (" + bucketHashesCombined + ")";
+
+//        String query = "SELECT CASE WHEN " + COLUMN_ID + "<0 THEN " + COLUMN_ID +
+//                "+4294967296 ELSE " + COLUMN_ID + " END AS " + COLUMN_ID +", " + COLUMN_JSON +
+//                " FROM " + ITEM_BUCKET_DEFINITIONS_TABLE_NAME + " WHERE "
+//                + COLUMN_ID + " IN (" + bucketHashesCombined + ")";
+
+        String query = "SELECT " + COLUMN_ID + ", " + COLUMN_JSON + " FROM " + ITEM_BUCKET_DEFINITIONS_TABLE_NAME +
+                " WHERE " + COLUMN_ID + " IN (" + bucketHashesCombined + ")";
 
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {

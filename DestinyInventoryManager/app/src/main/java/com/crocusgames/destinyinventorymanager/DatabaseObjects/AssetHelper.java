@@ -11,10 +11,10 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 public class AssetHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "destinydb";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public AssetHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        setForcedUpgrade();
     }
-
 }

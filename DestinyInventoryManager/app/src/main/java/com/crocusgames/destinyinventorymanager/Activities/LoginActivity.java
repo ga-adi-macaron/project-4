@@ -150,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                 CharacterInfoSingleton characterInfo = CharacterInfoSingleton.getInstance();
 
                 List<Character> characters = mainObject.getResponse().getDestinyAccounts().get(0).getCharacters();
-                
+
                 if (characters == null || characters.size() == 0) {
                     Toast.makeText(LoginActivity.this, "Unable to get account information. Please try again later.", Toast.LENGTH_SHORT).show();
                 } else {

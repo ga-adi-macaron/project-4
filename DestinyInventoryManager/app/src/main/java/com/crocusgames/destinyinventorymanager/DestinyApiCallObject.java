@@ -813,7 +813,7 @@ public class DestinyApiCallObject {
                                             Log.d(AppConstants.TAG, "Size: " + characterInfo.getItemList().size());
                                         }
                                     };
-                                    bucketListTask.execute(bucketHashCombined);
+                            bucketListTask.execute(bucketHashCombined);
                         }
                     };
                     itemHashTask.execute(itemHashCombined);
