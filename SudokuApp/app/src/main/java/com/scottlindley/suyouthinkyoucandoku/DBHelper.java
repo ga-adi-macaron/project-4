@@ -9,7 +9,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -290,7 +289,6 @@ public class DBHelper extends SQLiteOpenHelper{
     }
 
     public void addPuzzle(Puzzle puzzle){
-        Log.d(TAG, "addPuzzle: ");
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_DIFFICULTY, puzzle.getDifficulty());

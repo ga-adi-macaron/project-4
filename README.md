@@ -2,156 +2,43 @@
 
 ## Overview
 
-**You’ve come a long way, and it's time to show it.**
-This will be your most advanced project to date, and if you put creativity into it, it'll hopefully be the thing you want to show off most prominently in your portfolio.
+**A sudoku game featuring a multiplayer race mode**
+This app showcases a blend of logic and UI design. 
 
-**You get to call the shots and invent your own idea**, choosing frameworks & tools that are appropriate for what you want to build.
-Pull from everything you've learned so far, and **tackle something that'll push you a little outside of your comfort zone.**
+Games in general require a great deal of logic to maintain a set of rules and expectations. But playing a game that involves a logic-based puzzle is an even greater challenge. The app contains a sudoku puzzle solver that is capable of finding the solution to any puzzle in a short amount of time. By utilizing this solver, only the keys (not the solutions) to puzzles need to be stored in both the remote and local databases. Thus cutting down storage size by a factor of two.
 
-For this project, you'll be working on your own and using product development strategies learned in unit 3 to come up with a project proposal that will be reviewed with your instructional team.
-This proposal is done to make sure you are building **something that can be accomplish in the limited time we have** while making sure it's **something that will challenge you**.
+My go to game on the subway is always sudoku. I found that a sudoku app with a dissatifying and or clumbsy UI would almost always lead me to uninstalling. There are many designs that are superior to So you think you can Doku, but it is my believe that navigating about within the game is both simple and intuitive. The puzzle interface itself is designed with speed in mind. By taking a minimalistic approach, the user does not have to perform any unnecessary steps to place input into a cell.
 
+The race mode is the leading feature of the app. Using Google Play Game Services, oppoenents sign in with a Google account and are then matched up in a real-time-multiplayer room. As the users attempt to solve the same puzzle, one can see when the other inputs an answer into a cell. The input itself is not revealed, but only indicated through a color tint. In addition, there are weapons the users can throw as one another. Yes, weapons in a sudoku game.
 
-## Technical Requirements
+- Erase Bomb:
+  The user long presses on one of the nine large boxes to clear all of the opponents answers (not including the key) inside that box.
+- Spy:
+  A passive weapon, the user can peek at their opponent's answers for three seconds.
+- Interference:
+  Amazingly frustrating, this weapon obscures half the the puzzles key for a few seconds.... and then the other half.
+  
+Weapons can be purchased using coins in the armory. 5 coins are awarded upon winning a race.
 
-Your app must:
+There are 5 acheivements to be unlocked:
+- Beginner's Luck: 5 points
+  Win 1 race
+- No Spring Chicken: 10 points
+  Win 10 races
+- Soldier: 75 points
+  Win 50 races
+- Oh you, you CAN doku: 150 points
+  Win 100 races
+- Bow to the King: 200 points
+  Win 200 races
 
-- **Be a complete application** that provides a thorough solution to the problem you choose to address
-- **Have an impressive design and user experience** that follows [Google's Material Design Guidelines](https://developer.android.com/design/index.html) and can impress future clients and employers
-- **Use at least one API or SDK**
-- **Implement thoughtful user stories** that are significant enough to help you know which features to build and which to scrap
-- **Be object oriented** with organized, well-documented, [DRY](https://en.wikipedia.org/wiki/Don't_repeat_yourself) code
-- **Be robust**: handle orientation changes without losing state, and handle of failure well (e.g., failed network calls) gracefully
-- **Be available on the Google Play store**, so it is publicly available
+**Google Play Store Link**
+Download the app [here](https://play.google.com/store/apps/details?id=com.scottlindley.suyouthinkyoucandoku).
 
+<p align="center">
+  <img src="screenshots/one.png" height="300px" /> <img src="screenshots/two.png" height="300px" />
+</p>
+<p align="center">
+  <img src="screenshots/three.png" height="300px" /> <img src="screenshots/four.png" height="300px" />
+</p>
 
-## Code of Conduct
-
-As always, your app must adhere to General Assembly's [student code of conduct guidelines](https://charlesdrews.gitbooks.io/ga-adi-macaron/content/markdown/code-of-conduct.html).
-
-If you have questions about whether or not your work adheres to these guidelines, please speak with a member of your instructional team.
-
-
-## Timeline and Deliverables
-
-#### Week 10: Brainstorming and Research
-
-- Determine what problem(s) you'd like to address or niche you'd like to fill with your app
-
-
-- Write a **Research Plan** ([use this format](assets/research-plan-worksheet.pdf)) and add it to a `research.md` markdown file to be handed in with your completed project
-
-
-- Conduct _at least 3_ **user interviews**
-
-
-- Add the following to your `research.md` file after your research plan:
-  - **Research Highlights** ([use this format](assets/research-highlights-worksheet.pdf))
-  - **User Personas** ([use this format](assets/persona-worksheet.pdf))
-  - **Problem Statement(s)** ([use this format](assets/problem-statement-worksheet.pdf))
-  - **Competitive Analysis** ([feature inventory or +/Δ model](https://github.com/ga-adi-macaron/Course-Materials/tree/master/lessons/product-development/competitive-research-lesson#introduction-competitive-analysis-15-mins); embed in `research.md` as a [screenshot](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#images) or a [markdown table](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#tables))
-
-
-
-#### Week 11: Prioritization, Proposal, and Planning
-
-- Use a [**2x2 Matrix**](https://github.com/ga-adi-macaron/Course-Materials/tree/master/lessons/product-development/feature-prioritization#demo-2x2-matrix-feature-prioritization-10-mins) to prioritize your possible features
-
-
-- Write a **Project Proposal** (either in a `proposal.md` file or a Google Slides / PowerPoint deck) which includes:
-  1. **Overall Objectives**, including problems to be solved and user goals to facilitate - these should be _very specific_ and _based on your research_!
-  1. **Research Synthesis** - what trends, goals, motivations, and pain points did you identify?
-  1. **Target Audience** - must be _very specific_ and represent your interviewees - What do they need and why? How/when/where do they use similar apps? What do they value and what do they avoid? Etc.
-  1. **Prioritized list of features** - What problem or user goal does each one address? How did you determine priority?
-  1. **Differentiators** from competitors and pain points addressed
-  1. **Constraints** you face - e.g. availability of data, need for permissions users may deny, unfamiliar technologies required, etc.
-  1. Anything else you think we should know as we decide whether to approve your proposal
-
-
-- Present your proposal to Drew or Charlie starting at **3:30 pm on Monday, 12/12**
-  - [Sign up for a time slot here](https://docs.google.com/spreadsheets/d/1YABj9ZaNxLymnWsgcf2Qew3sGzPqNb0grlpg-DECS-8/edit?usp=sharing)
-  - 7 minutes for presentation, 8 minutes for our questions
-  - You may need to present a revised proposal on **Tuesday, 12/13** if we are concerned about your initial proposal
-
-
-- Once your proposal is approved:
-  - Create a **Paper Prototype** for all screens you plan to include in your app
-  - Write **User Stories** for your features and plan your testing
-  - Plan out the classes & interfaces you'll need
-  - Sketch out your app's architecture - do you need background services, scheduled jobs, local data storage, etc.? What 3rd party libraries will you use?
-
-
-#### Week 12: Sprint
-
-Begin building your app. Remember to...
-
-- Commit often & push to GitHub to preserve your progress
-- Do your work on separate _feature branches_ and test thoroughly before merging into your master branch - make sure your master branch always works!
-- Write tests for your features as you implement them (ideally, even before)
-- Choose good, descriptive names for classes & variables and document your code with comments
-
-
-#### Week 13: Holiday Break
-
-Catch up on sleep! Take some time to review your progress, reevaluate priorities, and get ready to have a productive final week.
-
-
-#### Week 14: Sprint
-
-Finish implementing and testing your app, then [publish it to the Google Play store](https://developer.android.com/studio/publish/index.html).
-
-Write a `readme.md` file that includes:
-- A link to your app on the Google Play store
-- What the app does & how it's useful
-- [Embedded screenshot(s)](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#images) to show off your features
-- Explanation of the technologies, techniques, libraries, etc. you used
-- A couple paragraphs about the **general approach you took** in your design process that point to your `research.md` file
-- If necessary, **any special instructions on how to build the app in Android Studio**
-- Descriptions of any **unsolved problems** or **major hurdles** you had to overcome
-
-
-#### Week 15: Project Due on Monday, 1/9/17
-
-Submit a pull request to this repo **_by 9:00 am_**. If you created a repo from scratch rather than fork this one, then make a fork, add a link to your other repo, and submit a pull request.
-
-Final deliverables that must be in your repo:
-- Source code for a completed, fully-functioning app
-- Unit tests and Espresso tests as needed
-- Frequent commits dating back to the beginning of the project with useful commit messages
-- A `readme.md` file meeting the requirements listed above, including a link to your app on the Google Play store
-- Photos of your paper prototypes (or a link to a [POP] prototype)
-- Your `proposal.md` file (or link to Google Slides document) meeting the requirements listed above
-- Your `research.md` file meeting the requirements listed above
-
-Everyone will present their app to the class starting at 9:00 am. You have a _maximum_ of 10 minutes, with 7 minutes to demo the app and 3 minutes to discuss your process.
-
-
-## Suggested Ways to Get Started
-
-* **Don’t get too caught up in too many awesome features** – simple is always better. Build something impressive that does one thing well.
-* **Design first.** Planning with user stories & wireframes before writing code means you won't get distracted changing your mind – you'll know what to build, and you can spend your time wisely by just building it.
-* **Don’t hesitate to write throwaway code** to solve short term problems.
-* **Read the docs for whatever technologies / frameworks / API’s you use**.
-* **Write DRY code**.
-* **Be consistent with your code style.**
-* **Commit early, commit often.** Don’t be afraid to break something because you can always go back in time to a previous version.
-* **Keep user stories small and well-defined**, and remember – user stories focus on what a user needs, not what development tasks need accomplishing.
-* **Write code another developer wouldn't have to ask you about**. Do your naming conventions make sense? Would another developer be able to look at your app and understand what everything is?
-* **Make it all well-formatted.** Are you indenting, consistently? Can we find the start and end of every div, curly brace, etc?
-* **Comment your code.** Will someone understand what is going on in each block or function? Even if it's obvious, explaining the what & why means someone else can pick it up and get it.
-* **Write pseudocode before you write actual code.** Thinking through the logic of something helps.
-
-
-## Resources
-
-- [Class resources list](https://charlesdrews.gitbooks.io/ga-adi-macaron/content/markdown/resources.html)
-- [Android Developer Website](http://developer.android.com/index.html)
-- [Google Design Guidelines](https://www.google.com/design/spec/material-design/introduction.html)
-- [API Search](http://apis.io) and [ProgrammableWeb](http://www.programmableweb.com/) - find APIs to get the data you need
-- [HackDesign](https://hackdesign.org/lessons) and [Visual Design Hacking](https://generalassemb.ly/online/videos/visual-design-hacking) - tips for producing great designs
-
----
-
-## Licensing
-1. All content is licensed under a CC­BY­NC­SA 4.0 license.
-2. All software code is licensed under GNU GPLv3. For commercial use or alternative licensing, please contact [legal@ga.co](mailto:legal@ga.co).

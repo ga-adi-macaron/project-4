@@ -1,6 +1,5 @@
 package com.scottlindley.suyouthinkyoucandoku;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -44,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, RealTimeMessageReceivedListener, RoomStatusUpdateListener, RoomUpdateListener {
-    private static final String TAG = "RaceActivity";
     public static final int RC_SIGN_IN = 5667;
     public static final int RC_AUTOMATCH = 6980;
     public static final String STILL_CONNECTED_MESSAGE = "opponent still connected";
@@ -736,14 +733,8 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         if (requestCode == RC_SIGN_IN) {
             mResolvingConnectionFailure = false;
             mGoogleApiClient.connect();
-            if (resultCode == Activity.RESULT_OK) {
-                Log.d(TAG, "onActivityResult: CONNECTING");
-            } else {
-                Log.d(TAG, "onActivityResult: "+resultCode);
-            }
         }
         if (requestCode == RC_AUTOMATCH) {
-            Log.d(TAG, "onActivityResult: "+resultCode);
             ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
             Bundle autoMatch = RoomConfig.createAutoMatchCriteria(1, 1, 0);
             RoomConfig roomConfig = RoomConfig.builder(RaceActivity.this)
@@ -784,7 +775,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
      */
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended: ");
         mGoogleApiClient.connect();
     }
 
@@ -797,7 +787,6 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
 
         mResolvingConnectionFailure = true;
 
-        Log.d(TAG, "onConnectionFailed: "+connectionResult);
         if(!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult, RC_SIGN_IN, "ERROR BASE GAME UTILS")){
             mResolvingConnectionFailure = false;
         }
@@ -841,9 +830,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "onCancelled: "+databaseError.getCode());
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
     }
 
@@ -899,9 +886,7 @@ public class RaceActivity extends BasePuzzleActivity implements GoogleApiClient.
         endGame(true);
     }
     @Override
-    public void onP2PDisconnected(String s) {
-        Log.d(TAG, "onP2PDisconnected: ");
-    }
+    public void onP2PDisconnected(String s) {}
     @Override
     public void onLeftRoom(int i, String s) {
         RaceActivity.this.finish();

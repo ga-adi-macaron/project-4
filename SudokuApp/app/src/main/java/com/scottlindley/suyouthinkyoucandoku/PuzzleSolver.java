@@ -173,10 +173,6 @@ public class PuzzleSolver {
         return mBoxCells;
     }
 
-    public int[] getKey(){
-        return mKey;
-    }
-
     public interface OnSolveFinishedListener{
         void grabSolution();
     }
