@@ -25,6 +25,5 @@ public interface PropublicaService {
 
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
     @GET("/congress/v1/{session}/bills/{bill-id}.json")
-        // TODO: 1/5/17 change congress?
     Call<DetailBill> getDetailBill(@Path("bill-id") String bill_id, @Path("session") int session);
 }

@@ -89,7 +89,6 @@ public class NewsFragment extends Fragment
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        // TODO: 12/17/16 Customize call
         makeCall();
     }
 

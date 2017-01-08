@@ -283,7 +283,6 @@ public class ResultFragment extends Fragment
     // INTERFACE AREA
     ---------------------------------------------------------------------------------*/
 
-    // TODO: 1/5/17
     @Override
     public void OnRepsResultSelected(String id) {
         Intent intent = new Intent(getContext(),DetailRepsResultActivity.class);
