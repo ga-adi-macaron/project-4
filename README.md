@@ -1,8 +1,9 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project #4: Your Portfolio Project
+# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Su you think you can Doku
 
 ## Overview
 
 **A sudoku game featuring a multiplayer race mode**
+
 This app showcases a blend of logic and UI design. 
 
 Games in general require a great deal of logic to maintain a set of rules and expectations. But playing a game that involves a logic-based puzzle is an even greater challenge. The app contains a sudoku puzzle solver that is capable of finding the solution to any puzzle in a short amount of time. By utilizing this solver, only the keys (not the solutions) to puzzles need to be stored in both the remote and local databases. Thus cutting down storage size by a factor of two.
@@ -33,12 +34,11 @@ There are 5 acheivements to be unlocked:
   Win 200 races
 
 **Google Play Store Link**
+
 Download the app [here](https://play.google.com/store/apps/details?id=com.scottlindley.suyouthinkyoucandoku).
 
 <p align="center">
   <img src="screenshots/one.png" height="300px" /> <img src="screenshots/two.png" height="300px" />
-</p>
-<p align="center">
   <img src="screenshots/three.png" height="300px" /> <img src="screenshots/four.png" height="300px" />
 </p>
 
