@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">XB Media and Market</string>
+    <string name="gamerscore_logo">https://hydra-media.cursecdn.com/wasteland.gamepedia.com/a/a1/Icon_gamerscore.png?version=806b92385543659548fbd2dd0fc2124f</string>
+    <string name="facebook_app_id">360430017652160</string>
+
+    <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
+</resources>
