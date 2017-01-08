@@ -3,15 +3,19 @@ package com.scottlindley.suyouthinkyoucandoku;
 import android.app.ActivityOptions;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.ChangeTransform;
@@ -167,6 +171,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 puzzleRefreshJob.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
             } else {
                 puzzleRefreshJob.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+                launchLoadingPuzzleDialog();
             }
             JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
             scheduler.schedule(puzzleRefreshJob.build());
@@ -174,6 +179,31 @@ public class MainMenuActivity extends AppCompatActivity {
             Toast.makeText(this, "Please connect to network to download puzzles.",
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void launchLoadingPuzzleDialog(){
+        View dialogView = getLayoutInflater().inflate(R.layout.loading_puzzle_dialog, null);
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        //User cannot cancel until service has finished
+                    }
+                })
+                .setView(dialogView)
+                .create();
+        dialog.show();
+
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                dialog.dismiss();
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(receiver, new IntentFilter(DBHelper.PUZZLE_LOADING_DONE_INTENT));
     }
 
     /*

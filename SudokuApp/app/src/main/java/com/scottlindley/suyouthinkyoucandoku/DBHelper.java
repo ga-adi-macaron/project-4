@@ -22,6 +22,7 @@ import java.util.List;
  */
 
 public class DBHelper extends SQLiteOpenHelper{
+    public static final String PUZZLE_LOADING_DONE_INTENT = "puzzle loading done";
     private static final String TAG = "DBHelper";
     public static final String DATABASE_NAME = DBAssetHelper.DATA_BASE_NAME;
     public static final int VERSION_NUMBER = 1;
@@ -111,9 +112,11 @@ public class DBHelper extends SQLiteOpenHelper{
                 for (Puzzle puzzle : puzzles){
                     addPuzzle(puzzle);
                 }
+
+                LocalBroadcastManager.getInstance(mContext)
+                        .sendBroadcast(new Intent(PUZZLE_LOADING_DONE_INTENT));
             }
         };
-
 
         LocalBroadcastManager.getInstance(mContext)
                 .registerReceiver(receiver, new IntentFilter(PuzzleRefreshService.PUZZLE_REFRESH_SERVICE));
