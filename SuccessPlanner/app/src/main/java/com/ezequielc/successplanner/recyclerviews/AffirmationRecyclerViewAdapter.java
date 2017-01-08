@@ -73,7 +73,8 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
                                                 notifyItemChanged(holder.getAdapterPosition());
                                             }
                                         })
-                                                .setNegativeButton("Cancel", null);
+                                                .setNegativeButton("Cancel", null)
+                                                .setCancelable(false);
                                         editOptionBuilder.create().show();
                                         break;
 
@@ -90,12 +91,13 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
                                                         notifyItemRemoved(holder.getAdapterPosition());
                                                     }
                                                 })
-                                                .setNegativeButton("No", null);
+                                                .setNegativeButton("No", null)
+                                                .setCancelable(false);
                                         deleteOptionBuilder.create().show();
                                         break;
                                 }
                             }
-                        });
+                        }).setCancelable(false);
                 builder.create().show();
                 return false;
             }

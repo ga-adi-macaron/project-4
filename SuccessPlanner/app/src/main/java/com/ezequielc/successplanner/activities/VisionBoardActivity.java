@@ -52,6 +52,7 @@ public class VisionBoardActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Vision Board");
 
+        // Request Write External Storage permission if not granted
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -63,6 +64,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         mTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                // View holds position while being chosen to be delete or edited
                 if (mEditingOrDeleting) {
                     return false;
                 }
@@ -99,6 +101,7 @@ public class VisionBoardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        // Alert dialog notifying users Vision Board will not be saved
         new AlertDialog.Builder(VisionBoardActivity.this)
                 .setMessage("Are you sure you want to exit?" +
                 "\nYou will lose your Vision Board")
@@ -109,6 +112,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("No", null)
+                .setCancelable(false)
                 .create().show();
     }
 
@@ -119,43 +123,54 @@ public class VisionBoardActivity extends AppCompatActivity {
             return;
         }
 
-        try {
-            String path = "/Pictures/Screenshots/VisionBoard.jpg";
-            String pathName = Environment.getExternalStorageDirectory().toString() + path;
+        new AlertDialog.Builder(VisionBoardActivity.this)
+                .setMessage("Save Vision Board?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        try {
+                            String path = "/Pictures/Screenshots/VisionBoard.jpg";
+                            String pathName = Environment.getExternalStorageDirectory().toString() + path;
 
-            View screenshot = getWindow().getDecorView().getRootView();
-            screenshot.setDrawingCacheEnabled(true);
-            Bitmap bitmap = Bitmap.createBitmap(screenshot.getDrawingCache());
-            screenshot.setDrawingCacheEnabled(false);
+                            View screenshot = getWindow().getDecorView().getRootView();
+                            screenshot.setDrawingCacheEnabled(true);
+                            Bitmap bitmap = Bitmap.createBitmap(screenshot.getDrawingCache());
+                            screenshot.setDrawingCacheEnabled(false);
 
-            final File imageFile = new File(pathName);
+                            final File imageFile = new File(pathName);
 
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            outputStream.flush();
-            outputStream.close();
+                            FileOutputStream outputStream = new FileOutputStream(imageFile);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                            outputStream.flush();
+                            outputStream.close();
 
-            MediaScannerConnection.scanFile(this,
-                    new String[]{imageFile.toString()}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
+                            MediaScannerConnection.scanFile(getApplicationContext(),
+                                    new String[]{imageFile.toString()}, null,
+                                    new MediaScannerConnection.OnScanCompletedListener() {
+                                        public void onScanCompleted(String path, Uri uri) {
 
+                                        }
+                                    });
+
+                            new AlertDialog.Builder(VisionBoardActivity.this)
+                                    .setMessage("Do you want to open Vision Board?")
+                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            openScreenShoot(imageFile);
+                                        }
+                                    })
+                                    .setNegativeButton("No", null)
+                                    .setCancelable(false)
+                                    .create().show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    });
-
-            new AlertDialog.Builder(VisionBoardActivity.this)
-                    .setMessage("Do you want to open Vision Board?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            openScreenShoot(imageFile);
-                        }
-                    })
-                    .setNegativeButton("No", null)
-                    .create().show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    }
+                })
+                .setNegativeButton("No", null)
+                .setCancelable(false)
+                .create().show();
     }
 
     public void openScreenShoot(File file){
@@ -168,7 +183,7 @@ public class VisionBoardActivity extends AppCompatActivity {
 
     public void textOptions(){
         CharSequence[] textOptions = {"New", "Edit", "Change Color", "Change Size"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+        new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Text Options:")
                 .setItems(textOptions, new DialogInterface.OnClickListener() {
                     @Override
@@ -190,8 +205,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                                 break;
                         }
                     }
-                });
-        builder.create().show();
+                }).create().show();
     }
 
     public void addNewText(){
@@ -221,7 +235,8 @@ public class VisionBoardActivity extends AppCompatActivity {
                         mViewGroup.addView(mNewText);
                     }
                 })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton("Cancel", null)
+                .setCancelable(false);
         builder.create().show();
 
         mNewText.setOnTouchListener(mTouchListener);
@@ -263,7 +278,8 @@ public class VisionBoardActivity extends AppCompatActivity {
                             ((TextView) child).setText(input);
                         }
                     })
-                            .setNegativeButton("Cancel", null);
+                            .setNegativeButton("Cancel", null)
+                            .setCancelable(false);
                     builder.create().show();
                     mEditingOrDeleting = false;
                 }
@@ -299,9 +315,8 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void pickColor(final TextView textView){
-        // TODO: ADD MORE COLORS
-        CharSequence[] colors = {"Green", "Red", "Blue", "Black"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+        CharSequence[] colors = {"Green", "Red", "Blue", "Yellow", "Magenta", "Black", "White", "Default"};
+        new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Pick Color:")
                 .setItems(colors, new DialogInterface.OnClickListener() {
                     @Override
@@ -316,21 +331,31 @@ public class VisionBoardActivity extends AppCompatActivity {
                             case 2: // Blue
                                 textView.setTextColor(Color.BLUE);
                                 break;
-                            case 3: // Black
+                            case 3: // Yellow
+                                textView.setTextColor(Color.YELLOW);
+                                break;
+                            case 4: // Magenta
+                                textView.setTextColor(Color.MAGENTA);
+                                break;
+                            case 5: // Black
                                 textView.setTextColor(Color.BLACK);
                                 break;
+                            case 6: // White
+                                textView.setTextColor(Color.WHITE);
+                                break;
+                            case 7: // Default -5128766
+                                textView.setTextColor(ContextCompat.getColor(getApplicationContext(),
+                                        android.R.color.secondary_text_dark));
                             default:
                                 break;
                         }
                     }
-                });
-        builder.create().show();
+                }).create().show();
     }
 
     public void pickColor(final ViewGroup viewGroup){
-        // TODO: ADD MORE COLORS
-        CharSequence[] colors = {"Green", "Red", "Blue", "Black"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+        CharSequence[] colors = {"Green", "Red", "Blue", "Yellow", "Magenta", "White", "Default"};
+        new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Pick Color:")
                 .setItems(colors, new DialogInterface.OnClickListener() {
                     @Override
@@ -345,15 +370,25 @@ public class VisionBoardActivity extends AppCompatActivity {
                             case 2: // Blue
                                 viewGroup.setBackgroundColor(Color.BLUE);
                                 break;
-                            case 3: // Black
-                                viewGroup.setBackgroundColor(Color.BLACK);
+                            case 3: // Yellow
+                                viewGroup.setBackgroundColor(Color.YELLOW);
+                                break;
+                            case 4: // Magenta
+                                viewGroup.setBackgroundColor(Color.MAGENTA);
+                                break;
+                            case 5: // White
+                                viewGroup.setBackgroundColor(Color.WHITE);
+                                break;
+                            case 6: // Default
+                                viewGroup.setBackgroundColor(
+                                        ContextCompat.getColor(getApplicationContext(),
+                                                android.R.color.holo_orange_light));
                                 break;
                             default:
                                 break;
                         }
                     }
-                });
-        builder.create().show();
+                }).create().show();
     }
 
     public void changeTextSize(){
@@ -404,7 +439,8 @@ public class VisionBoardActivity extends AppCompatActivity {
                         textView.setTextSize(value);
                     }
                 })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton("Cancel", null)
+                .setCancelable(false);
         builder.create().show();
     }
 
@@ -428,7 +464,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
 
         CharSequence[] deleteOptions = {"Delete Item", "Delete All"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this)
+        new AlertDialog.Builder(VisionBoardActivity.this)
                 .setTitle("Deletion Options:")
                 .setItems(deleteOptions, new DialogInterface.OnClickListener() {
                     @Override
@@ -444,21 +480,21 @@ public class VisionBoardActivity extends AppCompatActivity {
                                 break;
                         }
                     }
-                });
-        builder.create().show();
+                }).create().show();
     }
 
     public void deleteAllViews(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
-        builder.setMessage("Delete All?")
+        new AlertDialog.Builder(VisionBoardActivity.this)
+                .setMessage("Delete All?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         mViewGroup.removeAllViews();
                     }
                 })
-                .setNegativeButton("No", null);
-        builder.create().show();
+                .setNegativeButton("No", null)
+                .setCancelable(false)
+                .create().show();
     }
 
     public void deleteView(){
@@ -470,16 +506,17 @@ public class VisionBoardActivity extends AppCompatActivity {
             child.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
-                    builder.setMessage("Delete Item?")
+                    new AlertDialog.Builder(VisionBoardActivity.this)
+                            .setMessage("Delete Item?")
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     mViewGroup.removeView(child);
                                 }
                             })
-                            .setNegativeButton("No", null);
-                    builder.create().show();
+                            .setNegativeButton("No", null)
+                            .setCancelable(false)
+                            .create().show();
                     mEditingOrDeleting = false;
                 }
             });
@@ -538,6 +575,12 @@ public class VisionBoardActivity extends AppCompatActivity {
                 addNewImage(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            catch (OutOfMemoryError e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Images too large. Use smaller Images. Restarting...",
+                        Toast.LENGTH_LONG).show();
+                mViewGroup.removeAllViews();
             }
         }
     }

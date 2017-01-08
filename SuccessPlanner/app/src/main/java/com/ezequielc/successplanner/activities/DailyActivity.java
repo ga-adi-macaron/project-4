@@ -125,7 +125,7 @@ public class DailyActivity extends AppCompatActivity {
                                         break;
                                 }
                             }
-                        });
+                        }).setCancelable(false);
                 builder.create().show();
             }
         });
@@ -190,7 +190,8 @@ public class DailyActivity extends AppCompatActivity {
                 }
             }
         })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton("Cancel", null)
+                .setCancelable(false);
         builder.create().show();
     }
 

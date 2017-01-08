@@ -73,7 +73,8 @@ public class GoalRecyclerViewAdapter extends RecyclerView.Adapter<GoalRecyclerVi
                                                 notifyItemChanged(holder.getAdapterPosition());
                                             }
                                         })
-                                                .setNegativeButton("Cancel", null);
+                                                .setNegativeButton("Cancel", null)
+                                                .setCancelable(false);
                                         editOptionBuilder.create().show();
                                         break;
 
@@ -90,12 +91,13 @@ public class GoalRecyclerViewAdapter extends RecyclerView.Adapter<GoalRecyclerVi
                                                         notifyItemRemoved(holder.getAdapterPosition());
                                                     }
                                                 })
-                                                .setNegativeButton("No", null);
+                                                .setNegativeButton("No", null)
+                                                .setCancelable(false);
                                         deleteOptionBuilder.create().show();
                                         break;
                                 }
                             }
-                        });
+                        }).setCancelable(false);
                 builder.create().show();
                 return false;
             }

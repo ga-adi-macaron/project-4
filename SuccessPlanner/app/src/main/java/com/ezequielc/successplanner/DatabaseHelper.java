@@ -19,25 +19,25 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "successplanner.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "successplanner.db";
 
     // TODO: REMOVE THIS TABLE
-    public static final String DAILY_DATA_TABLE = "daily_data_list";
+    private static final String DAILY_DATA_TABLE = "daily_data_list";
 
-    public static final String COL_ID = "id";
-    public static final String COL_DATE = "date";
+    private static final String COL_ID = "id";
+    private static final String COL_DATE = "date";
 
-    public static final String GOALS_TABLE = "goals_list";
-    public static final String COL_GOALS = "goals";
+    private static final String GOALS_TABLE = "goals_list";
+    private static final String COL_GOALS = "goals";
 
-    public static final String AFFIRMATIONS_TABLE = "affirmations_list";
-    public static final String COL_AFFIRMATIONS = "affirmations";
+    private static final String AFFIRMATIONS_TABLE = "affirmations_list";
+    private static final String COL_AFFIRMATIONS = "affirmations";
 
-    public static final String SCHEDULE_TABLE = "schedule_list";
-    public static final String COL_SCHEDULE = "schedule";
+    private static final String SCHEDULE_TABLE = "schedule_list";
+    private static final String COL_SCHEDULE = "schedule";
 
-    public DatabaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -49,24 +49,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } return mInstance;
     }
 
-    public static final String CREATE_DAILY_DATA_TABLE =
+    private static final String CREATE_DAILY_DATA_TABLE =
             "CREATE TABLE " + DAILY_DATA_TABLE + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_DATE + " TEXT)";
 
-    public static final String CREATE_GOALS_TABLE =
+    private static final String CREATE_GOALS_TABLE =
             "CREATE TABLE " + GOALS_TABLE + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_DATE + " TEXT, " +
                     COL_GOALS + " TEXT)";
 
-    public static final String CREATE_AFFIRMATIONS_TABLE =
+    private static final String CREATE_AFFIRMATIONS_TABLE =
             "CREATE TABLE " + AFFIRMATIONS_TABLE + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_DATE + " TEXT, " +
                     COL_AFFIRMATIONS + " TEXT)";
 
-    public static final String CREATE_SCHEDULE_TABLE =
+    private static final String CREATE_SCHEDULE_TABLE =
             "CREATE TABLE " + SCHEDULE_TABLE + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_DATE + " TEXT, " +
