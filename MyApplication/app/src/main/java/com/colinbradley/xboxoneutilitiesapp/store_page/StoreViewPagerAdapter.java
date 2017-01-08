@@ -44,7 +44,7 @@ public class StoreViewPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return "Sales With Gold";
             case 2:
-                return "Marketplace";
+                return "Latest Items in Marketplace";
             default:
                 return "???";
         }
