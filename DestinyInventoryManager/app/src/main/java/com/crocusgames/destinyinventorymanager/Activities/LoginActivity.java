@@ -149,11 +149,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 CharacterInfoSingleton characterInfo = CharacterInfoSingleton.getInstance();
 
-                List<Character> characters = mainObject.getResponse().getDestinyAccounts().get(0).getCharacters();
+                try {
+                    List<Character> characters = mainObject.getResponse().getDestinyAccounts().get(0).getCharacters();
 
-                if (characters == null || characters.size() == 0) {
-                    Toast.makeText(LoginActivity.this, "Unable to get account information. Please try again later.", Toast.LENGTH_SHORT).show();
-                } else {
                     Log.d(AppConstants.TAG, "Character Quantity " + characters.size());
                     String membershipId = mainObject.getResponse().getDestinyAccounts().get(0).
                             getUserInfo().getMembershipId();
@@ -162,7 +160,6 @@ public class LoginActivity extends AppCompatActivity {
 
                     characterInfo.setMembershipId(membershipId);
                     characterInfo.setMembershipType(membershipType);
-
 
                     SharedPreferences sharedPreferences = getSharedPreferences(USER_PREFERENCES,
                             Context.MODE_PRIVATE);
@@ -208,6 +205,10 @@ public class LoginActivity extends AppCompatActivity {
                     characterInfo.setSelectedCharacter(0);
                     Intent intent = new Intent(LoginActivity.this, CharInvActivity.class);
                     startActivity(intent);
+
+                } catch (Exception e) {
+                    Toast.makeText(LoginActivity.this, "Unable to get account information. Please try again later.", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
