@@ -24,7 +24,7 @@ public interface PropublicaService {
     Call<RecentBills> getRecentBills(@Path("chamber") String chamber, @Path("filter") String filter, @Query("offset") int offSet);
 
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
-    @GET("/congress/v1/115/bills/{bill-id}.json")
+    @GET("/congress/v1/{session}/bills/{bill-id}.json")
         // TODO: 1/5/17 change congress?
-    Call<DetailBill> getDetailBill(@Path("bill-id") String bill_id);
+    Call<DetailBill> getDetailBill(@Path("bill-id") String bill_id, @Path("session") int session);
 }

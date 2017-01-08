@@ -17,15 +17,15 @@ import java.util.List;
  */
 
 public class ResultBillAdapter extends RecyclerView.Adapter<ResultBillAdapter.ResultViewHolder> {
-    private List<Result> mNewsResult;
+    private List<Result> mBillsList;
     private OnResultBillSelectedListener mListener;
 
     interface OnResultBillSelectedListener{
-        void OnResultBillSelected(String billId);
+        void OnResultBillSelected(String billId, long congress);
     }
 
-    public ResultBillAdapter(List<Result> newsResult, OnResultBillSelectedListener listener) {
-        mNewsResult = newsResult;
+    public ResultBillAdapter(List<Result> billsList, OnResultBillSelectedListener listener) {
+        mBillsList = billsList;
         mListener = listener;
     }
 
@@ -38,15 +38,34 @@ public class ResultBillAdapter extends RecyclerView.Adapter<ResultBillAdapter.Re
 
     @Override
     public void onBindViewHolder(ResultViewHolder holder, int position) {
-        String bill = mNewsResult.get(position).getBillType()+(int)mNewsResult.get(position).getNumber();
-        holder.mBillNumber.setText(bill);
-        holder.mBillTitle.setText(mNewsResult.get(position).getOfficialTitle());
-        holder.mBillItem.setOnClickListener(v-> mListener.OnResultBillSelected(bill));
+        String type = getBillType(mBillsList.get(position).getBillType());
+        String bill = mBillsList.get(position).getBillType()+(int) mBillsList.get(position).getNumber();
+        holder.mBillNumber.setText(String.format("%s%d", type, mBillsList.get(position).getNumber()));
+        holder.mBillTitle.setText(mBillsList.get(position).getOfficialTitle());
+        holder.mBillItem.setOnClickListener(v-> mListener.OnResultBillSelected(bill,mBillsList.get(position).getCongress()));
     }
 
+    private String getBillType(String type){
+        StringBuilder holder = new StringBuilder(type);
+        StringBuilder builder = new StringBuilder();
+        if (type.contains("res")) {
+            builder.append("Res.");
+            holder.replace(holder.indexOf("res"),type.length(),"");
+        }
+        if (type.contains("con")){
+            builder.insert(0,"Con.");
+            holder.replace(holder.indexOf("con"),holder.length(),"");
+        }
+        for (int i = holder.length(); i > 0; i--) {
+            holder.insert(i,".");
+        }
+        builder.insert(0,holder.toString().toUpperCase());
+
+        return builder.toString();
+    }
     @Override
     public int getItemCount() {
-        return mNewsResult.size()>=5 ? 5:mNewsResult.size();
+        return mBillsList.size()>=5 ? 5: mBillsList.size();
     }
 
     class ResultViewHolder extends RecyclerView.ViewHolder{

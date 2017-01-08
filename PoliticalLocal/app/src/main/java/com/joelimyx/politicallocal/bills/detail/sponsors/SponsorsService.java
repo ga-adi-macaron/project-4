@@ -14,6 +14,6 @@ import retrofit2.http.Path;
 public interface SponsorsService {
 
     @Headers("X-API-Key: rejxuzeqlf7ghtKW2xiQr1TwSAa3jNTSwGCNU24j")
-    @GET("/congress/v1/115/bills/{bill-id}/cosponsors.json")
-    Call<GsonSponsorsList> getSponsors(@Path("bill-id") String bill_id);
+    @GET("/congress/v1/{session}/bills/{bill-id}/cosponsors.json")
+    Call<GsonSponsorsList> getSponsors(@Path("bill-id") String bill_id, @Path("session") String session);
 }

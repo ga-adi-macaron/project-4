@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -18,9 +19,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageRequest;
@@ -33,6 +37,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.joelimyx.politicallocal.search.ResultFragment;
+import com.joelimyx.politicallocal.search.SearchHistory;
 import com.joelimyx.politicallocal.welcome.LoginActivity;
 import com.joelimyx.politicallocal.R;
 import com.joelimyx.politicallocal.bills.BillFragment;
@@ -83,16 +88,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser mUser;
 
     //Local variables
-    private FloatingActionButton mButton;
-    private boolean mIsFirst, mIsBillFragment = false;
+    private boolean mIsFirst;
     private OnBottomMenuItemSelectedListener mListener;
-    private OnBillFabClickedListener mBillFabClickedListener;
 
     public static final String sunlight_base_URL = "https://congress.api.sunlightfoundation.com/";
-
-    public interface OnBillFabClickedListener{
-        void OnBillFabClicked();
-    }
 
     @Override
     protected void onStart() {
@@ -156,6 +155,15 @@ public class MainActivity extends AppCompatActivity
         AppBarLayout appBar = (AppBarLayout) findViewById(R.id.bill_appbar_layout);
         appBar.addOnOffsetChangedListener(this);
         mSearchView = (FloatingSearchView) findViewById(R.id.search_view);
+        mSearchView.setOnQueryChangeListener((oldQuery, newQuery) -> {
+            if (oldQuery.isEmpty() && newQuery.isEmpty())
+                mSearchView.clearSuggestions();
+            else{
+                mSearchView.showProgress();
+                mSearchView.hideProgress();
+            }
+        });
+
         mSearchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
             @Override
             public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
@@ -197,15 +205,11 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.main_container, BillFragment.newInstance(),getString(R.string.bill_fragment))
                 .commit();
         mBottomNavigationView.getMenu().getItem(2).setChecked(true);
-
-        mButton = (FloatingActionButton) findViewById(R.id.bill_filter_fab);
-        mButton.setOnClickListener(v -> mBillFabClickedListener.OnBillFabClicked());
     }
 
     /*---------------------------------------------------------------------------------
     // Sign In Result AREA
     ---------------------------------------------------------------------------------*/
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -228,7 +232,6 @@ public class MainActivity extends AppCompatActivity
         FragmentManager transaction = getSupportFragmentManager();
         switch (item.getItemId()) {
             case R.id.reps:
-                mIsBillFragment = false;
                 String state = getSharedPreferences(getString(R.string.district_file), Context.MODE_PRIVATE).getString(getString(R.string.state),null);
                 transaction
                     .beginTransaction()
@@ -238,7 +241,6 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             case R.id.news:
-                mIsBillFragment = false;
                 transaction
                     .beginTransaction()
                     .replace(R.id.main_container, NewsFragment.newInstance())
@@ -247,7 +249,6 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.bills:
                 if (!(transaction.findFragmentByTag(getString(R.string.bill_fragment)) instanceof BillFragment)) {
-                    mIsBillFragment = true;
                     BillFragment temp = BillFragment.newInstance();
                     transaction
                             .beginTransaction()
@@ -255,9 +256,6 @@ public class MainActivity extends AppCompatActivity
                             .commit();
 
                     mListener = temp.getListener();
-                    mBillFabClickedListener = temp.getFabListener();
-
-                    mButton.setVisibility(View.VISIBLE);
                     mBottomNavigationView.setBackgroundColor(Color.parseColor("#FB8C00"));
                 }else {
                     mListener.OnBottomMenuItemSelected(getString(R.string.bill_fragment));
@@ -326,10 +324,6 @@ public class MainActivity extends AppCompatActivity
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         mSearchView.setTranslationY(verticalOffset);
         mBottomNavigationView.setTranslationY(verticalOffset*-1);
-        if (verticalOffset == 0 && mIsBillFragment) {
-            mButton.setVisibility(View.VISIBLE);
-        }else
-            mButton.setVisibility(View.GONE);
     }
 
     /*---------------------------------------------------------------------------------
@@ -349,7 +343,7 @@ public class MainActivity extends AppCompatActivity
                 .baseUrl(sunlight_base_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<RepsList> call = retrofit.create(SunlightService.class).getLegislatures(latitude,longitude);
+        Call<RepsList> call = retrofit.create(SunlightService.class).getLegislatures(latitude,longitude,null);
         if (preference.getBoolean(getString(R.string.is_first),true)) {
             call.enqueue(new Callback<RepsList>() {
                 @Override

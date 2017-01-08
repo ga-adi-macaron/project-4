@@ -49,6 +49,10 @@
             android:name=".welcome.LoginActivity"
             android:label="Sign In">
         </activity>
+        <activity
+            android:name=".search.DetailRepsResultActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

@@ -22,6 +22,7 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,7 +53,6 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
 
-    private static final String TAG = "DetailBillActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
                 .baseUrl(BillFragment.propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<DetailBill> call = retrofit.create(PropublicaService.class).getDetailBill(getIntent().getStringExtra("id"));
+        Call<DetailBill> call = retrofit.create(PropublicaService.class).getDetailBill(getIntent().getStringExtra("id"), getIntent().getIntExtra("congress",-1));
         call.enqueue(new Callback<DetailBill>() {
             @Override
             public void onResponse(Call<DetailBill> call, Response<DetailBill> response) {
@@ -174,13 +174,14 @@ public class DetailBillActivity extends AppCompatActivity implements AppBarLayou
         @Override
         public Fragment getItem(int position) {
             String billId = getIntent().getStringExtra("id");
+            String session = String.valueOf(getIntent().getIntExtra("congress",-1));
             switch (position){
                 case 0:
-                    return SummaryFragment.newInstance(billId,mSession);
+                    return SummaryFragment.newInstance(billId,session);
                 case 1:
-                    return SponsorsFragment.newInstance(billId);
+                    return SponsorsFragment.newInstance(billId, session);
                 case 2:
-                    return UpdateFragment.newInstance(billId);
+                    return UpdateFragment.newInstance(billId, session);
                 default:
                     return null;
             }

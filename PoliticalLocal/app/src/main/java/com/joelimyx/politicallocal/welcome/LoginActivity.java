@@ -76,11 +76,11 @@ public class LoginActivity extends AppCompatActivity{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == FIREBASE_SIGN_IN) {
             if (resultCode==RESULT_OK) {
-                String token = IdpResponse.fromResultIntent(data).getIdpToken();
-                firebaseAuthWithGoogle(token);
+                Toast.makeText(this, "First sign in", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
 
             } else if (resultCode == ResultCodes.RESULT_NO_NETWORK){
                 Toast.makeText(this, "No Network Available", Toast.LENGTH_SHORT).show();
@@ -89,20 +89,6 @@ public class LoginActivity extends AppCompatActivity{
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void firebaseAuthWithGoogle(String token){
-        AuthCredential credential = GoogleAuthProvider.getCredential(token, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-
-                    if (!task.isSuccessful()) {
-                        Log.w(TAG, "signInWithCredential", task.getException());
-                        Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     @Override

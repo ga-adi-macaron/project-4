@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.joelimyx.politicallocal.reps.MyRep;
 import com.joelimyx.politicallocal.reps.gson.congress.Result;
+import com.joelimyx.politicallocal.search.SearchHistory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,8 @@ import java.util.List;
 public class RepsSQLHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "politician.db";
     private static final String REPS_TABLE_NAME = "reps_table";
-    private static final int DATABASE_VERSION = 6;
+    private static final String HISTORY_TABLE_NAME = "history_table";
+    private static final int DATABASE_VERSION = 7;
 
     private static final String COL_BIO_ID = "bio_id";
     private static final String COL_C_ID = "c_id";
@@ -31,9 +33,12 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
     private static final String COL_TWITTER = "twitter";
     private static final String COL_CHAMBER = "chamber";
     private static final String COL_DISTRICT_CLASS = "district_class";
-    public static final String COL_FILE_NAME = "file_name";
+    private static final String COL_FILE_NAME = "file_name";
 
-    private static final String[] BASIC_COLUMNS = {COL_NAME,COL_PARTY};
+    private static final String COL_ID = "id";
+    private static final String COL_TERM = "term";
+    private static final String COL_COUNT = "count";
+
     private static final String CREATE_TABLE =
             "CREATE TABLE "+ REPS_TABLE_NAME+"("+
                     COL_BIO_ID+" TEXT PRIMARY KEY, "+
@@ -47,6 +52,12 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
                     COL_CHAMBER +" TEXT, "+
                     COL_FILE_NAME+" TEXT, "+
                     COL_DISTRICT_CLASS+" INTEGER)";
+
+    private static final String CREATE_HISTORY_TABLE =
+            "CREATE TABLE "+HISTORY_TABLE_NAME+"("+
+                    COL_ID+" INTEGER PRIMARY KEY, "+
+                    COL_TERM+ " TEXT, "+
+                    COL_COUNT+" INTEGER)";
 
     private static RepsSQLHelper sInstance;
 
@@ -64,11 +75,13 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
+        db.execSQL(CREATE_HISTORY_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + REPS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + HISTORY_TABLE_NAME);
         this.onCreate(db);
     }
 
@@ -164,4 +177,11 @@ public class RepsSQLHelper extends SQLiteOpenHelper {
         cursor.close();
         return myRep;
     }
+
+    /*---------------------------------------------------------------------------------
+    // Search History AREA
+    ---------------------------------------------------------------------------------*/
+//    public List<SearchHistory> getHistoryList(){
+//        new SearchHistory()
+//    }
 }

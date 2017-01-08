@@ -12,6 +12,7 @@ import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import com.joelimyx.politicallocal.reps.gson.congress.RepsList;
 import com.joelimyx.politicallocal.reps.gson.congress.Result;
 import com.joelimyx.politicallocal.reps.service.SunlightService;
 import com.joelimyx.politicallocal.search.gson.BillSearch;
+import com.twitter.sdk.android.core.models.Card;
 
 import java.util.List;
 
@@ -46,7 +48,19 @@ public class ResultFragment extends Fragment
         NewsAdapter.OnNewsItemSelectedListener, ResultBillAdapter.OnResultBillSelectedListener{
     private static final String ARG_QUERY = "query";
 
+    private static final int VISI_NONE_CODE = 0;
+    private static final int VISI_REPS_CODE = 1;
+    private static final int VISI_BILL_CODE = 2;
+    private static final int VISI_NEWS_CODE = 3;
+    private static final int VISI_REPS_BILL_CODE = 4;
+    private static final int VISI_NEWS_BILL_CODE = 5;
+    private static final int VISI_REPS_NEWS_CODE = 6;
+
     private String mQuery;
+    private Retrofit mSunlightRetrofit, mNewsRetrofit;
+    private RecyclerView mResultRepsRecyclerview, mResultNewsRecyclerview, mResultBillsRecyclerview;
+    private LinearLayout mResultRepsLayout, mResultNewsLayout, mResultBillsLayout;
+    private CardView mNoResult;
 
     public ResultFragment() {
     }
@@ -75,34 +89,72 @@ public class ResultFragment extends Fragment
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        RecyclerView resultRepsRecyclerview = (RecyclerView) view.findViewById(R.id.result_representatives_recyclerview),
-                resultNewsRecyclerview = (RecyclerView) view.findViewById(R.id.result_news_recyclerview),
-                resultBillsRecyclerview = (RecyclerView) view.findViewById(R.id.result_bills_recyclerview);
+        mResultRepsRecyclerview = (RecyclerView) view.findViewById(R.id.result_representatives_recyclerview);
+        mResultNewsRecyclerview = (RecyclerView) view.findViewById(R.id.result_news_recyclerview);
+        mResultBillsRecyclerview = (RecyclerView) view.findViewById(R.id.result_bills_recyclerview);
 
-        LinearLayout resultRepsLayout = (LinearLayout) view.findViewById(R.id.result_representatives),
-                resultNewsLayout = (LinearLayout) view.findViewById(R.id.result_news),
-                resultBillsLayout = (LinearLayout) view.findViewById(R.id.result_bills);
+        mResultRepsLayout = (LinearLayout) view.findViewById(R.id.result_representatives);
+        mResultNewsLayout = (LinearLayout) view.findViewById(R.id.result_news);
+        mResultBillsLayout = (LinearLayout) view.findViewById(R.id.result_bills);
 
-        resultRepsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        resultNewsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        resultBillsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mResultRepsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mResultNewsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mResultBillsRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
 
+        mResultRepsRecyclerview.setNestedScrollingEnabled(false);
+        mResultNewsRecyclerview.setNestedScrollingEnabled(false);
+        mResultBillsRecyclerview.setNestedScrollingEnabled(false);
+
+        mNoResult = (CardView) view.findViewById(R.id.no_result);
         /*---------------------------------------------------------------------------------
-        // Reps Result
+        // Retrofit AREA
         ---------------------------------------------------------------------------------*/
-        Retrofit sunlightRetrofit = new Retrofit.Builder()
+        mSunlightRetrofit = new Retrofit.Builder()
                 .baseUrl(MainActivity.sunlight_base_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<RepsList> repsCall = sunlightRetrofit.create(SunlightService.class).searchLegislatures(mQuery);
+
+        mNewsRetrofit = new Retrofit.Builder()
+                .baseUrl(NewsFragment.baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        if (mQuery.matches(".*\\d.*")){
+            try{
+                int zip = Integer.valueOf(mQuery);
+                locateReps(String.valueOf(mQuery));
+                hideLayouts(VISI_REPS_CODE);
+            }catch (NumberFormatException e) {
+                e.printStackTrace();
+                hideLayouts(VISI_NONE_CODE);
+            }
+        }else{
+            searchNews(mQuery);
+            searchReps(mQuery);
+            searchBills(mQuery);
+        }
+
+    }
+
+    /*---------------------------------------------------------------------------------
+    // Search helper method
+    ---------------------------------------------------------------------------------*/
+
+    /**
+     * Search representative by name
+     * @param query name of the representative
+     */
+    private void searchReps(String query){
+
+        Call<RepsList> repsCall = mSunlightRetrofit.create(SunlightService.class).searchLegislatures(mQuery);
         repsCall.enqueue(new Callback<RepsList>() {
             @Override
             public void onResponse(Call<RepsList> call, Response<RepsList> response) {
                 List<Result> results = response.body().getResults();
                 if (results.size()>0) {
-                    resultRepsRecyclerview.setAdapter(new ResultRepsAdapter(results, getContext(), ResultFragment.this));
+                    mResultRepsRecyclerview.setAdapter(new ResultRepsAdapter(results, getContext(), ResultFragment.this));
                 }else{
-                    resultRepsLayout.setVisibility(View.GONE);
+                    mResultRepsLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -112,22 +164,47 @@ public class ResultFragment extends Fragment
                 t.printStackTrace();
             }
         });
+    }
 
-        /*---------------------------------------------------------------------------------
-        // News Result
-        ---------------------------------------------------------------------------------*/
-        Retrofit newsRetrofit = new Retrofit.Builder()
-                .baseUrl(NewsFragment.baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        Call<News> newsCall = newsRetrofit.create(BingSearchService.class).getNews(mQuery+" politic",5,0);
+    /**
+     * Locate representative by zip
+     * @param zip postal code
+     */
+    private void locateReps(String zip){
+        Call<RepsList> repsCall = mSunlightRetrofit.create(SunlightService.class).getLegislatures(0,0,zip);
+        repsCall.enqueue(new Callback<RepsList>() {
+            @Override
+            public void onResponse(Call<RepsList> call, Response<RepsList> response) {
+                List<Result> results = response.body().getResults();
+                if (results.size()>0) {
+                    mResultRepsRecyclerview.setAdapter(new ResultRepsAdapter(results, getContext(), ResultFragment.this));
+                }else{
+                    mResultRepsLayout.setVisibility(View.GONE);
+                    mNoResult.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RepsList> call, Throwable t) {
+                Toast.makeText(getContext(), "Representatives Search Fail", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Search on news related to politic with query
+     * @param query search query
+     */
+    private void searchNews(String query){
+        Call<News> newsCall = mNewsRetrofit.create(BingSearchService.class).getNews(mQuery+" politic",5,0);
         newsCall.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
                 if (response.body().getValue().size()>0) {
-                    resultNewsRecyclerview.setAdapter(new NewsAdapter(response.body().getValue(), getContext(), ResultFragment.this));
+                    mResultNewsRecyclerview.setAdapter(new NewsAdapter(response.body().getValue(), getContext(), ResultFragment.this));
                 }else{
-                    resultNewsLayout.setVisibility(View.GONE);
+                    mResultNewsLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -137,21 +214,23 @@ public class ResultFragment extends Fragment
                 t.printStackTrace();
             }
         });
+    }
 
-        /*---------------------------------------------------------------------------------
-        // Bills Result
-        ---------------------------------------------------------------------------------*/
+    /**
+     * Search bill's tags or titles that contains
+     * @param query tags or title
+     */
+    private void searchBills(String query){
 
-        Call<BillSearch> billsCall = sunlightRetrofit.create(SunlightService.class).searchBill(mQuery,null);
+        Call<BillSearch> billsCall = mSunlightRetrofit.create(SunlightService.class).searchBill(mQuery,null);
         billsCall.enqueue(new Callback<BillSearch>() {
             @Override
             public void onResponse(Call<BillSearch> call, Response<BillSearch> response) {
                 if (response.body().getResults().size()>0) {
-                    resultBillsRecyclerview.setAdapter(new ResultBillAdapter(response.body().getResults(),ResultFragment.this));
+                    mResultBillsRecyclerview.setAdapter(new ResultBillAdapter(response.body().getResults(),ResultFragment.this));
                 }else{
-                    resultBillsLayout.setVisibility(View.GONE);
+                    mResultBillsLayout.setVisibility(View.GONE);
                 }
-
             }
 
             @Override
@@ -162,10 +241,54 @@ public class ResultFragment extends Fragment
         });
     }
 
+    private void hideLayouts(int code){
+        switch (code){
+            case VISI_NONE_CODE:
+                mResultBillsLayout.setVisibility(View.GONE);
+                mResultNewsLayout.setVisibility(View.GONE);
+                mResultRepsLayout.setVisibility(View.GONE);
+                mNoResult.setVisibility(View.VISIBLE);
+                break;
+
+            case VISI_REPS_CODE:
+                mResultNewsLayout.setVisibility(View.GONE);
+                mResultBillsLayout.setVisibility(View.GONE);
+                break;
+
+            case VISI_NEWS_CODE:
+                mResultBillsLayout.setVisibility(View.GONE);
+                mResultRepsLayout.setVisibility(View.GONE);
+                break;
+
+            case VISI_BILL_CODE:
+                mResultNewsLayout.setVisibility(View.GONE);
+                mResultRepsLayout.setVisibility(View.GONE);
+                break;
+
+            case VISI_REPS_BILL_CODE:
+                mResultNewsLayout.setVisibility(View.GONE);
+                break;
+
+            case VISI_NEWS_BILL_CODE:
+                mResultRepsLayout.setVisibility(View.GONE);
+                break;
+
+            case VISI_REPS_NEWS_CODE:
+                mResultBillsLayout.setVisibility(View.GONE);
+                break;
+
+        }
+    }
+    /*---------------------------------------------------------------------------------
+    // INTERFACE AREA
+    ---------------------------------------------------------------------------------*/
+
     // TODO: 1/5/17
     @Override
     public void OnRepsResultSelected(String id) {
-
+        Intent intent = new Intent(getContext(),DetailRepsResultActivity.class);
+        intent.putExtra("id",id.toUpperCase());
+        startActivity(intent);
     }
 
     @Override
@@ -192,12 +315,13 @@ public class ResultFragment extends Fragment
                 Toast.makeText(getContext(), "Connection Lost", Toast.LENGTH_SHORT).show();
             }
         });
-        
+
     }
 
     @Override
-    public void OnResultBillSelected(String billId) {
+    public void OnResultBillSelected(String billId, long congress) {
         Intent intent = new Intent(getContext(), DetailBillActivity.class);
+        intent.putExtra("congress",(int)congress);
         intent.putExtra("id",billId.toLowerCase());
         getActivity().startActivity(intent);
 

@@ -75,7 +75,7 @@ public class ResultRepsAdapter extends RecyclerView.Adapter<ResultRepsAdapter.Re
 
     @Override
     public int getItemCount() {
-        return mMyReps.size();
+        return mMyReps.size()>=5 ? 5:mMyReps.size();
     }
 
     class ResultRepsViewHolder extends RecyclerView.ViewHolder {

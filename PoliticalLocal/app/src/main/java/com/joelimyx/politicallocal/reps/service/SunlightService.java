@@ -15,11 +15,19 @@ import retrofit2.http.Query;
 
 public interface SunlightService {
     @GET("/legislators/locate")
-    Call<RepsList> getLegislatures(@Query("latitude") double latitude, @Query("longitude") double longitude);
+    Call<RepsList> getLegislatures(
+            @Query("latitude") double latitude,
+            @Query("longitude") double longitude,
+            @Nullable @Query("zip") String zip);
 
     @GET("/legislators?in_office=true")
     Call<RepsList> searchLegislatures(@Query("query") String query);
 
     @GET("/bills/search?order=last_action_at")
-    Call<BillSearch> searchBill(@Query("query") String query, @Nullable @Query("congres") String session);
+    Call<BillSearch> searchBill(
+            @Query("query") String query,
+            @Nullable @Query("congres") String session);
+
+    @GET("/legislators")
+    Call<RepsList> getRepByID(@Query("bioguide_id") String id);
 }

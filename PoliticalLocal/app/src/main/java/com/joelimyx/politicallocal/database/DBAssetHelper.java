@@ -11,7 +11,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class DBAssetHelper extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "politician.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     public DBAssetHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
