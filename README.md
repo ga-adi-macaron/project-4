@@ -6,6 +6,9 @@ This app is a simple, easy to use app that gives gamers the things that they nee
 **Tech/Libraries**, 
 In this app I mainly used Async Tasks to do all the API calls to xboxapi.com.  I also used the Facebook SDK to have a sharing feature, and used an android library found from Android Arsenal (fm.jiecao:jiecaovideoplayer:5.1) to make the fullscreen video player with swipe commands for volume change and time scrubbing. For downloading, I just used the native DownloadManager to queue up and download clips/screenshots
 
+**Link to Play Store**
+https://play.google.com/store/apps/details?id=com.colinbradley.xboxoneutilitiesapp
+
 **Screenshots**
 ![Home Page](/Screenshots/homepage.png?raw=true “Home Page”)
 ![Friends List Page] (/Screenshots/friendshouse.png?raw=true “Friends Page”)
