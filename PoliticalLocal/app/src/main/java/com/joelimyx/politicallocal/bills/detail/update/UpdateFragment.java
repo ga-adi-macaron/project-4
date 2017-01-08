@@ -26,17 +26,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class UpdateFragment extends Fragment {
     private static final String ARG_BILL_ID = "bill id";
+    private static final String ARG_SESSION = "session";
 
-    private String mBillId;
+    private String mBillId, mSession;
 
 
     public UpdateFragment() {
     }
 
-    public static UpdateFragment newInstance(String param1) {
+    public static UpdateFragment newInstance(String billId, String session) {
         UpdateFragment fragment = new UpdateFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_BILL_ID, param1);
+        args.putString(ARG_BILL_ID, billId);
+        args.putString(ARG_SESSION, session);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,6 +48,7 @@ public class UpdateFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mBillId = getArguments().getString(ARG_BILL_ID);
+            mSession = getArguments().getString(ARG_SESSION);
         }
     }
 
@@ -65,7 +68,7 @@ public class UpdateFragment extends Fragment {
                 .baseUrl(BillFragment.propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<DetailBill> call = retrofit.create(PropublicaService.class).getDetailBill(mBillId);
+        Call<DetailBill> call = retrofit.create(PropublicaService.class).getDetailBill(mBillId, Integer.valueOf(mSession));
         call.enqueue(new Callback<DetailBill>() {
             @Override
             public void onResponse(Call<DetailBill> call, Response<DetailBill> response) {

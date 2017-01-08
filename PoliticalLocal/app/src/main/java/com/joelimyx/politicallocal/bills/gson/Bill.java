@@ -24,9 +24,6 @@ public class Bill {
     @SerializedName("cosponsors")
     @Expose
     private String cosponsors;
-    @SerializedName("committees")
-    @Expose
-    private String committees;
     @SerializedName("primary_subject")
     @Expose
     private String primarySubject;
@@ -83,14 +80,6 @@ public class Bill {
 
     public void setCosponsors(String cosponsors) {
         this.cosponsors = cosponsors;
-    }
-
-    public String getCommittees() {
-        return committees;
-    }
-
-    public void setCommittees(String committees) {
-        this.committees = committees;
     }
 
     public String getPrimarySubject() {

@@ -41,7 +41,7 @@ public class NewsFragment extends Fragment
         implements NewsAdapter.OnNewsItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener{
 
-    private static String baseUrl = "https://api.cognitive.microsoft.com/";
+    public static String baseUrl = "https://api.cognitive.microsoft.com/";
     private SwipeRefreshLayout mRefreshLayout;
     private Retrofit mRetrofit;
     private Call<News> mCall;

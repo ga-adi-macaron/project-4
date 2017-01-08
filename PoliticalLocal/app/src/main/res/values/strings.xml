@@ -13,4 +13,9 @@
     <string name="filter">filter</string>
     <string name="chamber_default">house</string>
     <string name="filter_default">introduced</string>
+    <string name="title_activity_result">ResultActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_detail_reps_result">DetailRepsResultActivity</string>
 </resources>

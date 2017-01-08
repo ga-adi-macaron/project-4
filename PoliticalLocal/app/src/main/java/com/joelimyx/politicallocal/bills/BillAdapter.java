@@ -31,12 +31,12 @@ import java.util.List;
  * Created by Joe on 12/20/16.
  */
 
-class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
+public class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
     private Context mContext;
     private List<Bill> mBillList;
     private VotersAdapter mVotersAdapter;
     private OnBillItemSelectedListener mListener;
-    private String mFilter;
+    private String mFilter, mSession;
 
     private static final String TAG = "BillAdapter";
 
@@ -45,10 +45,10 @@ class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
          * Call back from Adapter to fragment to start the DetailBillActivity
          * @param billId bill number in the format of hr123
          */
-        void onBillItemSelected(String billId);
+        void onBillItemSelected(String billId, String session);
     }
 
-    BillAdapter(List<Bill> billList, Context context, OnBillItemSelectedListener listener, String filter) {
+    public BillAdapter(List<Bill> billList, Context context, OnBillItemSelectedListener listener, String filter) {
         mBillList = billList;
         mListener = listener;
         mContext = context;
@@ -68,14 +68,13 @@ class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
         holder.mBillNumber.setText(current.getNumber());
         holder.mBillTitle.setText(Html.fromHtml(current.getTitle()));
         String billId = mBillList.get(position).getNumber().replace(".","");
-        holder.mBillItem.setOnClickListener(view -> {
-            mListener.onBillItemSelected(billId);
-        });
+        holder.mBillItem.setOnClickListener(view -> mListener.onBillItemSelected(billId, mSession));
 
         if (mFilter.equals("passed")) {
             holder.mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
             mVotersAdapter = new VotersAdapter(new ArrayList<>(), mContext);
             holder.mRecyclerView.setAdapter(mVotersAdapter);
+            // TODO: 1/5/17 Work on votes once there is more bills passed
 //            getVotes("house",billId.toLowerCase());
 //            getVotes("senate",billId.toLowerCase());
         }
@@ -86,8 +85,10 @@ class BillAdapter extends RecyclerView.Adapter<BillAdapter.BillViewHolder> {
         return mBillList.size();
     }
 
-    void swapData(List<Bill> newBills, String filter){
+    void swapData(List<Bill> newBills, String filter, String session){
         mFilter = filter;
+        mSession = session;
+
         mBillList.clear();
         mBillList = newBills;
         notifyDataSetChanged();

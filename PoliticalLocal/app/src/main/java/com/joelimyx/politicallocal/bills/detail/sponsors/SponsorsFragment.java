@@ -36,22 +36,23 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SponsorsFragment extends Fragment {
     private static final String ARG_BILL_ID = "bill id";
+    private static final String ARG_SESSION = "session";
     public static final String congress_Url = "https://congress.api.sunlightfoundation.com/";
 
-    private static final String TAG = "SponsorsFragment";
     private TextView mMainSponsorName,mMainSponsorDistrictRank, mCosponsorPlaceHolder;
     private CircleImageView mMainSponsorPortrait;
     private SponsorsAdapter mAdapter;
-    private String mBillId;
+    private String mBillId, mSession;
 
 
     public SponsorsFragment() {
     }
 
-    public static SponsorsFragment newInstance(String billId) {
+    public static SponsorsFragment newInstance(String billId, String session) {
         SponsorsFragment fragment = new SponsorsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_BILL_ID, billId);
+        args.putString(ARG_SESSION, session);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +62,7 @@ public class SponsorsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mBillId = getArguments().getString(ARG_BILL_ID);
+            mSession = getArguments().getString(ARG_SESSION);
         }
     }
 
@@ -90,11 +92,10 @@ public class SponsorsFragment extends Fragment {
                 .baseUrl(BillFragment.propublica_baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        Call<GsonSponsorsList> call = retrofit.create(SponsorsService.class).getSponsors(mBillId);
+        Call<GsonSponsorsList> call = retrofit.create(SponsorsService.class).getSponsors(mBillId, mSession);
         call.enqueue(new Callback<GsonSponsorsList>() {
             @Override
             public void onResponse(Call<GsonSponsorsList> call, Response<GsonSponsorsList> response) {
-
                 //Major sponsor
                 String majorSponsor = response.body().getResults().get(0).getSponsorId();
                 setMainSponsorLayout(majorSponsor);
@@ -113,6 +114,7 @@ public class SponsorsFragment extends Fragment {
             @Override
             public void onFailure(Call<GsonSponsorsList> call, Throwable t) {
                 Toast.makeText(getContext(), "Failed to get Sponsor List", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
             }
         });
 
@@ -165,6 +167,7 @@ public class SponsorsFragment extends Fragment {
             @Override
             public void onFailure(Call<GsonDetailSponsor> call, Throwable t) {
                 Toast.makeText(getContext(), "Failed to get Sponsor Detail", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
             }
         });
     }
@@ -224,6 +227,7 @@ public class SponsorsFragment extends Fragment {
             @Override
             public void onFailure(Call<GsonDetailSponsor> call, Throwable t) {
                 Toast.makeText(getContext(), "Failed to get Sponsor Detail", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
             }
         });
     }

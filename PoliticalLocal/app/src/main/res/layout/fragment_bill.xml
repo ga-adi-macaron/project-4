@@ -1,26 +1,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                   xmlns:tools="http://schemas.android.com/tools"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent"
-                   tools:context="com.joelimyx.politicallocal.bills.BillFragment">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                tools:context="com.joelimyx.politicallocal.bills.BillFragment">
 
     <TextView
-        android:id="@+id/current_chamber_text"
+        android:id="@+id/chamber_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:textSize="22sp"/>
+        android:textSize="18sp"
+        android:text="Chamber: "/>
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/chamber_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:ms_hide_arrow="true"
+        android:layout_toEndOf="@id/chamber_text"/>
+
     <TextView
-        android:id="@+id/current_filter_text"
-        android:layout_toEndOf="@id/current_chamber_text"
+        android:id="@+id/filter_text"
+        android:layout_toEndOf="@id/chamber_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:textSize="22sp"/>
+        android:textSize="18sp"
+        android:text="Filter: "/>
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/filter_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        app:ms_hide_arrow="true"
+        android:layout_toEndOf="@id/filter_text"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/bill_swiperefresh"
-        android:layout_below="@id/current_chamber_text"
+        android:layout_below="@id/chamber_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <android.support.v7.widget.RecyclerView
