@@ -41,31 +41,35 @@ public class GameClipsAdapter extends RecyclerView.Adapter<GameClipsViewHolder>{
     @Override
     public void onBindViewHolder(final GameClipsViewHolder holder, final int position) {
         final GameClip currentClip = mGameClipsList.get(position);
-        holder.mGame.setText(mGameClipsList.get(position).getGameName());
+        holder.mGame.setText(mGameClipsList.get(position).getmGameName());
         holder.mDescription.setText(mGameClipsList.get(position).getClipDescription());
         holder.mTitle.setText(mGameClipsList.get(position).getClipName());
-        holder.bindImage(mGameClipsList.get(position).getImgURL(), mContext);
+        holder.bindImage(mGameClipsList.get(position).getmImgURL(), mContext);
 
-        Uri imgUri = Uri.parse(mGameClipsList.get(position).getImgURL());
-        final Uri clipUri = Uri.parse(mGameClipsList.get(position).getClipURL());
+        Uri imgUri = Uri.parse(mGameClipsList.get(position).getmImgURL());
+        final Uri clipUri = Uri.parse(mGameClipsList.get(position).getmClipURL());
         ShareLinkContent fbShare = new ShareLinkContent.Builder()
-                .setContentTitle(mGameClipsList.get(position).getClipName() + " from " + mGameClipsList.get(position).getGameName())
+                .setContentTitle(mGameClipsList.get(position).getClipName() + " from " + mGameClipsList.get(position).getmGameName())
                 .setImageUrl(imgUri)
                 .setContentUrl(clipUri)
                 .build();
         holder.mShareButton.setShareContent(fbShare);
 
+
         holder.mDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.downloadVideo(currentClip.getClipURL(), "GameClip_");
+                String clipTitle = currentClip.getClipName() + "_from_" + currentClip.getmGameName();
+                String noPoundSign = clipTitle.replace("#", "");
+                String noSpacesTitle = noPoundSign.replace(" ", "_");
+                mOnItemSelectedListener.downloadVideo(currentClip.getmClipURL(), noSpacesTitle);
             }
         });
 
         holder.mImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.onItemSelectedToPlay(currentClip.getClipURL(), currentClip.getImgURL(), currentClip.getClipName());
+                mOnItemSelectedListener.onItemSelectedToPlay(currentClip.getmClipURL(), currentClip.getmImgURL(), currentClip.getClipName());
 
             }
         });

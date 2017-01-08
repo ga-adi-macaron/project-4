@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary"
     tools:context="com.colinbradley.xboxoneutilitiesapp.profile_page.ProfileActivity">
 
     <TextView
@@ -16,7 +17,7 @@
         android:layout_marginTop="8sp"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:text="GamerTag1963"
+        android:text="ArrangingHat638"
         android:visibility="invisible"
         android:textColor="@color/textColor"
     />
@@ -26,7 +27,7 @@
         android:layout_width="150sp"
         android:layout_height="150sp"
         android:background="@color/colorPrimary"
-        android:layout_marginRight="16sp"
+        android:layout_marginRight="66sp"
         android:layout_marginLeft="16sp"
         android:layout_marginTop="8sp"
         android:layout_below="@id/profile_gamertag"
@@ -143,11 +144,23 @@
     android:id="@+id/profile_viewpager"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_toRightOf="@id/profile_gamertag"
+    android:layout_toRightOf="@id/profile_pic"
     android:layout_below="@id/profile_toolbar"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 </android.support.v4.view.ViewPager>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_fab"
+        android:src="@drawable/home"
+        android:layout_marginTop="20sp"
+        android:layout_marginRight="25sp"
+        android:layout_toLeftOf="@id/profile_viewpager"
+        android:layout_below="@id/profile_pic"
+        android:visibility="invisible"
+        />
 
 
 

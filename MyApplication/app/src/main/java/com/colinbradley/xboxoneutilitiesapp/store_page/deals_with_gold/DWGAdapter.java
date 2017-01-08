@@ -44,7 +44,7 @@ public class DWGAdapter extends RecyclerView.Adapter<DWGViewHolder> {
         holder.mNewPrice.setText(mDWGList.get(position).getmNewPrice());
         holder.bindImageToView(mContext, mDWGList.get(position).getmURLforBoxArt());
 
-        holder.mImage.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOnItemSelectedListener.onItemSelected(

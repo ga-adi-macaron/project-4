@@ -10,7 +10,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.colinbradley.xboxoneutilitiesapp.MainActivity">
+    tools:context="com.colinbradley.xboxoneutilitiesapp.MainActivity"
+    android:background="@color/darkerAccent">
 
     <ImageView
         android:id="@+id/homescreen_logo"
@@ -30,14 +31,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/users_gt_input"
-        android:text="GO"/>
+        android:text="GO to profile"
+        android:layout_marginBottom="50sp"
+        android:elevation="200sp"/>
 
     <Button
         android:id="@+id/go_to_video_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/start_button"
-        android:text="video testing"/>
+        android:text="checkout the store!"
+        android:elevation="200sp"/>
 
 
 </RelativeLayout>

@@ -5,7 +5,8 @@
     android:id="@+id/activity_store"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.colinbradley.xboxoneutilitiesapp.store_page.StoreActivity">
+    tools:context="com.colinbradley.xboxoneutilitiesapp.store_page.StoreActivity"
+    android:background="@color/darkerAccent">
 
 
     <android.support.v7.widget.Toolbar

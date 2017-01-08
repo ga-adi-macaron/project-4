@@ -36,6 +36,7 @@ public class DownloaderActivity extends AppCompatActivity{
 
     ProgressBar mProgressBar;
     Button mButton;
+    Button mTest;
     ImageView mImageView;
 
     @Override
@@ -45,6 +46,7 @@ public class DownloaderActivity extends AppCompatActivity{
         Log.d(TAG, "onCreate: got to downloader activity");
 
         mProgressBar = (ProgressBar)findViewById(R.id.dl_progressbar);
+        mTest = (Button)findViewById(R.id.dl_back);
         mButton = (Button)findViewById(R.id.show_dl);
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,12 +128,19 @@ public class DownloaderActivity extends AppCompatActivity{
         request.setTitle(mFileName)
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalFilesDir(this, Environment.DIRECTORY_PICTURES,mFileName);
+                .setDestinationInExternalFilesDir(this, Environment.DIRECTORY_PICTURES, mFileName);
         Log.d(TAG, "onCreate: create request");
         enqueue = mDownloadManager.enqueue(request);
         Log.d(TAG, "onCreate: enqueue request");
 
+        mTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
+
 
     public void showDownload(){
         Log.d(TAG, "showDownload: ");

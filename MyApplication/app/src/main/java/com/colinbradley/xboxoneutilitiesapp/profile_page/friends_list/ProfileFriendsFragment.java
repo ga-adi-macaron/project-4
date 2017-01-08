@@ -23,7 +23,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -36,62 +35,63 @@ import okhttp3.Response;
 public class ProfileFriendsFragment extends Fragment implements FriendsListAdapter.OnItemSelectedListener{
     public static final String TAG = "FriendsFragment";
 
+    public static final String LIST_KEY = "list";
+
     RecyclerView mRV;
     FriendsListAdapter mAdapter;
-    List<Friend> mFriendsList;
+    ArrayList<Friend> mFriendsList;
     AsyncTask<Void,Void,Void> mTask;
     ProgressBar mProgressBar;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mFriendsList = new ArrayList<>();
+        mFriendsList = new ArrayList<Friend>();
         View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
 
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.friends_progressbar);
 
-        mTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                OkHttpClient client = new OkHttpClient();
+        if (savedInstanceState != null){
+            mFriendsList = savedInstanceState.getParcelableArrayList(LIST_KEY);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }else {
 
-                Request request = new Request.Builder()
-                        .headers(MainActivity.mHeaders)
-                        .url("https://xboxapi.com/v2/" + ProfileActivity.mXUID + "/friends")
-                        .build();
+            mTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    OkHttpClient client = new OkHttpClient();
 
-                try {
-                    Response response = client.newCall(request).execute();
-                    Log.d(TAG, "doInBackground: Gathering Friends");
-                    JSONArray friendsArray = new JSONArray(response.body().string());
-                    for (int i = 0; i < friendsArray.length(); i++){
-                        String gamertag = friendsArray.getJSONObject(i).getString("Gamertag");
-                        String picURL = friendsArray.getJSONObject(i).getString("GameDisplayPicRaw");
-                        long xuid = friendsArray.getJSONObject(i).getLong("id");
-                        mFriendsList.add(new Friend(gamertag,picURL,xuid));
-                        Log.d(TAG, "doInBackground: friend added GT -- " + gamertag + " XUID -- " + xuid);
-                        Collections.sort(mFriendsList, Friend.gamertagComparator);
+                    Request request = new Request.Builder()
+                            .headers(MainActivity.mHeaders)
+                            .url("https://xboxapi.com/v2/" + ProfileActivity.mXUID + "/friends")
+                            .build();
+
+                    try {
+                        Response response = client.newCall(request).execute();
+                        Log.d(TAG, "doInBackground: Gathering Friends");
+                        JSONArray friendsArray = new JSONArray(response.body().string());
+                        for (int i = 0; i < friendsArray.length(); i++) {
+                            String gamertag = friendsArray.getJSONObject(i).getString("Gamertag");
+                            String picURL = friendsArray.getJSONObject(i).getString("GameDisplayPicRaw");
+                            long xuid = friendsArray.getJSONObject(i).getLong("id");
+                            mFriendsList.add(new Friend(gamertag, picURL, xuid));
+                            Log.d(TAG, "doInBackground: friend added GT -- " + gamertag + " XUID -- " + xuid);
+                            Collections.sort(mFriendsList, Friend.gamertagComparator);
+                        }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mAdapter.notifyDataSetChanged();
-                mProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }.execute();
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    mAdapter.notifyDataSetChanged();
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+            }.execute();
+        }
 
 
 
@@ -101,6 +101,13 @@ public class ProfileFriendsFragment extends Fragment implements FriendsListAdapt
         mAdapter = new FriendsListAdapter(mFriendsList,rootView.getContext(), ProfileFriendsFragment.this);
         mRV.setAdapter(mAdapter);
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(LIST_KEY, mFriendsList);
+
     }
 
     @Override

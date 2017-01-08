@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean mIsCanceled;
 
-
+    int ALARM_ID = 123456;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +61,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-
-
 
         mEditText = (EditText) findViewById(R.id.users_gt_input);
         mStartButton = (Button) findViewById(R.id.start_button);
@@ -120,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-
                                 return null;
                             }
 
@@ -129,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
                                 super.onCancelled();
                                     onResume();
                                     Toast.makeText(MainActivity.this, "Please Enter a Valid Gamertag", Toast.LENGTH_SHORT).show();
-
                             }
 
                             @Override
@@ -138,21 +132,14 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("xuid", mXUID);
                                 startActivity(intent);
                             }
-
                         }.execute();
 
                     } else {
                         Toast.makeText(MainActivity.this, "No Connection", Toast.LENGTH_SHORT).show();
                     }
-
-
-
                 }
-
             }
         });
-
-
     }
 
     @Override

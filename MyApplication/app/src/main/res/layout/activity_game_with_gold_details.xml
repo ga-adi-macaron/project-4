@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
 
 
 <RelativeLayout
@@ -13,7 +14,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold.GWGDetails">
+    tools:context="com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold.GWGDetails"
+    android:background="@color/colorPrimary">
 
     <ImageView
         android:id="@+id/gwgd_main_img"
@@ -52,6 +54,7 @@
         android:layout_marginBottom="4sp"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:textColor="#000000"
         android:text="Game Title: the sequel"
         android:visibility="invisible"/>
 
@@ -60,7 +63,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/gwgd_title"
-        android:visibility="invisible"/>
+        android:visibility="invisible"
+        android:textColor="#000000"
+        />
 
     <TextView
         android:id="@+id/gwgd_price"
@@ -70,6 +75,7 @@
         android:layout_marginLeft="20sp"
         android:text="$19.99"
         android:textSize="20sp"
+        android:textColor="#000000"
         android:visibility="invisible"/>
 
     <TextView
@@ -78,6 +84,7 @@
         android:layout_height="wrap_content"
         android:text="Now Free With GOLD!!"
         android:textSize="20sp"
+        android:textColor="#000000"
         android:layout_below="@id/gwgd_dev_name"
         android:layout_marginLeft="16sp"
         android:layout_toRightOf="@id/gwgd_price"
@@ -99,6 +106,7 @@
         android:layout_below="@id/gwgd_price"
         android:layout_marginTop="8sp"
         android:textSize="18sp"
+        android:textColor="#000000"
         android:visibility="invisible"/>
 
     <TextView
@@ -106,6 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Genres"
+        android:textColor="#000000"
         android:layout_below="@id/gwgd_description"
         android:visibility="invisible"/>
 
@@ -114,6 +123,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/gwgd_genres"
+        android:textColor="#000000"
         android:visibility="invisible"/>
 
     <ProgressBar
