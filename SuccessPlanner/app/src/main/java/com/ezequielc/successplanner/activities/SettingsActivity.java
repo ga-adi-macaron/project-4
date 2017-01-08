@@ -27,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Settings");
 
+        // References to Views
         mReceiveQuotes = (Switch) findViewById(R.id.get_quote);
         mDeleteAll = (TextView) findViewById(R.id.delete_all_entries);
 

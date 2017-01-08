@@ -54,6 +54,7 @@ public class ScheduleRecyclerViewAdapter extends RecyclerView.Adapter<ScheduleRe
                                         View dialogView = inflater.inflate(R.layout.dialog_add_schedule, null);
                                         editOptionBuilder.setView(dialogView);
 
+                                        // Grabs the text in the adapter position and set it to the edit text
                                         final EditText editText = (EditText) dialogView.findViewById(R.id.schedule_edit_text);
                                         editText.setText(mScheduleList.get(holder.getAdapterPosition()).getSchedule());
 

@@ -22,7 +22,7 @@
         android:title="Save"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/action_settings"
+    <item android:id="@+id/action_change_background"
         android:title="Change Background Color"
         app:showAsAction="never"/>
 </menu>

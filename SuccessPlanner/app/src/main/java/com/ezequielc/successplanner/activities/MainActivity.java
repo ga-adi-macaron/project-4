@@ -47,12 +47,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // References to Views
         mQuote = (TextView) findViewById(R.id.quote_text);
         mCardView = (CardView) findViewById(R.id.card_view);
         mCalendarView = (CalendarView) findViewById(R.id.calendar_view);
 
         mSharedPreferences = getSharedPreferences(SettingsActivity.PREFERENCES, Context.MODE_PRIVATE);
 
+        // Shared Preference whether the User wants to receive quote or not
         if (mSharedPreferences.getBoolean(SettingsActivity.RECEIVE_QUOTE_SWITCH, true)) {
             if (isConnected()) {
                 getQuote();
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Passes intent data to DailyActivity
     public void intentData(int year, int month, int dayOfMonth){
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, dayOfMonth);
@@ -159,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Maintain the same quote if it was gotten onCreate
         if (mSharedPreferences.getBoolean(SettingsActivity.RECEIVE_QUOTE_SWITCH, true)) {
             mCardView.setVisibility(View.VISIBLE);
             if (!mGotQuote) {

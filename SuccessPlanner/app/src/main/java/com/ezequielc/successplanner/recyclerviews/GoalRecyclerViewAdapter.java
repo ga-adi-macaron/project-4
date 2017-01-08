@@ -54,6 +54,7 @@ public class GoalRecyclerViewAdapter extends RecyclerView.Adapter<GoalRecyclerVi
                                         View dialogView = inflater.inflate(R.layout.dialog_add_goals, null);
                                         editOptionBuilder.setView(dialogView);
 
+                                        // Grabs the text in the adapter position and set it to the edit text
                                         final EditText editText = (EditText) dialogView.findViewById(R.id.goal_edit_text);
                                         editText.setText(mGoalList.get(holder.getAdapterPosition()).getGoal());
 

@@ -54,6 +54,7 @@ public class AffirmationRecyclerViewAdapter extends RecyclerView.Adapter<Affirma
                                         View dialogView = inflater.inflate(R.layout.dialog_add_affirmations, null);
                                         editOptionBuilder.setView(dialogView);
 
+                                        // Grabs the text in the adapter position and set it to the edit text
                                         final EditText editText = (EditText) dialogView.findViewById(R.id.affirmations_edit_text);
                                         editText.setText(mAffirmationList.get(holder.getAdapterPosition()).getAffirmation());
 

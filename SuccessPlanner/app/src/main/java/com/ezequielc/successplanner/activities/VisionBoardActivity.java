@@ -101,7 +101,7 @@ public class VisionBoardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Alert dialog notifying users Vision Board will not be saved
+        // AlertDialog notifying users Vision Board will not be saved
         new AlertDialog.Builder(VisionBoardActivity.this)
                 .setMessage("Are you sure you want to exit?" +
                 "\nYou will lose your Vision Board")
@@ -117,18 +117,21 @@ public class VisionBoardActivity extends AppCompatActivity {
     }
 
     public void takeScreenshot(){
+        // If Write External Storage is not granted, cancels the process
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Do not have Storage Permission", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // AlertDialog asking if User wants to save the vision board
         new AlertDialog.Builder(VisionBoardActivity.this)
                 .setMessage("Save Vision Board?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
+                            // Path to the screenshot folder
                             String path = "/Pictures/Screenshots/VisionBoard.jpg";
                             String pathName = Environment.getExternalStorageDirectory().toString() + path;
 
@@ -144,6 +147,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                             outputStream.flush();
                             outputStream.close();
 
+                            // Updates the gallery to see new files instantly
                             MediaScannerConnection.scanFile(getApplicationContext(),
                                     new String[]{imageFile.toString()}, null,
                                     new MediaScannerConnection.OnScanCompletedListener() {
@@ -152,6 +156,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                                         }
                                     });
 
+                            // AlertDialog asking if User wants to open the vision board
                             new AlertDialog.Builder(VisionBoardActivity.this)
                                     .setMessage("Do you want to open Vision Board?")
                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -173,6 +178,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 .create().show();
     }
 
+    // Intent to open screenshot
     public void openScreenShoot(File file){
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
@@ -181,6 +187,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // AlertDialog listing text options
     public void textOptions(){
         CharSequence[] textOptions = {"New", "Edit", "Change Color", "Change Size"};
         new AlertDialog.Builder(VisionBoardActivity.this)
@@ -208,6 +215,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 }).create().show();
     }
 
+    // Displays New TextView unto the Vision Board
     public void addNewText(){
         RelativeLayout.LayoutParams wrapContent =
                 new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -242,6 +250,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         mNewText.setOnTouchListener(mTouchListener);
     }
 
+    // Allow TextView to be edited
     public void editTextView(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
@@ -268,6 +277,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                     View dialogView = inflater.inflate(R.layout.dialog_add_text, null);
                     builder.setView(dialogView);
 
+                    // Grabs the text in the adapter position and set it to the edit text
                     final EditText editText = (EditText) dialogView.findViewById(R.id.new_text_edit_text);
                     editText.setText(((TextView) child).getText().toString());
 
@@ -287,6 +297,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    // Change color of TextView
     public void changeTextColor(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
@@ -314,6 +325,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    // List of colors to be picked for TextView
     public void pickColor(final TextView textView){
         CharSequence[] colors = {"Green", "Red", "Blue", "Yellow", "Magenta", "Black", "White", "Default"};
         new AlertDialog.Builder(VisionBoardActivity.this)
@@ -343,7 +355,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                             case 6: // White
                                 textView.setTextColor(Color.WHITE);
                                 break;
-                            case 7: // Default -5128766
+                            case 7: // Default
                                 textView.setTextColor(ContextCompat.getColor(getApplicationContext(),
                                         android.R.color.secondary_text_dark));
                             default:
@@ -353,6 +365,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 }).create().show();
     }
 
+    // List of colors to be picked for ViewGroup
     public void pickColor(final ViewGroup viewGroup){
         CharSequence[] colors = {"Green", "Red", "Blue", "Yellow", "Magenta", "White", "Default"};
         new AlertDialog.Builder(VisionBoardActivity.this)
@@ -391,6 +404,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 }).create().show();
     }
 
+    // Change the text size of the TextView
     public void changeTextSize(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
@@ -418,6 +432,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    // Displays a Dialog with a NumberPicker to pick a text Size
     public void pickSize(final TextView textView){
         AlertDialog.Builder builder = new AlertDialog.Builder(VisionBoardActivity.this);
         LayoutInflater inflater = LayoutInflater.from(VisionBoardActivity.this);
@@ -444,6 +459,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         builder.create().show();
     }
 
+    // Displays New ImageView unto the Vision Board
     public void addNewImage(Bitmap bitmap){
         RelativeLayout.LayoutParams wrapContent =
                 new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -457,6 +473,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         mNewImage.setOnTouchListener(mTouchListener);
     }
 
+    // AlertDialog listing delete options
     public void deletionOptions(){
         if (mViewGroup.getChildCount() == 0) {
             Toast.makeText(this, "Vision Board is Empty", Toast.LENGTH_SHORT).show();
@@ -483,6 +500,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 }).create().show();
     }
 
+    // Removes all views in ViewGroup
     public void deleteAllViews(){
         new AlertDialog.Builder(VisionBoardActivity.this)
                 .setMessage("Delete All?")
@@ -497,6 +515,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 .create().show();
     }
 
+    // Specific view from ViewGroup to be removed
     public void deleteView(){
         mEditingOrDeleting = true;
         Toast.makeText(this, "Choose Item to Delete...", Toast.LENGTH_LONG).show();
@@ -523,6 +542,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    // Change Color of ViewGroup
     public void changeBackgroundColor(){
         pickColor(mViewGroup);
     }
@@ -554,7 +574,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 takeScreenshot();
                 return true;
 
-            case R.id.action_settings:
+            case R.id.action_change_background:
                 changeBackgroundColor();
                 return true;
 
@@ -585,6 +605,7 @@ public class VisionBoardActivity extends AppCompatActivity {
         }
     }
 
+    // Intent to select an Image
     public void selectImage(){
         Intent intent = new Intent();
         intent.setType("image/*");
