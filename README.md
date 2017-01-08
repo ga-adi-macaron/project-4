@@ -9,6 +9,7 @@ The Vault is created keeping the hardcore and casual players in mind and minimis
 The Vault is created by the players; for the players. We know that Guardians want to spent the least amount of time possible navigating through their inventory to equip or transfer items. Therefore; The Vault focuses on speed more than anything else. The application is lightning-fast to launch & show your items and is always responsive.
 
 Grind Mode: An Automated Inventory Clean-up Feature
+
 The most frustrating thing when you are in a great fire team and completing consecutive strikes, raids, events is getting your inventory filled up with engrams. The Vault has a "Grind Mode" feature that you can turn on with single tap. Grind Mode periodically checks your characters' inventories for engrams and transfers them to your Vault; so that you always have space for new epic loot.
 
 [Google Play Link](https://play.google.com/store/apps/details?id=com.crocusgames.destinyinventorymanager)
