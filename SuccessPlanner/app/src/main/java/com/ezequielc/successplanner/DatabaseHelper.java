@@ -22,9 +22,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "successplanner.db";
 
-    // TODO: REMOVE THIS TABLE
-    private static final String DAILY_DATA_TABLE = "daily_data_list";
-
     private static final String COL_ID = "id";
     private static final String COL_DATE = "date";
 
@@ -49,11 +46,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } return mInstance;
     }
 
-    private static final String CREATE_DAILY_DATA_TABLE =
-            "CREATE TABLE " + DAILY_DATA_TABLE + " (" +
-                    COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COL_DATE + " TEXT)";
-
     private static final String CREATE_GOALS_TABLE =
             "CREATE TABLE " + GOALS_TABLE + " (" +
                     COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -74,7 +66,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_DAILY_DATA_TABLE);
         db.execSQL(CREATE_GOALS_TABLE);
         db.execSQL(CREATE_AFFIRMATIONS_TABLE);
         db.execSQL(CREATE_SCHEDULE_TABLE);
@@ -82,13 +73,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF EXISTS " + DAILY_DATA_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + GOALS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + AFFIRMATIONS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + SCHEDULE_TABLE);
         onCreate(db);
     }
 
+    // Insert Goals into database for specific date
     public void insertGoals(Goal goal){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -99,6 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Insert Affirmations into database for specific date
     public void insertAffirmations(Affirmation affirmation){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -109,6 +101,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Insert Schedule into database for specific date
     public void insertSchedule(Schedule schedule){
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -119,6 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // List Goals for the specific date it was inserted
     public List<Goal> getGoalsForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
@@ -145,6 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return goalList;
     }
 
+    // List Affirmations for the specific date it was inserted
     public List<Affirmation> getAffirmationsForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
@@ -171,6 +166,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return affirmationList;
     }
 
+    // List Schedule for the specific date it was inserted
     public List<Schedule> getScheduleForDate(String currentDate){
         SQLiteDatabase db = getReadableDatabase();
 
@@ -197,6 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return scheduleList;
     }
 
+    // Delete Goal from database based on ID
     public void deleteGoal(Goal goal){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -205,6 +202,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Delete Affirmation from database based on ID
     public void deleteAffirmations(Affirmation affirmation){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -213,6 +211,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Delete Schedule from database based on ID
     public void deleteSchedule(Schedule schedule){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -221,6 +220,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Update Goal from database based on ID
     public void updateGoal(Goal goal){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -231,6 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Update Affirmation from database based on ID
     public void updateAffirmation(Affirmation affirmation){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -241,6 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Update Schedule from database based on ID
     public void updateSchedule(Schedule schedule){
         SQLiteDatabase db = getWritableDatabase();
         String selection = COL_ID + " = ?";
@@ -248,6 +250,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COL_SCHEDULE, schedule.getSchedule());
         db.update(SCHEDULE_TABLE, values, selection, selectionArgs);
+        db.close();
+    }
+
+    // Deletes all data in all tables
+    public void deleteAll(){
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + GOALS_TABLE);
+        db.execSQL("DELETE FROM " + AFFIRMATIONS_TABLE);
+        db.execSQL("DELETE FROM " + SCHEDULE_TABLE);
         db.close();
     }
 }

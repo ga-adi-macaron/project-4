@@ -32,10 +32,6 @@ public class Affirmation {
         return mDate;
     }
 
-    public void setDate(String mDate) {
-        this.mDate = mDate;
-    }
-
     public String getAffirmation() {
         return mAffirmation;
     }

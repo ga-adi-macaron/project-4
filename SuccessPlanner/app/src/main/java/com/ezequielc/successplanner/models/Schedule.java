@@ -32,10 +32,6 @@ public class Schedule {
         return mDate;
     }
 
-    public void setDate(String mDate) {
-        this.mDate = mDate;
-    }
-
     public String getSchedule() {
         return mSchedule;
     }

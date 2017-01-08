@@ -125,7 +125,7 @@ public class DailyActivity extends AppCompatActivity {
                                         break;
                                 }
                             }
-                        }).setCancelable(false);
+                        });
                 builder.create().show();
             }
         });

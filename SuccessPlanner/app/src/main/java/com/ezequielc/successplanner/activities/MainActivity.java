@@ -187,13 +187,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_change_background:
+            case R.id.action_settings:
+                // Intent to Settings Activity
                 Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
 
             case R.id.action_vision_board:
-                // Vision Board
+                // Intent to Vision Board Activity
                 Intent visionBoardIntent = new Intent(MainActivity.this, VisionBoardActivity.class);
                 startActivity(visionBoardIntent);
                 return true;
@@ -203,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Checks if there is Internet Connection
     private boolean isConnected(){
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -212,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    // Get quote from API call
     public void getQuote(){
         OkHttpClient client = new OkHttpClient();
 

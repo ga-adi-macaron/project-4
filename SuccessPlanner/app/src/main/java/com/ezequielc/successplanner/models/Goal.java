@@ -32,10 +32,6 @@ public class Goal {
         return mDate;
     }
 
-    public void setDate(String mDate) {
-        this.mDate = mDate;
-    }
-
     public String getGoal() {
         return mGoal;
     }

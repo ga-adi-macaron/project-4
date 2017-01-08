@@ -554,7 +554,7 @@ public class VisionBoardActivity extends AppCompatActivity {
                 takeScreenshot();
                 return true;
 
-            case R.id.action_change_background:
+            case R.id.action_settings:
                 changeBackgroundColor();
                 return true;
 
