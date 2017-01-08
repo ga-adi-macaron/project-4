@@ -68,7 +68,6 @@ class Presenter implements VideoGameSearchContract.Presenter {
                 for(int i=0;i<root.length();i++) {
                     Gson gson = new Gson();
                     GameResultObject game = gson.fromJson(root.getJSONObject(i).toString(), GameResultObject.class);
-//                    if(game.hasSufficientData())
                         mGameList.add(game);
                 }
             } catch(IOException | JSONException e) {

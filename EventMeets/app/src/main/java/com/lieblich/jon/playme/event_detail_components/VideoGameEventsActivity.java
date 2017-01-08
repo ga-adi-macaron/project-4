@@ -1,6 +1,7 @@
 package com.lieblich.jon.playme.event_detail_components;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lieblich.jon.playme.R;
 import com.lieblich.jon.playme.model.GameResultObject;
@@ -47,6 +49,10 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
                 if(query.length() < 1) {
                     mQueryText.setError("Search cannot be blank");
                 } else {
+                    if(mGameList != null) {
+                        mGameList.clear();
+                        mAdapter.notifyDataSetChanged();
+                    }
                     mBar.setVisibility(View.VISIBLE);
                     mPresenter.onSearchRequested(query);
                 }
@@ -62,5 +68,8 @@ public class VideoGameEventsActivity extends AppCompatActivity implements VideoG
         mAdapter = new VideoGamesRecyclerAdapter(mGameList);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
+        if(games.size() == 0) {
+            Snackbar.make(findViewById(R.id.activity_video_game_events), "No results found", Snackbar.LENGTH_LONG).show();
+        }
     }
 }

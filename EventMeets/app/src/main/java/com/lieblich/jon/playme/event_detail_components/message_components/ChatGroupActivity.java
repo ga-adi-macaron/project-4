@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.lieblich.jon.playme.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +36,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     private ChildEventListener mListener;
     private List<SelfMessageObject> mContent;
-    private boolean hasMessages;
+    private String mChatTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,12 @@ public class ChatGroupActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mGroup = dataSnapshot.getValue(MessageGroup.class);
+                if(mGroup.getUsers().get(0).getUser().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    mChatTitle = mGroup.getUsers().get(1).getFirstName();
+                } else {
+                    mChatTitle = mGroup.getUsers().get(0).getFirstName();
+                }
+                setTitle(mChatTitle);
                 if(mGroup.getMessages()==null||mGroup.getMessages().size()==0) {
                     mReference.child("messages").push().setValue(new SelfMessageObject("started a new chat", mGroup.getCreator()));
                 }
