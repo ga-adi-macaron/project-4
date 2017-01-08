@@ -16,4 +16,15 @@
         android:layout_height="60sp"
         android:layout_centerInParent="true"/>
 
+    <TextView
+        android:id="@+id/dwg_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="40sp"
+        android:textColor="@color/textColor"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        android:layout_margin="16sp"
+        android:text="Sorry...there are no games on sale at the moment"/>
+
 </RelativeLayout>

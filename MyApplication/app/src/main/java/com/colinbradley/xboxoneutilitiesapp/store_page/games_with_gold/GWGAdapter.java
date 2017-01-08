@@ -44,7 +44,7 @@ public class GWGAdapter extends RecyclerView.Adapter<GWGViewHolder> {
         holder.mOriginalPrice.setText(mGWGList.get(position).getmOriginalPrice());
         holder.bindImageToView(mContext, mGWGList.get(position).getmURLforBoxArt());
 
-        holder.mBoxArt.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOnItemSelectedListener.onItemSelected(mGWGList.get(position).getmGameID());

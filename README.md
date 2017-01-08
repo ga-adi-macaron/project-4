@@ -1,15 +1,13 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project #4: Your Portfolio Project
-
 ## Overview
 
-**You’ve come a long way, and it's time to show it.**
-This will be your most advanced project to date, and if you put creativity into it, it'll hopefully be the thing you want to show off most prominently in your portfolio.
+**XB Media & Market App**
+This app is a simple, easy to use app that gives gamers the things that they need right upfront.  The thing that puts this app apart from other apps is that you can download the game clips and screenshots from Xbox live directly onto your phone, no other app gives you that option..even the actual Xbox Smartglass App. This app also gives gamers the information they need to get the full potential out of their Xbox Live Membership by showing the Free games and games on sale specifically for Gold Members.
 
-**You get to call the shots and invent your own idea**, choosing frameworks & tools that are appropriate for what you want to build.
-Pull from everything you've learned so far, and **tackle something that'll push you a little outside of your comfort zone.**
+**Tech/Libraries**, 
+In this app I mainly used Async Tasks to do all the API calls to xboxapi.com.  I also used the Facebook SDK to have a sharing feature, and used an android library found from Android Arsenal (fm.jiecao:jiecaovideoplayer:5.1) to make the fullscreen video player with swipe commands for volume change and time scrubbing. For downloading, I just used the native DownloadManager to queue up and download clips/screenshots
 
-For this project, you'll be working on your own and using product development strategies learned in unit 3 to come up with a project proposal that will be reviewed with your instructional team.
-This proposal is done to make sure you are building **something that can be accomplish in the limited time we have** while making sure it's **something that will challenge you**.
+**Screenshots**
+![Home Page](/Screenshots/homepage.png)
 
 
 ## Technical Requirements

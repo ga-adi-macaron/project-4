@@ -32,7 +32,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -44,9 +43,10 @@ import okhttp3.Response;
 
 public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapter.OnItemSelectedListener{
     public static final String TAG = "GameClipsFragment";
+    public static final String LIST_KEY = "list";
     RecyclerView mRV;
     GameClipsAdapter mAdapter;
-    List<GameClip> mClipsList;
+    ArrayList<GameClip> mClipsList;
     AsyncTask<Void,Void,Void> mTask;
     String mGCtitle;
     String mGCgameName;
@@ -70,59 +70,65 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
 
         mProgressBar = (ProgressBar)rootView.findViewById(R.id.gameclips_progressbar);
 
-        mTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                OkHttpClient client = new OkHttpClient();
+        if (savedInstanceState != null){
+            mClipsList = savedInstanceState.getParcelableArrayList(LIST_KEY);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }else {
 
-                Request request = new Request.Builder()
-                        .headers(MainActivity.mHeaders)
-                        .url("https://xboxapi.com/v2/" + ProfileActivity.mXUID + "/game-clips")
-                        .build();
+            mTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    OkHttpClient client = new OkHttpClient();
 
-                try {
-                    Response response = client.newCall(request).execute();
-                    JSONArray clipsJSONarray = new JSONArray(response.body().string());
-                    for (int i = 0; i < clipsJSONarray.length(); i++){
-                        JSONObject clipObj = clipsJSONarray.getJSONObject(i);
-                        JSONArray urlInfo = clipObj.getJSONArray("gameClipUris");
-                        JSONArray imgURLs = clipObj.getJSONArray("thumbnails");
+                    Request request = new Request.Builder()
+                            .headers(MainActivity.mHeaders)
+                            .url("https://xboxapi.com/v2/" + ProfileActivity.mXUID + "/game-clips")
+                            .build();
 
-                        mGCtitle = clipObj.getString("clipName");
-                        mGCgameName = clipObj.getString("titleName");
-                        mGCdescription = clipObj.getString("userCaption");
-                        mGCurl = urlInfo.getJSONObject(0).getString("uri");
-                        mGCimgUrl = imgURLs.getJSONObject(0).getString("uri");
+                    try {
+                        Response response = client.newCall(request).execute();
+                        JSONArray clipsJSONarray = new JSONArray(response.body().string());
+                        for (int i = 0; i < clipsJSONarray.length(); i++) {
+                            JSONObject clipObj = clipsJSONarray.getJSONObject(i);
+                            JSONArray urlInfo = clipObj.getJSONArray("gameClipUris");
+                            JSONArray imgURLs = clipObj.getJSONArray("thumbnails");
 
-                        int j = i + 1;
-                        if (mGCtitle.equals("")){
-                            mGCtitle = "Clip #" + j;
+                            mGCtitle = clipObj.getString("clipName");
+                            mGCgameName = clipObj.getString("titleName");
+                            mGCdescription = clipObj.getString("userCaption");
+                            mGCurl = urlInfo.getJSONObject(0).getString("uri");
+                            mGCimgUrl = imgURLs.getJSONObject(0).getString("uri");
+
+                            int j = i + 1;
+                            if (mGCtitle.equals("")) {
+                                mGCtitle = "Clip #" + j;
+                            }
+                            if (mGCdescription.equals("")) {
+                                mGCdescription = "no description";
+                            }
+
+                            Log.d(TAG, "doInBackground: created new Clip: " + mGCurl);
+                            Log.d(TAG, "doInBackground: ^^clip name: " + mGCtitle);
+                            Log.d(TAG, "doInBackground: ^^clip description: " + mGCdescription);
+                            Log.d(TAG, "doInBackground: ^^game clip came from: " + mGCgameName);
+
+                            mClipsList.add(new GameClip(mGCtitle, mGCgameName, mGCdescription, mGCurl, mGCimgUrl));
+                            Log.d(TAG, "doInBackground: added clip...size = " + mClipsList.size());
                         }
-                        if (mGCdescription.equals("")){
-                            mGCdescription = "no description";
-                        }
-
-                        Log.d(TAG, "doInBackground: created new Clip: " + mGCurl);
-                        Log.d(TAG, "doInBackground: ^^clip name: " + mGCtitle);
-                        Log.d(TAG, "doInBackground: ^^clip description: " + mGCdescription);
-                        Log.d(TAG, "doInBackground: ^^game clip came from: " + mGCgameName);
-
-                        mClipsList.add(new GameClip(mGCtitle,mGCgameName,mGCdescription,mGCurl,mGCimgUrl));
-                        Log.d(TAG, "doInBackground: added clip...size = " + mClipsList.size());
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mAdapter.notifyDataSetChanged();
-                mProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }.execute();
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    mAdapter.notifyDataSetChanged();
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+            }.execute();
+        }
 
         mCallbackManager = CallbackManager.Factory.create();
         mShareDialog = new ShareDialog(this);
@@ -150,6 +156,12 @@ public class ProfileGameClipsFragment extends Fragment implements GameClipsAdapt
         mRV.setAdapter(mAdapter);
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(LIST_KEY, mClipsList);
     }
 
     @Override

@@ -1,10 +1,13 @@
 package com.colinbradley.xboxoneutilitiesapp.store_page.games_with_gold;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by colinbradley on 12/29/16.
  */
 
-public class GameWithGold {
+public class GameWithGold implements Parcelable{
 
     private String mTitle;
     private String mOriginalPrice;
@@ -48,5 +51,41 @@ public class GameWithGold {
 
     public void setmGameID(String mGameID) {
         this.mGameID = mGameID;
+    }
+
+//-----------------------------
+    //Parcelable Methods
+//-----------------------------
+
+    private GameWithGold(Parcel in) {
+        mTitle = in.readString();
+        mOriginalPrice = in.readString();
+        mURLforBoxArt = in.readString();
+        mGameID = in.readString();
+    }
+
+    public static final Creator<GameWithGold> CREATOR = new Creator<GameWithGold>() {
+        @Override
+        public GameWithGold createFromParcel(Parcel in) {
+            return new GameWithGold(in);
+        }
+
+        @Override
+        public GameWithGold[] newArray(int size) {
+            return new GameWithGold[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(mTitle);
+        parcel.writeString(mOriginalPrice);
+        parcel.writeString(mURLforBoxArt);
+        parcel.writeString(mGameID);
     }
 }

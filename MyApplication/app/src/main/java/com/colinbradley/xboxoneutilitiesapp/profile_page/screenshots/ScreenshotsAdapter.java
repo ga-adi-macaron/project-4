@@ -58,7 +58,10 @@ public class ScreenshotsAdapter extends RecyclerView.Adapter<ScreenshotsViewHold
         holder.mDLButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mOnItemSelectedListener.downloadImg(currentSS.getImgURL(), "Screenshot_");
+                String ssTitle = currentSS.getTitle() + "_from_" + currentSS.getGame();
+                String noPoundSign = ssTitle.replace("#", "");
+                String noSpaces = noPoundSign.replace(" ", "_");
+                mOnItemSelectedListener.downloadImg(currentSS.getImgURL(), noSpaces);
             }
         });
 

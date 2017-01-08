@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.colinbradley.xboxoneutilitiesapp.FullscreenImageActivity;
 import com.colinbradley.xboxoneutilitiesapp.MainActivity;
 import com.colinbradley.xboxoneutilitiesapp.R;
 import com.squareup.picasso.Picasso;
@@ -28,6 +29,14 @@ import okhttp3.Response;
 
 public class GWGDetails extends AppCompatActivity {
     public static final String TAG = "GWGDetails";
+    public static final String TITLE_KEY = "title";
+    public static final String DESCRIPTION_KEY = "des";
+    public static final String DEV_KEY = "dev";
+    public static final String ID_KEY = "id";
+    public static final String PRICE_KEY = "price";
+    public static final String IMG_LIST_KEY = "imgList";
+    public static final String GENRE_LIST_KEY = "genres";
+    public static final String CURRENT_INDEX_KEY = "curIndex";
 
     TextView mTitle, mOriginalPrice, mDescription, mDevName, mGenreView;
     ImageView mImageView, mPrevious, mNext;
@@ -37,8 +46,8 @@ public class GWGDetails extends AppCompatActivity {
     ProgressBar mProgressBar;
 
     String mGameID, mGameTitle, mGameDescription, mGameDevName, mGamePrice;
-    List<String> mImgURLs;
-    List<String> mGenres;
+    ArrayList<String> mImgURLs;
+    ArrayList<String> mGenres;
     int currentIndex;
     int startIndex;
     int endIndex;
@@ -67,81 +76,76 @@ public class GWGDetails extends AppCompatActivity {
         mCrossout = (ImageView)findViewById(R.id.gwgd_crossout);
         mFreeWithGold = (TextView)findViewById(R.id.gwgd_free_w_gold);
 
-        final Intent intent = getIntent();
-        mGameID = intent.getStringExtra("id");
+        if (savedInstanceState != null){
+            mGameTitle = savedInstanceState.getString(TITLE_KEY);
+            mGameDescription = savedInstanceState.getString(DESCRIPTION_KEY);
+            mGameDevName = savedInstanceState.getString(DEV_KEY);
+            mGameID = savedInstanceState.getString(ID_KEY);
+            mGamePrice = savedInstanceState.getString(PRICE_KEY);
+            mImgURLs = savedInstanceState.getStringArrayList(IMG_LIST_KEY);
+            mGenres = savedInstanceState.getStringArrayList(GENRE_LIST_KEY);
+            currentIndex = savedInstanceState.getInt(CURRENT_INDEX_KEY);
+            fillViews();
+        }else {
+            currentIndex = 0;
+            final Intent intent = getIntent();
+            mGameID = intent.getStringExtra("id");
 
-        mTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                OkHttpClient client = new OkHttpClient();
+            mTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    OkHttpClient client = new OkHttpClient();
 
-                Request request = new Request.Builder()
-                        .headers(MainActivity.mHeaders)
-                        .url("https://xboxapi.com/v2/game-details/" + mGameID)
-                        .build();
+                    Request request = new Request.Builder()
+                            .headers(MainActivity.mHeaders)
+                            .url("https://xboxapi.com/v2/game-details/" + mGameID)
+                            .build();
 
-                try {
-                    Response response = client.newCall(request).execute();
+                    try {
+                        Response response = client.newCall(request).execute();
 
-                    JSONObject responseObj = new JSONObject(response.body().string());
-                    JSONArray item = responseObj.getJSONArray("Items");
-                    JSONObject game = item.getJSONObject(0);
+                        JSONObject responseObj = new JSONObject(response.body().string());
+                        JSONArray item = responseObj.getJSONArray("Items");
+                        JSONObject game = item.getJSONObject(0);
 
-                    mGameTitle = game.getString("Name");
-                    mGameDescription = game.getString("Description");
-                    mGameDevName = game.getString("DeveloperName");
+                        mGameTitle = game.getString("Name");
+                        mGameDescription = game.getString("Description");
+                        mGameDevName = game.getString("DeveloperName");
 
-                    JSONArray availabilitiesArray = game.getJSONArray("Availabilities");
-                    JSONObject obj = availabilitiesArray.getJSONObject(0);
-                    JSONObject offerDisplayData = obj.getJSONObject("OfferDisplayData");
-                    double priceAsInt = offerDisplayData.getDouble("listPrice");
+                        JSONArray availabilitiesArray = game.getJSONArray("Availabilities");
+                        JSONObject obj = availabilitiesArray.getJSONObject(0);
+                        JSONObject offerDisplayData = obj.getJSONObject("OfferDisplayData");
+                        double priceAsInt = offerDisplayData.getDouble("listPrice");
 
-                    mGamePrice = "$" + priceAsInt;
+                        mGamePrice = "$" + priceAsInt;
 
-                    JSONArray imgArray = game.getJSONArray("Images");
-                    for (int i = 0; i < imgArray.length(); i++){
-                        String img = imgArray.getJSONObject(i).getString("Url");
-                        mImgURLs.add(img);
-                        Log.d(TAG, "doInBackground: added img #" + mImgURLs.size() + "  url --- " + img);
+                        JSONArray imgArray = game.getJSONArray("Images");
+                        for (int i = 0; i < imgArray.length(); i++) {
+                            String img = imgArray.getJSONObject(i).getString("Url");
+                            mImgURLs.add(img);
+                            Log.d(TAG, "doInBackground: added img #" + mImgURLs.size() + "  url --- " + img);
+                        }
+
+                        JSONArray genreArray = game.getJSONArray("Genres");
+                        for (int i = 0; i < genreArray.length(); i++) {
+                            String genre = genreArray.getJSONObject(i).getString("Name");
+                            mGenres.add(genre);
+                        }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
                     }
-
-                    JSONArray genreArray = game.getJSONArray("Genres");
-                    for (int i = 0; i < genreArray.length(); i++){
-                        String genre = genreArray.getJSONObject(i).getString("Name");
-                        mGenres.add(genre);
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mTitle.setText(mGameTitle);
-                mOriginalPrice.setText(mGamePrice);
-                mDescription.setText(mGameDescription);
-                mDevName.setText(mGameDevName);
-                mGenreView.setText(mGenres.toString());
-                fillImageView(mImgURLs);
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    fillViews();
+                }
+            }.execute();
+        }
 
-                mProgressBar.setVisibility(View.INVISIBLE);
-
-                mFreeWithGold.setVisibility(View.VISIBLE);
-                mCrossout.setVisibility(View.VISIBLE);
-                mImageView.setVisibility(View.VISIBLE);
-                mGenre.setVisibility(View.VISIBLE);
-                mDescription.setVisibility(View.VISIBLE);
-                mDevName.setVisibility(View.VISIBLE);
-                mGenreView.setVisibility(View.VISIBLE);
-                mOriginalPrice.setVisibility(View.VISIBLE);
-                mTitle.setVisibility(View.VISIBLE);
-                mNext.setVisibility(View.VISIBLE);
-                mPrevious.setVisibility(View.VISIBLE);
-
-            }
-        }.execute();
+        checkIndex(currentIndex,startIndex,endIndex);
 
         mNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +154,7 @@ public class GWGDetails extends AppCompatActivity {
                     //do nothing
                 }else {
                     nextImage();
+                    checkIndex(currentIndex,startIndex,endIndex);
                 }
             }
         });
@@ -161,15 +166,71 @@ public class GWGDetails extends AppCompatActivity {
                     //do nothing
                 }else {
                     previousImage();
+                    checkIndex(currentIndex,startIndex,endIndex);
                 }
             }
         });
+
+        mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), FullscreenImageActivity.class);
+                i.putExtra("url", mImgURLs.get(currentIndex));
+                startActivity(i);
+            }
+        });
+    }
+
+    public void checkIndex(int currentIndex, int startIndex, int endIndex){
+        if (currentIndex == startIndex){
+            mPrevious.setAlpha(0.2f);
+        }else if (currentIndex == endIndex){
+            mNext.setAlpha(0.2f);
+        }else if (currentIndex < endIndex && currentIndex > startIndex){
+            mPrevious.setAlpha(1.0f);
+            mNext.setAlpha(1.0f);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putStringArrayList(IMG_LIST_KEY, mImgURLs);
+        outState.putStringArrayList(GENRE_LIST_KEY, mGenres);
+        outState.putString(DESCRIPTION_KEY, mGameDescription);
+        outState.putString(DEV_KEY, mGameDevName);
+        outState.putString(ID_KEY, mGameID);
+        outState.putString(TITLE_KEY, mGameTitle);
+        outState.putString(PRICE_KEY, mGamePrice);
+        outState.putInt(CURRENT_INDEX_KEY, currentIndex);
+        super.onSaveInstanceState(outState);
+    }
+
+    public void fillViews(){
+        mTitle.setText(mGameTitle);
+        mOriginalPrice.setText(mGamePrice);
+        mDescription.setText(mGameDescription);
+        mDevName.setText(mGameDevName);
+        mGenreView.setText(mGenres.toString());
+        fillImageView(mImgURLs);
+
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        mFreeWithGold.setVisibility(View.VISIBLE);
+        mCrossout.setVisibility(View.VISIBLE);
+        mImageView.setVisibility(View.VISIBLE);
+        mGenre.setVisibility(View.VISIBLE);
+        mDescription.setVisibility(View.VISIBLE);
+        mDevName.setVisibility(View.VISIBLE);
+        mGenreView.setVisibility(View.VISIBLE);
+        mOriginalPrice.setVisibility(View.VISIBLE);
+        mTitle.setVisibility(View.VISIBLE);
+        mNext.setVisibility(View.VISIBLE);
+        mPrevious.setVisibility(View.VISIBLE);
     }
 
     public void fillImageView(List<String> list){
         startIndex = 0;
         endIndex = list.size()-1;
-        currentIndex = 0;
         Picasso.with(this).load(mImgURLs.get(currentIndex)).into(mImageView);
         currentIndex++;
     }

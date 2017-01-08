@@ -42,7 +42,7 @@ public class XBMarketplaceAdapter extends RecyclerView.Adapter<XBMarketplaceView
         holder.mDevName.setText(mGameList.get(position).getmDevName());
         holder.bindImage(mGameList.get(position).getmMainImgURL(), mContext);
 
-        holder.mImg.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mOnItemSelectedListener.onItemSelected(mGameList.get(position).getmGameID());

@@ -22,7 +22,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -34,10 +33,11 @@ import okhttp3.Response;
 
 public class XBMarketplaceFragment extends Fragment implements XBMarketplaceAdapter.OnItemSelectedListener {
     public static final String TAG = "XBMarketplaceFragment";
+    public static final String XBM_LIST_KEY = "xbm";
 
     XBMarketplaceAdapter mAdapter;
     RecyclerView mRV;
-    List<Game> mGameList;
+    ArrayList<Game> mGameList;
     AsyncTask<Void,Void,Void> mTask;
     ProgressBar mProgressBar;
 
@@ -48,54 +48,64 @@ public class XBMarketplaceFragment extends Fragment implements XBMarketplaceAdap
         View v = inflater.inflate(R.layout.fragment_xbox_marketplace, container, false);
 
         mProgressBar = (ProgressBar)v.findViewById(R.id.xbm_progressbar);
-        mTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                OkHttpClient client = new OkHttpClient();
 
-                Request request = new Request.Builder()
-                        .headers(MainActivity.mHeaders)
-                        .url("https://xboxapi.com/v2/browse-marketplace/games/")
-                        .build();
+        if (savedInstanceState != null){
+            mGameList = savedInstanceState.getParcelableArrayList(XBM_LIST_KEY);
+            mProgressBar.setVisibility(View.INVISIBLE);
+        }else {
+            mTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    OkHttpClient client = new OkHttpClient();
 
-                try {
-                    Response response = client.newCall(request).execute();
+                    Request request = new Request.Builder()
+                            .headers(MainActivity.mHeaders)
+                            .url("https://xboxapi.com/v2/browse-marketplace/games/")
+                            .build();
 
-                    JSONObject responseObj = new JSONObject(response.body().string());
+                    try {
+                        Response response = client.newCall(request).execute();
 
-                    JSONArray gamesList = responseObj.getJSONArray("Items");
+                        JSONObject responseObj = new JSONObject(response.body().string());
 
-                    for (int i = 0; i < gamesList.length(); i++){
-                        String title = gamesList.getJSONObject(i).getString("Name");
-                        String devName = gamesList.getJSONObject(i).getString("DeveloperName");
-                        String gameID = gamesList.getJSONObject(i).getString("ID");
-                        String imgURL = gamesList.getJSONObject(i).getJSONArray("Images").getJSONObject(0).getString("Url");
+                        JSONArray gamesList = responseObj.getJSONArray("Items");
 
-                        Game game = new Game(title, gameID, imgURL, devName);
-                        mGameList.add(game);
+                        for (int i = 0; i < gamesList.length(); i++) {
+                            String title = gamesList.getJSONObject(i).getString("Name");
+                            String devName = gamesList.getJSONObject(i).getString("DeveloperName");
+                            String gameID = gamesList.getJSONObject(i).getString("ID");
+                            String imgURL = gamesList.getJSONObject(i).getJSONArray("Images").getJSONObject(0).getString("Url");
+
+                            Game game = new Game(title, gameID, imgURL, devName);
+                            mGameList.add(game);
+                        }
+
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
                     }
-
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mAdapter.notifyDataSetChanged();
-                mProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }.execute();
-
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    mAdapter.notifyDataSetChanged();
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+            }.execute();
+        }
 
         mRV = (RecyclerView)v.findViewById(R.id.xbm_recyclerview);
         mRV.setLayoutManager(new LinearLayoutManager(v.getContext(), LinearLayoutManager.VERTICAL, false));
         mAdapter = new XBMarketplaceAdapter(mGameList, v.getContext(), XBMarketplaceFragment.this);
         mRV.setAdapter(mAdapter);
-
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(XBM_LIST_KEY, mGameList);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
