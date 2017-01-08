@@ -47,7 +47,7 @@ The most frustrating thing when you are in a great fire team and completing cons
 ### Paper Prototyping images can be found on in the folder “paper_prototypes”
 
 ### Known issues:
- - The espresso test is not applicable for this application as the application needs the oath authentication at the launch. The espresso test is unable to follow the steps that happen in the web view.
+ - The espresso test is not applicable for this application as the application needs the oath authentication at launch. The espresso test is unable to follow the steps that happen in the web view.
  - There are no non-android methods used in the application; therefore there are no unit tests.
 
 ---
