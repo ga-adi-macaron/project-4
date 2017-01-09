@@ -186,6 +186,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                if(ME.getPlaylistCount() < 8){
+                    Location location = new Location(LocationManager.GPS_PROVIDER);
+                    location.setLatitude(latLng.latitude);
+                    location.setLongitude(latLng.longitude);
+                    onCreateDialog(location).show();
+                }
+            }
+        });
+
         //  When a marker is clicked, get the playlist Id contained in its tag,
         //  and start the playlist activity with the Id. But only if it's within
         //  a certain distance from your location.
