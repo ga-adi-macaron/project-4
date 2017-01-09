@@ -1,6 +1,6 @@
 #Found Sound
 
-<img src="foundsoundbanner.jpg" height="300px" /> 
+<img src="PeoplesPlaylist/foundsoundbanner.jpg" height="300px" /> 
 
 #Features
 ##---Cool Map
@@ -31,8 +31,8 @@
 ##---
 
 <p align="center">
-  <img src="ss1.png" height="300px" /> 
-  <img src="ss2.png" height="300px" />
+  <img src="PeoplesPlaylist/ss1.png" height="300px" /> 
+  <img src="PeoplesPlaylist/ss2.png" height="300px" />
 </p>
 ###BUGS
 
