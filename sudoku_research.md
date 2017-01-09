@@ -26,10 +26,11 @@ This study sets out to find whether or not potential users would enjoy a multipl
 
 **Research Questions**
 
--Would users enjoy a multiplayer sudoku?
--What makes a multiplayer game fun?
--What kind of UI do people want to see in a puzzle game?
--What kind of UI do people expect from a game?
+
+ - Would users enjoy a multiplayer sudoku?
+ - What makes a multiplayer game fun?
+ - What kind of UI do people want to see in a puzzle game?
+ - What kind of UI do people expect from a game?
 
 **Participants**
 
@@ -37,8 +38,8 @@ Target audience includes people between the ages 20 and 35 who enjoy puzzles
 
 **Script**
 
--Would you consider yourself a puzzler (one who enjoys solving puzzles)?
--What kind of puzzles do you like to solve?
--Have you ever done a sudoku puzzle?
--Do you play multiplayer games?
--What is exciting about a multiplayer game?
+ - Would you consider yourself a puzzler (one who enjoys solving puzzles)?
+ - What kind of puzzles do you like to solve?
+ - Have you ever done a sudoku puzzle?
+ - Do you play multiplayer games?
+ - What is exciting about a multiplayer game?
