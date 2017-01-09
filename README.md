@@ -8,27 +8,27 @@
   - The ability to also view their contributors
   - Call to action by calling, email or sending them a tweet.
   <p align="center">
-    <img src="screenshot/replist.png" width=100>
-    <img src="screenshot/repcontrib.png" width=100>
-    <img src="screenshot/repaction.png" width=100>
+    <img src="screenshot/replist.png" width=200>
+    <img src="screenshot/repcontrib.png" width=200>
+    <img src="screenshot/repaction.png" width=200>
   </p>
 
 - Customized news to get the most recent news about their Legislatures
   - News links are being handled in app using custom chrome tab.
   <p align="center">
-    <img src="screenshot/news.png" width=100>
-    <img src="screenshot/customchrome.png" width=100>
+    <img src="screenshot/news.png" width=200>
+    <img src="screenshot/customchrome.png" width=200>
   </p>
 
 - Grab recents bills
   - Ability to view details of the bills such as: Summary, Tags, Sponsors and Updates.
   <p align="center">
-    <img src="screenshot/billlist.png" width=100>
-    <img src="screenshot/billdetail.png" width=100>
+    <img src="screenshot/billlist.png" width=200>
+    <img src="screenshot/billdetail.png" width=200>
   </p>
 - Search all function
   <p align="center">
-    <img src="screenshot/search.png" width=100>
+    <img src="screenshot/search.png" width=200>
   </p>
 - Implements <a href="https://material.io/">Material Design</a> for the best UI/UX experience.
 
