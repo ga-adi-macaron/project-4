@@ -12,3 +12,9 @@
 - OkHttp
 - Picasso
 - Gson
+
+###Screenshots
+<img src="https://github.com/jlieblich/project-4/blob/master/assets/Screenshot1.png" width="112" height="200"/>
+<img src="https://github.com/jlieblich/project-4/blob/master/assets/Screenshot2.png" width="112" height="200"/>
+<img src="https://github.com/jlieblich/project-4/blob/master/assets/Screenshot3.png" width="112" height="200"/>
+<img src="https://github.com/jlieblich/project-4/blob/master/assets/Screenshot4.png" width="112" height="200"/>
