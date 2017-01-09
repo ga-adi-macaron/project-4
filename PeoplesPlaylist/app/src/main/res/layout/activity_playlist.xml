@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_playlist"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/road"
+    tools:context="com.korbkenny.peoplesplaylist.playlist.PlaylistActivity">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+    <FrameLayout
+        android:id="@+id/cover_user_frame"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/cover_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            />
+
+        <ImageView
+            android:id="@+id/playlist_user_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom|right"/>
+    </FrameLayout>
+    <TextView
+        android:id="@+id/playlist_title"
+        android:layout_toLeftOf="@id/cover_user_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:text="This is the title, ya know?"
+        android:fontFamily="sans-serif-condensed"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:textColor="#b681b3"
+        android:shadowColor="#000000"
+        android:shadowRadius="2"
+        android:shadowDx="-2"
+        android:shadowDy="-2"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/playlist_description"
+        android:layout_toLeftOf="@id/cover_user_frame"
+        android:layout_below="@id/playlist_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:fontFamily="sans-serif-condensed"
+        android:textColor="@color/park"
+        android:text="So this is a playlist I made recently, and it's all about going to the beach at night and seeing the stars. Please only submit acoustic songs!"/>
+
+    <RelativeLayout
+        android:id="@+id/playlist_bottom_row"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/save_this_playlist"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="10dp"
+            app:cardCornerRadius="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Save\n4 l8r"
+                android:textSize="20sp"
+                android:textColor="#fffffc"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:textStyle="bold"
+
+                android:background="@color/natural"/>
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/player_play_pause_card"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            android:layout_margin="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/player_play_pause"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/park"
+                android:src="@drawable/playbutton"
+                android:layout_gravity="center"/>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/add_song"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            android:layout_margin="10dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Add\nTrack"
+                android:textColor="#fffffc"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:fontFamily="sans-serif-condensed"
+                android:background="@color/colorAccent"/>
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/recycler_cardview"
+        android:layout_below="@id/cover_user_frame"
+        android:layout_above="@id/playlist_bottom_row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="25dp"
+        >
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/playlist_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/water"
+        />
+    </android.support.v7.widget.CardView>
+</RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/big_cover_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:alpha="0"
+        android:gravity="center"
+        android:background="@color/road">
+
+        <ImageView
+            android:id="@+id/big_big_cover"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="16dp"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+</RelativeLayout>
