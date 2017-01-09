@@ -34,29 +34,11 @@ public class Value {
 
     /**
      * 
-     * @param name
-     *     The name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * 
      * @return
      *     The url
      */
     public String getUrl() {
         return url;
-    }
-
-    /**
-     * 
-     * @param url
-     *     The url
-     */
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     /**
@@ -70,15 +52,6 @@ public class Value {
 
     /**
      * 
-     * @param image
-     *     The image
-     */
-    public void setImage(Image image) {
-        this.image = image;
-    }
-
-    /**
-     * 
      * @return
      *     The description
      */
@@ -88,29 +61,11 @@ public class Value {
 
     /**
      * 
-     * @param description
-     *     The description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * 
      * @return
      *     The provider
      */
     public List<Provider> getProvider() {
         return provider;
-    }
-
-    /**
-     * 
-     * @param provider
-     *     The provider
-     */
-    public void setProvider(List<Provider> provider) {
-        this.provider = provider;
     }
 
 }

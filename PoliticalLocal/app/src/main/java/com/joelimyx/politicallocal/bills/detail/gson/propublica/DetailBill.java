@@ -22,24 +22,12 @@ public class DetailBill {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getCopyright() {
         return copyright;
     }
 
-    public void setCopyright(String copyright) {
-        this.copyright = copyright;
-    }
-
     public List<Result> getResults() {
         return results;
-    }
-
-    public void setResults(List<Result> results) {
-        this.results = results;
     }
 
 }

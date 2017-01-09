@@ -23,32 +23,17 @@ public class Attributes_ {
         return orgName;
     }
 
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
 
     public String getTotal() {
         return total;
-    }
-
-    public void setTotal(String total) {
-        this.total = total;
     }
 
     public String getPacs() {
         return pacs;
     }
 
-    public void setPacs(String pacs) {
-        this.pacs = pacs;
-    }
-
     public String getIndivs() {
         return indivs;
-    }
-
-    public void setIndivs(String indivs) {
-        this.indivs = indivs;
     }
 
 }

@@ -14,8 +14,4 @@ public class History {
         return enacted;
     }
 
-    public void setEnacted(boolean enacted) {
-        this.enacted = enacted;
-    }
-
 }

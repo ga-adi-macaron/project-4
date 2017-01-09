@@ -19,13 +19,4 @@ public class Thumbnail {
         return contentUrl;
     }
 
-    /**
-     * 
-     * @param contentUrl
-     *     The contentUrl
-     */
-    public void setContentUrl(String contentUrl) {
-        this.contentUrl = contentUrl;
-    }
-
 }

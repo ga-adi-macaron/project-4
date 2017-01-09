@@ -19,13 +19,4 @@ public class Image {
         return thumbnail;
     }
 
-    /**
-     * 
-     * @param thumbnail
-     *     The thumbnail
-     */
-    public void setThumbnail(Thumbnail thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
 }

@@ -25,29 +25,11 @@ public class News {
 
     /**
      * 
-     * @param totalEstimatedMatches
-     *     The totalEstimatedMatches
-     */
-    public void setTotalEstimatedMatches(Integer totalEstimatedMatches) {
-        this.totalEstimatedMatches = totalEstimatedMatches;
-    }
-
-    /**
-     * 
      * @return
      *     The value
      */
     public List<Value> getValue() {
         return value;
-    }
-
-    /**
-     * 
-     * @param value
-     *     The value
-     */
-    public void setValue(List<Value> value) {
-        this.value = value;
     }
 
 }

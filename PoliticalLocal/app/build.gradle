@@ -19,14 +19,23 @@ repositories {
 
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'Political Local'
+            keyPassword 'plcfrogz726'
+            storeFile file('/Users/Joe/jks/keystore.jks')
+            storePassword 'plcfrogz726'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.joelimyx.politicallocal"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        multiDexEnabled true
+        versionCode 2
+        versionName "0.2 beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     android {
@@ -39,6 +48,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -51,9 +61,6 @@ dependencies {
     compile('com.twitter.sdk.android:twitter:2.3.0@aar') {
         transitive = true;
     }
-
-
-
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:recyclerview-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'

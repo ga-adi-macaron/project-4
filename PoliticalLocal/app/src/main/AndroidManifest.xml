@@ -53,6 +53,15 @@
             android:name=".search.DetailRepsResultActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".main.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".main.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.Transparent">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.joelimyx.politicallocal.main.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

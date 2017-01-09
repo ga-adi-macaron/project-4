@@ -21,24 +21,12 @@ public class Result {
         return congress;
     }
 
-    public void setCongress(String congress) {
-        this.congress = congress;
-    }
-
     public String getChamber() {
         return chamber;
     }
 
-    public void setChamber(String chamber) {
-        this.chamber = chamber;
-    }
-
     public List<Bill> getBills() {
         return bills;
-    }
-
-    public void setBills(List<Bill> bills) {
-        this.bills = bills;
     }
 
 }

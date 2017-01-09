@@ -18,16 +18,8 @@ public class Contributors {
         return attributes;
     }
 
-    public void setAttributes(Attributes attributes) {
-        this.attributes = attributes;
-    }
-
     public List<Contributor> getContributor() {
         return contributor;
-    }
-
-    public void setContributor(List<Contributor> contributor) {
-        this.contributor = contributor;
     }
 
 }

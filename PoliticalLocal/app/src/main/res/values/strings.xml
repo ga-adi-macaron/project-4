@@ -14,5 +14,6 @@
     <string name="chamber_default">house</string>
     <string name="filter_default">introduced</string>
     <string name="title_activity_result">ResultActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
 
 </resources>

@@ -14,8 +14,4 @@ public class Response {
         return contributors;
     }
 
-    public void setContributors(Contributors contributors) {
-        this.contributors = contributors;
-    }
-
 }

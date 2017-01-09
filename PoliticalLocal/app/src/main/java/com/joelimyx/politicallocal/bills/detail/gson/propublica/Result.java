@@ -52,77 +52,40 @@ public class Result {
         return congress;
     }
 
-
     public String getBill() {
         return bill;
-    }
-
-    public void setBill(String bill) {
-        this.bill = bill;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getSponsor() {
         return sponsor;
-    }
-
-    public void setSponsor(String sponsor) {
-        this.sponsor = sponsor;
     }
 
     public String getGpoPdfUri() {
         return gpoPdfUri;
     }
 
-    public void setGpoPdfUri(String gpoPdfUri) {
-        this.gpoPdfUri = gpoPdfUri;
-    }
-
     public String getIntroducedDate() {
         return introducedDate;
-    }
-
-    public void setIntroducedDate(String introducedDate) {
-        this.introducedDate = introducedDate;
     }
 
     public String getCosponsors() {
         return cosponsors;
     }
 
-    public void setCosponsors(String cosponsors) {
-        this.cosponsors = cosponsors;
-    }
-
     public String getPrimarySubject() {
         return primarySubject;
-    }
-
-    public void setPrimarySubject(String primarySubject) {
-        this.primarySubject = primarySubject;
     }
 
     public Object getHousePassageVote() {
         return housePassageVote;
     }
 
-    public void setHousePassageVote(Object housePassageVote) {
-        this.housePassageVote = housePassageVote;
-    }
-
     public Object getSenatePassageVote() {
         return senatePassageVote;
-    }
-
-    public void setSenatePassageVote(Object senatePassageVote) {
-        this.senatePassageVote = senatePassageVote;
     }
 
     public String  getLatest_major_action_date() {
@@ -135,10 +98,6 @@ public class Result {
 
     public List<Action> getActions() {
         return actions;
-    }
-
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
     }
 
 }

@@ -29,48 +29,24 @@ public class Result {
         return billType;
     }
 
-    public void setBillType(String billType) {
-        this.billType = billType;
-    }
-
     public long getNumber() {
         return number;
-    }
-
-    public void setNumber(long number) {
-        this.number = number;
     }
 
     public long getCongress() {
         return congress;
     }
 
-    public void setCongress(long congress) {
-        this.congress = congress;
-    }
-
     public String getLastActionAt() {
         return lastActionAt;
-    }
-
-    public void setLastActionAt(String lastActionAt) {
-        this.lastActionAt = lastActionAt;
     }
 
     public String getOfficialTitle() {
         return officialTitle;
     }
 
-    public void setOfficialTitle(String officialTitle) {
-        this.officialTitle = officialTitle;
-    }
-
     public History getHistory() {
         return history;
-    }
-
-    public void setHistory(History history) {
-        this.history = history;
     }
 
 }

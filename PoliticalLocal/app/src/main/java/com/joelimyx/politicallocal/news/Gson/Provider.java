@@ -24,29 +24,11 @@ public class Provider {
 
     /**
      * 
-     * @param type
-     *     The _type
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     * 
      * @return
      *     The name
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * 
-     * @param name
-     *     The name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
 }

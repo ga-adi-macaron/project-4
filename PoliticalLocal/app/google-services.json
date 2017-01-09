@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "974984474077-dcqlnbkjni2tjjrai1ff72eema2983qi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joelimyx.politicallocal",
+            "certificate_hash": "9AF5432D0D793E4D29678EAD6A09BC5A0D22422B"
+          }
+        },
+        {
           "client_id": "974984474077-k9ht6hkdqv27rd4mjr083dj967d6rmq4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

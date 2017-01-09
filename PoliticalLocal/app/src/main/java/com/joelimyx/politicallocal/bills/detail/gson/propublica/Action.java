@@ -22,16 +22,8 @@ public class Action {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
 }

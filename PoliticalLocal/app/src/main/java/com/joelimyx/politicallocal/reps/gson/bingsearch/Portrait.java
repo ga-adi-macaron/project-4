@@ -15,8 +15,4 @@ public class Portrait {
         return value;
     }
 
-    public void setValue(List<Value> value) {
-        this.value = value;
-    }
-
 }

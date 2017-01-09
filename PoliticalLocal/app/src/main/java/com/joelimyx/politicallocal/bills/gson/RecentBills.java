@@ -15,8 +15,4 @@ public class RecentBills {
         return results;
     }
 
-    public void setResults(List<Result> results) {
-        this.results = results;
-    }
-
 }

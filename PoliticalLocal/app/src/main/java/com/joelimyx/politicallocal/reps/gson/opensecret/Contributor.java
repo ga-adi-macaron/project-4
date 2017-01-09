@@ -14,8 +14,4 @@ public class Contributor {
         return attributes;
     }
 
-    public void setAttributes(Attributes_ attributes) {
-        this.attributes = attributes;
-    }
-
 }

@@ -193,6 +193,15 @@ public class MainActivity extends AppCompatActivity
             mBottomNavigationView.setVisibility(View.VISIBLE);
         });
 
+        mSearchView.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()){
+                case R.id.about:
+                    Intent intent = new Intent(this, AboutActivity.class);
+                    startActivity(intent);
+                    break;
+            }
+        });
+
         /*---------------------------------------------------------------------------------
         // Bottom Nav Bar
         ---------------------------------------------------------------------------------*/
