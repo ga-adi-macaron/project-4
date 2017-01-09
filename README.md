@@ -28,7 +28,14 @@
 
 
 #Technologies
-##---
+
+- Google Maps API
+- Firebase Database
+- Firebase Storage
+- Firebase Auth
+- Geofire
+- Mediaplayer
+- Mediarecorder
 
 <p align="center">
   <img src="PeoplesPlaylist/ss1.png" height="300px" /> 
