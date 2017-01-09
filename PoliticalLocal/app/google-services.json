@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "974984474077",
+    "firebase_url": "https://political-local.firebaseio.com",
+    "project_id": "political-local",
+    "storage_bucket": "political-local.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:974984474077:android:0d8082e31f9615a1",
+        "android_client_info": {
+          "package_name": "com.joelimyx.politicallocal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "974984474077-dcqlnbkjni2tjjrai1ff72eema2983qi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joelimyx.politicallocal",
+            "certificate_hash": "9AF5432D0D793E4D29678EAD6A09BC5A0D22422B"
+          }
+        },
+        {
+          "client_id": "974984474077-k9ht6hkdqv27rd4mjr083dj967d6rmq4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joelimyx.politicallocal",
+            "certificate_hash": "739B9A8A06220DDBA24C21FE3583A174210F3B30"
+          }
+        },
+        {
+          "client_id": "974984474077-gghf76e42uhtv6rc89nia6cdg54m932k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTJRq22g4gKGCo3SqzUu7X-VJ8hO0WRMA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "974984474077-gghf76e42uhtv6rc89nia6cdg54m932k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

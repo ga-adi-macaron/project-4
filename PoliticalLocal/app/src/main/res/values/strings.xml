@@ -1,0 +1,19 @@
+<resources>
+
+    <string name="district_file">district_file</string>
+    <string name="state">state</string>
+    <string name="district">district</string>
+    <string name="contact_information">Contact / Information:</string>
+    <string name="is_first">is first</string>
+    <string name="app_name">Political Local</string>
+    <string name="bill_fragment">bill</string>
+
+    <string name="bill_filter">bill filter</string>
+    <string name="chamber">chamber</string>
+    <string name="filter">filter</string>
+    <string name="chamber_default">house</string>
+    <string name="filter_default">introduced</string>
+    <string name="title_activity_result">ResultActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
+
+</resources>
