@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.lieblich.jon.playme">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/playme_ic"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.lieblich.jon.playme.BaseLoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.lieblich.jon.playme.main_menu.MainMenuView"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name="com.lieblich.jon.playme.event_detail_components.EventDetailActivity"
+            android:label="@string/title_activity_event_detail"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.find_players_components.EventMessageActivity">
+        </activity>
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.VideoGameEventsActivity">
+        </activity>
+        <activity android:name="com.lieblich.jon.playme.event_detail_components.message_components.ChatGroupActivity">
+        </activity>
+    </application>
+
+</manifest>

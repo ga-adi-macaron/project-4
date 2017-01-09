@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <Button
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:text="PC"
+        android:background="@drawable/button_shape"
+        android:id="@+id/pc_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:visibility="gone"
+        android:text="Xbox"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/button_shape"
+        android:id="@+id/xbox_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Nintendo"
+        android:background="@drawable/button_shape"
+        android:id="@+id/nintendo_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:visibility="gone"
+        android:layout_marginTop="8dp"
+        android:text="Playstation"
+        android:background="@drawable/button_shape"
+        android:id="@+id/playstation_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

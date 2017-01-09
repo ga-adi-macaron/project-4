@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.lieblich.jon.playme.main_menu.MainMenuView">
+
+    <item
+        android:id="@+id/action_signout"
+        android:orderInCategory="0"
+        android:title="Sign Out"
+        app:showAsAction="never"/>
+</menu>

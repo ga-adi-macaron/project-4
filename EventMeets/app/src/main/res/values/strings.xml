@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Play Me</string>
+    <string name="login">Log me in</string>
+    <string name="login_prompt">Username/Email</string>
+    <string name="user">Username</string>
+    <string name="password">Password</string>
+    <string name="password_confirm">Confirm Password</string>
+    <string name="create_account">Create New Account</string>
+    <string name="recommendation_header"><b>Your Current Chats</b></string>
+    <string name="browse">Browse all categories</string>
+    <string name="title_activity_event_detail">EventDetailActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="igdb_credit">Search powered by <a href="https://www.igdb.com/">Internet Game Database</a></string>
+</resources>
