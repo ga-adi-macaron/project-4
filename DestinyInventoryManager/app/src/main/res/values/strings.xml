@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">The Vault</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_char1_inv"></string>
+    <string name="title_activity_vault">VaultActivity</string>
+    <string name="settings_selection">Settings</string>
+    <string name="grind_detail">Periodically checks your inventory for engrams and automatically transfers them to vault;
+        so that you always have space for new items.
+        \nLasts until cancelled.</string>
+</resources>
