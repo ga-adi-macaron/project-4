@@ -1,6 +1,16 @@
 # <img src="assets/ic_launcher.png" width=100> Political Local
 
 ## Overview
+This is an app that heavily focus on the current political scene in DC so that the average American citizens can get the most up to date information. This app is heavily focused on Material Design to provide the cleanest user experience.
+
+## Prototype
+<p align="center">
+  <img src="prototype/pro1.jpg" width=200>
+  <img src="prototype/pro2.jpg" width=200>
+  <img src="prototype/pro3.jpg" width=200>
+  <img src="prototype/pro4.jpg" width=200>
+  <img src="prototype/pro5.jpg" width=200>
+</p>
 
 
 ## Features
