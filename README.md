@@ -3,6 +3,8 @@
 ## Overview
 This is an app that heavily focus on the current political scene in DC so that the average American citizens can get the most up to date information. This app is heavily focused on Material Design to provide the cleanest user experience.
 
+<a href="https://play.google.com/apps/testing/com.joelimyx.politicallocal"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height=100></a>
+
 ## Prototype
 <p align="center">
   <img src="prototype/pro1.jpg" width=200>
