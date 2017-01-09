@@ -1,6 +1,7 @@
 package com.lieblich.jon.playme.event_detail_components.message_components;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -36,12 +37,16 @@ public class ChatGroupActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     private ChildEventListener mListener;
     private List<SelfMessageObject> mContent;
-    private String mChatTitle;
+    private String mChatTitle, mSenderName;
+    private static final String TYPE = "message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_group);
+
+        SharedPreferences pref = getSharedPreferences("account", MODE_PRIVATE);
+        mSenderName = pref.getString("firstName", "ERROR");
 
         Intent intent = getIntent();
         String chatKey = intent.getStringExtra("chatKey");
@@ -56,7 +61,7 @@ public class ChatGroupActivity extends AppCompatActivity {
         mGroup = new MessageGroup();
         mContent = new ArrayList<>();
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mAdapter = new MessageRecyclerAdapter(mContent);
+        mAdapter = new MessageRecyclerAdapter(mContent, mSenderName);
         mMessageRecycler.setAdapter(mAdapter);
 
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -93,7 +98,7 @@ public class ChatGroupActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             String message = mMessageText.getText().toString();
-                            SelfMessageObject sending = new SelfMessageObject(message);
+                            SelfMessageObject sending = new SelfMessageObject(message, mSenderName, TYPE);
                             mReference.child("messages").push().setValue(sending);
                             mMessageText.setText("");
                         }

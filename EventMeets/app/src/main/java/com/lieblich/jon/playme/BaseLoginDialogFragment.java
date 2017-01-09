@@ -1,6 +1,7 @@
 package com.lieblich.jon.playme;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,9 +27,11 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
     private BaseLoginContract.Presenter mPresenter;
     private Dialog mDialog;
     private View mLayout;
+    private String mName;
 
-    public void setPresenter(BaseLoginContract.Presenter presenter) {
+    public void setPresenter(BaseLoginContract.Presenter presenter, String name) {
         mPresenter = presenter;
+        mName = name;
     }
 
     public BaseLoginDialogFragment(){}
@@ -80,7 +83,7 @@ public class BaseLoginDialogFragment extends DialogFragment implements View.OnCl
         switch(id) {
             case R.id.login_prompt_button:
                 mDialog.setContentView(R.layout.logging_in_progress);
-                mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString());
+                mPresenter.checkLoginDetails(mAccountName.getText().toString(),mPassword.getText().toString(),mName);
                 break;
             case R.id.create_account_btn:
                 mHiddenConfirmPassword.setVisibility(View.VISIBLE);

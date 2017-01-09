@@ -9,11 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.lieblich.jon.playme.main_menu.MainMenuView;
 
 public class BaseLoginActivity extends AppCompatActivity implements BaseLoginContract.View, View.OnClickListener{
     private BaseLoginContract.Presenter mPresenter;
     private BaseLoginDialogFragment mFragment;
+    private String mName;
 
     @Override
     protected void onStart() {
@@ -43,7 +45,7 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     public void displayLoginDialog() {
         FragmentManager manager = getSupportFragmentManager();
         mFragment = new BaseLoginDialogFragment();
-        mFragment.setPresenter(mPresenter);
+        mFragment.setPresenter(mPresenter, mName);
 
         manager.beginTransaction()
                 .add(mFragment, "login")
@@ -77,9 +79,11 @@ public class BaseLoginActivity extends AppCompatActivity implements BaseLoginCon
     }
 
     @Override
-    public void addAccountInfoToSharedPreferences(String username, String password) {
+    public void addAccountInfoToSharedPreferences(String username, String password, String name) {
+        mName = name;
         SharedPreferences preferences = getSharedPreferences("account", MODE_PRIVATE);
-        preferences.edit().putString("username", username).putString("password", password).apply();
+        preferences.edit().putString("username", username)
+                .putString("password", password).putString("firstName", mName).apply();
     }
 
     @Override

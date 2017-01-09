@@ -32,10 +32,6 @@ class Presenter implements VideoGameSearchContract.Presenter {
     private static final String TYPE_HEADER = "Accept";
     private static final String TYPE = "application/json";
 
-//    private static final String BASE_URL = "http://www.giantbomb.com/api/search?";
-//    private static final String KEY = "&api_key=76850e49a2af9255d3cbb9caec66d702dfac1521";
-//    private static final String PARAMS = "&resources=game&field_list=name,id,platforms,image&format=json&query=";
-
     Presenter(VideoGameSearchContract.View view) {
         mView = view;
         mGameList = new ArrayList<>();

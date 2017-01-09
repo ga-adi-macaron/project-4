@@ -17,7 +17,7 @@ public interface BaseLoginContract {
 
         void checkSharedPreferences();
 
-        void addAccountInfoToSharedPreferences(String username, String password);
+        void addAccountInfoToSharedPreferences(String username, String password, String firstName);
 
         void sendLoginErrorToFragment(String error);
     }
@@ -27,7 +27,7 @@ public interface BaseLoginContract {
 
         void notifyLoginSuccess(boolean wasSuccessful);
 
-        void checkLoginDetails(String username, String password);
+        void checkLoginDetails(String username, String password, String name);
 
         void onUserReturn(String username, String password);
 

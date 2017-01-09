@@ -3,6 +3,9 @@ package com.lieblich.jon.playme;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.lieblich.jon.playme.model.RegularPlayer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -56,8 +59,31 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     }
 
     @Override
-    public void checkLoginDetails(final String username, final String password) {
-        if(username != null&&username.length() > 0&&password != null&&password.length() > 0) {
+    public void checkLoginDetails(final String username, final String password, final String name) {
+        if(username != null&&username.length() > 0&&password != null&&password.length() > 0&&(name == null||name.equals("ERROR"))) {
+            FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    final String firstName = dataSnapshot.getValue(RegularPlayer.class).getFirstName();
+                    mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(!task.isSuccessful()) {
+                                mView.sendLoginErrorToFragment("invalid");
+                            } else {
+                                mView.addAccountInfoToSharedPreferences(username,password,firstName);
+                                notifyLoginSuccess(true);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } else if(username != null&&username.length() > 0&&password != null&&password.length() > 0) {
             mAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(
                     new OnCompleteListener<AuthResult>() {
                         @Override
@@ -65,7 +91,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
                             if (!task.isSuccessful()) {
                                 mView.sendLoginErrorToFragment("invalid");
                             } else {
-                                mView.addAccountInfoToSharedPreferences(username,password);
+                                mView.addAccountInfoToSharedPreferences(username,password,name);
                                 notifyLoginSuccess(true);
                             }
                         }
@@ -78,6 +104,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     @Override
     public void onUserReturn(String username, String password) {
         if(username != null && password != null) {
+
             mAuth.signInWithEmailAndPassword(username, password);
             notifyLoginSuccess(true);
         }
@@ -86,7 +113,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
     @Override
     public void onNewAccountRequested(String username, String password, String confirmPassword, String firstName, String lastName) {
 
-        if(username.length() > 0&&password.length() > 0&&firstName.length() > 0&&lastName.length() > 0) {
+        if(username.length() > 0&&password.length() >= 6&&firstName.length() > 0&&lastName.length() > 0) {
             if (password.equals(confirmPassword)) {
                 requestAccount(username, password, firstName, lastName);
             } else {
@@ -114,7 +141,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
         ref.child(userKey).setValue(player);
     }
 
-    private void requestAccount(final String username, final String password, String first, String last) {
+    private void requestAccount(final String username, final String password, final String first, String last) {
         mFirst = first;
         mLast = last;
         mAuth.createUserWithEmailAndPassword(username, password).addOnCompleteListener(
@@ -127,7 +154,7 @@ public class BaseLoginPresenter implements BaseLoginContract.Presenter {
                             mView.notifyFragmentSuccess();
                             String userKey = mAuth.getCurrentUser().getUid();
                             addUserToDatabase(userKey, mFirst, mLast);
-                            mView.addAccountInfoToSharedPreferences(username, password);
+                            mView.addAccountInfoToSharedPreferences(username, password, first);
                         }
                     }
                 });

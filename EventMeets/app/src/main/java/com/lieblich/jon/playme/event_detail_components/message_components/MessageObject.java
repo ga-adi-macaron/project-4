@@ -9,10 +9,6 @@ public class MessageObject extends SelfMessageObject {
     private String sender;
     private String type;
 
-    public MessageObject(String content){
-        super(content);
-    }
-
     public MessageObject() {}
 
     public MessageObject(String content, String sender) {
