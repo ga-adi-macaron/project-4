@@ -80,7 +80,7 @@ class AvailablePlayerRecycler extends RecyclerView.Adapter<AvailablePlayerViewHo
             holder.mDisplayName.setText("(YOU)");
             holder.mIcon.setVisibility(View.GONE);
             mPlayers.add(new AvailablePlayer("you", "you"));
-            holder.mLayout.setBackgroundColor(Color.BLUE);
+            holder.mLayout.setBackgroundColor(Color.GREEN);
         }
     }
 
