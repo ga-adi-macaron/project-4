@@ -19,5 +19,5 @@ Success Planner allows users to add and keep tract of their goals, affirmations 
 <p align="center">
   <img src="screenshots/Screenshot_1483917013.png" height="300px" />
   <img src="screenshots/Screenshot_1483917031.png" height="300px" />
-  <img src="screenshotsScreenshot_1483917059.png" height="300px" />
+  <img src="screenshots/Screenshot_1483917059.png" height="300px" />
 </p>
