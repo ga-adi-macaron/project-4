@@ -1,4 +1,4 @@
-##Resarch Plan##
+##Research Plan##
 
 **Multiplayer Sudoku Research**
 
