@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "667951060873",
+    "firebase_url": "https://sudokuapp-cba79.firebaseio.com",
+    "project_id": "sudokuapp-cba79",
+    "storage_bucket": "sudokuapp-cba79.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667951060873:android:336820e2efca9216",
+        "android_client_info": {
+          "package_name": "com.scottlindley.suyouthinkyoucandoku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667951060873-itqcd79fk716eoa799mim2crpo8q3m33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.scottlindley.suyouthinkyoucandoku",
+            "certificate_hash": "99921907E3B2C61924E0A1EF6D4555B586404FDE"
+          }
+        },
+        {
+          "client_id": "667951060873-ggd0bf577d5lb2svg65cir5j68rv16d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLJSPobwpvlLUUBAxZQeBMlHA839pLfXg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667951060873-ggd0bf577d5lb2svg65cir5j68rv16d3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

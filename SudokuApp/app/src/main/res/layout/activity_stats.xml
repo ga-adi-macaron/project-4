@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_stats"
+    android:orientation="vertical"
+    android:layout_centerInParent="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:transitionName="@string/background_transition"
+    android:background="#4b4b4b"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.scottlindley.suyouthinkyoucandoku.StatsActivity">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/stats_card"
+        android:transitionName="@string/transition4"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:cardCornerRadius="15dp"
+        android:layout_margin="24dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/colorPrimary">
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_margin="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/high_score"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="High Score: "
+            android:gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#eee"/>
+        <TextView
+            android:id="@+id/best_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="High Score: "
+            android:gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#eee"/>
+        <TextView
+            android:id="@+id/races_won"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="High Score: "
+            android:gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#eee"/>
+        <TextView
+            android:id="@+id/races_lost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="High Score: "
+            android:gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#eee"/>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:transitionName="@string/transition1"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition2"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardCornerRadius="15dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:transitionName="@string/transition3"/>
+
+</RelativeLayout>
